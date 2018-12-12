@@ -39,7 +39,8 @@ see the file [3rd-party-licenses.txt](3rd-party-licenses.txt).
 Please notice the following issues/limitations:
 
 * Currently, this package depends on [rcl_interfaces pull request 51](https://github.com/ros2/rcl_interfaces/pull/51) and [rclcpp pull request 584](https://github.com/ros2/rclcpp/pull/584).
+* Currently, (sub-)systems managed by the mode manager are not recognized by the `ros2 lifecycle` tool (*"Node not found"*). So to trigger lifecycle transitions in (sub-)systems, you have to go with the `ros2 service call` tool. Check the [system_modes_examples](./system_modes_examples/) documentation for example calls.
 
-##Acknowledgments
+## Acknowledgments
 
 This activity has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme (grant agreement n° 780785).

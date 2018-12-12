@@ -1,0 +1,54 @@
+# config/test
+---
+
+system:
+  ros__parameters:
+    type: system
+    parts:
+      testPart
+      testPart2
+    modes:
+      __DEFAULT__:
+        testPart: INACTIVE
+        testPart2: ACTIVE
+      AA:
+        testPart: ACTIVE.WEAK
+        testPart2: ACTIVE.SLOW
+      BB:
+        testPart: ACTIVE.STRONG
+        testPart2: ACTIVE.FAST
+
+testPart:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: WARN
+      FOO:
+        ros__parameters:
+          foo: 0.1
+          bar: DBG
+      BAR:
+        ros__parameters:
+          foo: 0.2
+          bar: ERR
+
+testPart2:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: WARN
+      AAA:
+        ros__parameters:
+          foo: 0.2
+          bar: DBG
+      BBB:
+        ros__parameters:
+          foo: 0.9
+          bar: ERR
+

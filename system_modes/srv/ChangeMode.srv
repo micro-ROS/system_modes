@@ -1,0 +1,4 @@
+string node_name
+string mode_name
+---
+bool success

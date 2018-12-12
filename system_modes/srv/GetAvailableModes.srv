@@ -1,0 +1,3 @@
+string node_name
+---
+string[] available_modes

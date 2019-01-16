@@ -64,32 +64,36 @@ public:
   Manipulator(const Manipulator &) = delete;
   ~Manipulator() = default;
 
-  rcl_lifecycle_transition_key_t on_configure(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_configure(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_configure()", this->get_name());
 
-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   };
 
-  rcl_lifecycle_transition_key_t on_activate(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_activate(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_activate()", this->get_name());
 
-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   };
 
-  rcl_lifecycle_transition_key_t on_deactivate(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_deactivate(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_deactivate()", this->get_name());
 
-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   };
 
-  rcl_lifecycle_transition_key_t on_cleanup(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_cleanup(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_cleanup()", this->get_name());
 
-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   };
 };
 

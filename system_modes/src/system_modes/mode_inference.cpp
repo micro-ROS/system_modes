@@ -449,8 +449,7 @@ ModeInference::read_modes_from_model(const string & model_path)
 
   rcl_params_t * yaml_params = rcl_yaml_node_struct_init(rcl_get_default_allocator());
   if (!rcl_parse_yaml_file(model_path.c_str(), yaml_params)) {
-    throw std::runtime_error("Failed to parse parameters " + model_path + ": " +
-            rcl_get_error_string());
+    throw std::runtime_error("Failed to parse parameters " + model_path);
   }
 
   rclcpp::ParameterMap param_map = rclcpp::parameter_map_from(yaml_params);

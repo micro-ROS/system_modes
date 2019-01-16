@@ -27,6 +27,7 @@
 #include <utility>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 #include "system_modes/msg/mode_event.hpp"
 
@@ -34,9 +35,14 @@ using std::string;
 using std::out_of_range;
 using std::chrono::seconds;
 
+using std::placeholders::_1;
+using std::placeholders::_2;
+using std::placeholders::_3;
+
 using lifecycle_msgs::msg::State;
 using lifecycle_msgs::msg::Transition;
 using lifecycle_msgs::msg::TransitionEvent;
+using lifecycle_msgs::srv::GetState;
 using lifecycle_msgs::srv::ChangeState;
 using lifecycle_msgs::srv::GetAvailableStates;
 
@@ -95,47 +101,45 @@ ModeManager::add_system(const std::string & system)
 
   // Lifecycle services
   service_name = system + "/change_state";
+  std::function<void(const std::shared_ptr<rmw_request_id_t>,
+    const std::shared_ptr<ChangeState::Request>,
+    std::shared_ptr<ChangeState::Response>)> state_change_callback =
+    std::bind(&ModeManager::on_change_state, this, system, _2, _3);
   this->state_change_srv_[system] = this->create_service<ChangeState>(
-    service_name, std::bind(
-      &ModeManager::callback_change_state, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name,
+    state_change_callback);
 
   service_name = system + "/get_state";
-  this->get_state_srv_[system] =
-    this->create_service<lifecycle_msgs::srv::GetState>(service_name,
-      std::bind(&ModeManager::callback_get_state, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+  std::function<void(const std::shared_ptr<rmw_request_id_t>,
+    const std::shared_ptr<GetState::Request>,
+    std::shared_ptr<GetState::Response>)> state_get_callback =
+    std::bind(&ModeManager::on_get_state, this, system, _3);
+  this->get_state_srv_[system] = this->create_service<GetState>(
+    service_name,
+    state_get_callback);
 
   service_name = system + "/get_available_states";
+  std::function<void(const std::shared_ptr<rmw_request_id_t>,
+    const std::shared_ptr<GetAvailableStates::Request>,
+    std::shared_ptr<GetAvailableStates::Response>)> state_avail_callback =
+    std::bind(&ModeManager::on_get_available_states, this, system, _3);
   this->states_srv_[system] = this->create_service<GetAvailableStates>(
-    service_name, std::bind(
-      &ModeManager::callback_get_available_states, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name,
+    state_avail_callback);
 
   // Mode services
   service_name = system + "/change_mode";
   this->mode_change_srv_[system] = this->create_service<ChangeMode>(
-    service_name, std::bind(
-      &ModeManager::callback_change_mode, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name, std::bind(&ModeManager::on_change_mode, this, _1, _2, _3));
 
   service_name = system + "/get_mode";
   this->get_mode_srv_[system] =
     this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::callback_get_mode, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = system + "/get_available_modes";
   this->modes_srv_[system] = this->create_service<GetAvailableModes>(
-    service_name, std::bind(
-      &ModeManager::callback_get_available_modes, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name, std::bind(&ModeManager::on_get_available_modes, this, _1, _2, _3));
 
   // Lifecycle change clients
   service_name = system + "/change_state";
@@ -162,24 +166,16 @@ ModeManager::add_node(const std::string & node)
   // Mode services
   service_name = node + "/change_mode";
   this->mode_change_srv_[node] = this->create_service<ChangeMode>(
-    service_name, std::bind(
-      &ModeManager::callback_change_mode, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name, std::bind(&ModeManager::on_change_mode, this, _1, _2, _3));
 
   service_name = node + "/get_mode";
   this->get_mode_srv_[node] =
     this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::callback_get_mode, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = node + "/get_available_modes";
   this->modes_srv_[node] = this->create_service<GetAvailableModes>(
-    service_name, std::bind(
-      &ModeManager::callback_get_available_modes, this,
-      std::placeholders::_1, std::placeholders::_2,
-      std::placeholders::_3));
+    service_name, std::bind(&ModeManager::on_get_available_modes, this, _1, _2, _3));
 
   // Lifecycle change clients
   service_name = node + "/change_state";
@@ -204,34 +200,31 @@ ModeManager::add_node(const std::string & node)
 }
 
 void
-ModeManager::callback_change_state(
-  const std::shared_ptr<rmw_request_id_t>,
-  const std::shared_ptr<ChangeState::Request> request,
-  std::shared_ptr<ChangeState::Response> response)
+ModeManager::on_change_state(
+    const std::string & system,
+    const std::shared_ptr<ChangeState::Request> request,
+    std::shared_ptr<ChangeState::Response> response)
 {
   RCLCPP_INFO(
     this->get_logger(),
     "-> request for transition of %s: %s",
-    request->node_name.c_str(),
+    system.c_str(),
     request->transition.label.c_str());
 
   // We can't wait for the state/mode transitions
-  response->success = this->change_state(
-    request->node_name,
-    request->transition.id);
+  response->success = this->change_state(system, request->transition.id);
 }
 
 void
-ModeManager::callback_get_state(
-  const std::shared_ptr<rmw_request_id_t>,
-  const std::shared_ptr<lifecycle_msgs::srv::GetState::Request> request,
-  std::shared_ptr<lifecycle_msgs::srv::GetState::Response> response)
+ModeManager::on_get_state(
+  const std::string & system,
+  std::shared_ptr<GetState::Response> response)
 {
   // TODO(anordman): to be on the safe side, don't use the node name from
   //       the request, but bind it to the callback instead
-  RCLCPP_INFO(this->get_logger(), "-> callback get_state of %s", request->node_name.c_str());
+  RCLCPP_INFO(this->get_logger(), "-> callback get_state of %s", system.c_str());
   try {
-    auto stateAndMode = this->mode_inference_->infer(request->node_name);
+    auto stateAndMode = this->mode_inference_->infer(system);
     if (stateAndMode.first == 0) {
       response->current_state.id = State::PRIMARY_STATE_UNCONFIGURED;
       response->current_state.label = "unconfigured";
@@ -251,9 +244,8 @@ ModeManager::callback_get_state(
 }
 
 void
-ModeManager::callback_get_available_states(
-  const std::shared_ptr<rmw_request_id_t>,
-  const std::shared_ptr<GetAvailableStates::Request> request,
+ModeManager::on_get_available_states(
+  const std::string & system,
   std::shared_ptr<GetAvailableStates::Response> response)
 {
   // TODO(anordman): to be on the safe side, don't use the node name from
@@ -261,7 +253,7 @@ ModeManager::callback_get_available_states(
   RCLCPP_INFO(
     this->get_logger(),
     "-> callback get_available_states of %s",
-    request->node_name.c_str());
+    system.c_str());
 
   // TODO(anordman): Don't hard-code: Which are the available states for systems, though?
   State inactive;
@@ -275,7 +267,7 @@ ModeManager::callback_get_available_states(
 }
 
 void
-ModeManager::callback_change_mode(
+ModeManager::on_change_mode(
   const std::shared_ptr<rmw_request_id_t>,
   const std::shared_ptr<ChangeMode::Request> request,
   std::shared_ptr<ChangeMode::Response> response)
@@ -291,7 +283,7 @@ ModeManager::callback_change_mode(
 }
 
 void
-ModeManager::callback_get_mode(
+ModeManager::on_get_mode(
   const std::shared_ptr<rmw_request_id_t>,
   const std::shared_ptr<system_modes::srv::GetMode::Request> request,
   std::shared_ptr<system_modes::srv::GetMode::Response> response)
@@ -309,7 +301,7 @@ ModeManager::callback_get_mode(
 }
 
 void
-ModeManager::callback_get_available_modes(
+ModeManager::on_get_available_modes(
   const std::shared_ptr<rmw_request_id_t>,
   const std::shared_ptr<GetAvailableModes::Request> request,
   std::shared_ptr<GetAvailableModes::Response> response)
@@ -444,7 +436,6 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
 
   // Request
   auto request = std::make_shared<ChangeState::Request>();
-  request->node_name = node;
   request->transition.id = transition;
   request->transition.label = transition_label_(transition);
 

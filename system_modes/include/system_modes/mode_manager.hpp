@@ -52,29 +52,27 @@ protected:
   virtual void add_node(const std::string &);
 
   // Lifecycle service callbacks
-  virtual void callback_change_state(
-    const std::shared_ptr<rmw_request_id_t>,
+  virtual void on_change_state(
+    const std::string &,
     const std::shared_ptr<lifecycle_msgs::srv::ChangeState::Request>,
     std::shared_ptr<lifecycle_msgs::srv::ChangeState::Response>);
-  virtual void callback_get_state(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<lifecycle_msgs::srv::GetState::Request>,
+  virtual void on_get_state(
+    const std::string &,
     std::shared_ptr<lifecycle_msgs::srv::GetState::Response>);
-  virtual void callback_get_available_states(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<lifecycle_msgs::srv::GetAvailableStates::Request>,
+  virtual void on_get_available_states(
+    const std::string &,
     std::shared_ptr<lifecycle_msgs::srv::GetAvailableStates::Response>);
 
   // Mode service callbacks
-  virtual void callback_change_mode(
+  virtual void on_change_mode(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<system_modes::srv::ChangeMode::Request>,
     std::shared_ptr<system_modes::srv::ChangeMode::Response>);
-  virtual void callback_get_mode(
+  virtual void on_get_mode(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<system_modes::srv::GetMode::Request>,
     std::shared_ptr<system_modes::srv::GetMode::Response>);
-  virtual void callback_get_available_modes(
+  virtual void on_get_available_modes(
     const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<system_modes::srv::GetAvailableModes::Request>,
     std::shared_ptr<system_modes::srv::GetAvailableModes::Response>);

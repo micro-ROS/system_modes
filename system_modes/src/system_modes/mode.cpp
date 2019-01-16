@@ -199,7 +199,8 @@ static const std::map<unsigned int, string> TRANSITIONS_ = {
   {Transition::TRANSITION_CLEANUP, "cleanup"},
   {Transition::TRANSITION_ACTIVATE, "activate"},
   {Transition::TRANSITION_DEACTIVATE, "deactivate"},
-  {Transition::TRANSITION_SHUTDOWN, "shutdown"},
+  {Transition::TRANSITION_INACTIVE_SHUTDOWN, "inactive_shutdown"},
+  {Transition::TRANSITION_ACTIVE_SHUTDOWN, "active_shutdown"},
   {Transition::TRANSITION_DESTROY, "destroy"}
 };
 
@@ -209,7 +210,8 @@ static const std::map<unsigned int, unsigned int> GOAL_STATES_ = {
   {Transition::TRANSITION_CLEANUP, State::PRIMARY_STATE_UNCONFIGURED},
   {Transition::TRANSITION_ACTIVATE, State::PRIMARY_STATE_ACTIVE},
   {Transition::TRANSITION_DEACTIVATE, State::PRIMARY_STATE_INACTIVE},
-  {Transition::TRANSITION_SHUTDOWN, State::PRIMARY_STATE_FINALIZED}
+  {Transition::TRANSITION_INACTIVE_SHUTDOWN, State::PRIMARY_STATE_FINALIZED},
+  {Transition::TRANSITION_ACTIVE_SHUTDOWN, State::PRIMARY_STATE_FINALIZED}
 };
 
 const std::string

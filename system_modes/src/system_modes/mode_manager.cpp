@@ -195,9 +195,9 @@ ModeManager::add_node(const std::string & node)
 
 void
 ModeManager::on_change_state(
-    const std::string & system,
-    const std::shared_ptr<ChangeState::Request> request,
-    std::shared_ptr<ChangeState::Response> response)
+  const std::string & system,
+  const std::shared_ptr<ChangeState::Request> request,
+  std::shared_ptr<ChangeState::Response> response)
 {
   RCLCPP_INFO(
     this->get_logger(),
@@ -398,16 +398,13 @@ ModeManager::change_mode(
   auto nodes = this->mode_inference_->get_nodes();
   if (std::find(nodes.begin(), nodes.end(), node_name) != nodes.end()) {
     // if node, change parameters accordingly
-    std::cout << node_name << " is node" << std::endl;
     this->change_part_mode(node_name, mode_name);
     return true;
   }
-  
-  auto systems = this->mode_inference_->get_systems();
-  if (std::find(systems.begin(), systems.end(), node_name) != systems.end()) { {}
-    // if system, change parts accordingly
-    std::cout << node_name <<" is system" << std::endl;
 
+  auto systems = this->mode_inference_->get_systems();
+  if (std::find(systems.begin(), systems.end(), node_name) != systems.end()) {
+    // if system, change parts accordingly
     for (auto part : new_mode->get_parts()) {
       auto stateAndMode = new_mode->get_part_mode(part);
 
@@ -427,7 +424,7 @@ ModeManager::change_mode(
 
     return true;
   }
-  
+
   return false;
 }
 

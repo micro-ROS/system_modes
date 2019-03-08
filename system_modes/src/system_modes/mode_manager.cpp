@@ -61,17 +61,9 @@ ModeManager::ModeManager(const string & model_path)
   state_change_clients_(), mode_change_clients_(),
   state_request_pub_(), mode_request_pub_()
 {
-  // Register servers, service client, publishers, and subscribers
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);
-  }
-  for (auto node : this->mode_inference_->get_nodes()) {
-    this->add_node(node);
-  }
 
-  // print info
-  RCLCPP_INFO(get_logger(), "System Mode Manager, providing the following services:");
-  for (auto system : this->mode_inference_->get_systems()) {
     RCLCPP_INFO(get_logger(), "- system '%s'", system.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/change_state", system.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/get_state", system.c_str());
@@ -81,6 +73,8 @@ ModeManager::ModeManager(const string & model_path)
     RCLCPP_INFO(get_logger(), "  - %s/get_available_modes", system.c_str());
   }
   for (auto node : this->mode_inference_->get_nodes()) {
+    this->add_node(node);
+
     RCLCPP_INFO(get_logger(), "- node '%s'", node.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/change_mode", node.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/get_mode", node.c_str());
@@ -401,28 +395,40 @@ ModeManager::change_mode(
     node_name,
     std::make_pair(State::PRIMARY_STATE_ACTIVE, mode_name.c_str()));
 
-  // if system, change parts accordingly
-  for (auto part : new_mode->get_parts()) {
-    auto stateAndMode = new_mode->get_part_mode(part);
+  auto nodes = this->mode_inference_->get_nodes();
+  if (std::find(nodes.begin(), nodes.end(), node_name) != nodes.end()) {
+    // if node, change parameters accordingly
+    std::cout << node_name << " is node" << std::endl;
+    this->change_part_mode(node_name, mode_name);
+    return true;
+  }
+  
+  auto systems = this->mode_inference_->get_systems();
+  if (std::find(systems.begin(), systems.end(), node_name) != systems.end()) { {}
+    // if system, change parts accordingly
+    std::cout << node_name <<" is system" << std::endl;
 
-    if (stateAndMode.first != State::PRIMARY_STATE_ACTIVE) {
-      this->change_part_state(part, Transition::TRANSITION_DEACTIVATE);
-    } else {
-      // TODO(anordman): This is not always correct. Find the correct
-      // state/transition and mode via mode inference
-      this->change_part_state(part, Transition::TRANSITION_ACTIVATE);
-      if (stateAndMode.second.empty()) {
-        this->change_part_mode(part, DEFAULT_MODE);
+    for (auto part : new_mode->get_parts()) {
+      auto stateAndMode = new_mode->get_part_mode(part);
+
+      if (stateAndMode.first != State::PRIMARY_STATE_ACTIVE) {
+        this->change_part_state(part, Transition::TRANSITION_DEACTIVATE);
       } else {
-        this->change_part_mode(part, stateAndMode.second);
+        // TODO(anordman): This is not always correct. Find the correct
+        // state/transition and mode via mode inference
+        this->change_part_state(part, Transition::TRANSITION_ACTIVATE);
+        if (stateAndMode.second.empty()) {
+          this->change_part_mode(part, DEFAULT_MODE);
+        } else {
+          this->change_part_mode(part, stateAndMode.second);
+        }
       }
     }
+
+    return true;
   }
-
-  // if node, change parameters accordingly
-  this->change_part_mode(node_name, mode_name);
-
-  return true;
+  
+  return false;
 }
 
 void

@@ -43,7 +43,7 @@ ament_target_dependencies(drive_base
 )
 install(TARGETS drive_base
   EXPORT export_${PROJECT_NAME}
-  DESTINATION bin)
+  DESTINATION lib/${PROJECT_NAME})
 
 # manipulator
 add_executable(manipulator src/manipulator.cpp)
@@ -62,7 +62,7 @@ ament_target_dependencies(manipulator
 )
 install(TARGETS manipulator
   EXPORT export_${PROJECT_NAME}
-  DESTINATION bin)
+  DESTINATION lib/${PROJECT_NAME})
 
 # mode file
 install(FILES example_modes.yaml

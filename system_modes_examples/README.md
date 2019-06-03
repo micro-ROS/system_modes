@@ -42,12 +42,12 @@ In an additional fifth terminal, you may mimic a planning/executive component to
 1. Start by initializing your system to inactive. The ROS 2 command  
   $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 1, label: configure}}"`  
   will call the according service on the mode manager, which will change the state of the two nodes to *inactive* accordingly. Observe the console output of the mode manager and the two nodes as well as the mode monitor. The mode monitor should display the following system state:  
-  ![mode-monitor](./doc/screenshot-monitor-inactive.png "Screenshot of the mode monitor")
+  ![mode-monitor](./doc/screenshot-monitor-inactive.png "Screenshot of the mode monitor")  
 1. Activate your system with the following ROS 2 command:  
   $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 3, label: activate}}"`  
   To change the *actuation* system into active and its default mode (since no explicit mode was requested), the mode manager will set the *drive\_base* to active and leave the *manipulator* inactive, as specified in the model file.
   The mode monitor should display the following system state:  
-  ![mode-monitor](./doc/screenshot-monitor-active.png "Screenshot of the mode monitor")
+  ![mode-monitor](./doc/screenshot-monitor-active.png "Screenshot of the mode monitor")  
 1. Set your system into *PERFORMANCE* mode with the following ROS 2 command:  
   $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
   To change the *actuation* system into its *PERFORMANCE* mode, the mode manager will change the *drive\_base* to *FAST* mode and activate the *manipulator* node in its *STRONG* mode.
@@ -61,3 +61,4 @@ In an additional fifth terminal, you may mimic a planning/executive component to
   The mode monitor should display the following system state:  
   ![mode-monitor](./doc/screenshot-monitor-moderate.png "Screenshot of the mode monitor")  
   Note, that the mode monitor is able to infer that the system's *actual* mode is now *MODERATE*. This is based on the fact that both its nodes are active, the *drive\_base* is in its *SLOW* mode, and the manipulator is in its *WEAK* mode. However, the last requested mode for the *actuation* system is *PERFORMANCE*, so the monitor infers that the system is still transitioning into its target mode, indicating that the actual system state is *activating* (see [lifecycle](../system_modes/README.md#lifecycle)).
+

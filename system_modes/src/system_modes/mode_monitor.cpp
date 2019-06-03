@@ -70,17 +70,22 @@ static const string MONITOR_TEXT_WARN = "\033[21;"s + to_string(MONITOR_TEXT_WAR
 static const string MONITOR_SEPARATOR = MONITOR_TEXT_PLAIN + " | ";
 static const string MONITOR_SEPARATOR_BOLD = MONITOR_TEXT_BOLD + " | ";
 
-ModeMonitor::ModeMonitor(const string & model_path, bool clear = true)
+ModeMonitor::ModeMonitor(const string & model_path,
+  unsigned int rate = 1000,
+  bool verbose = false,
+  bool clear = true)
 : Node("__mode_monitor"),
   mode_inference_(),
   model_path_(model_path),
-  clear_screen_(clear)
+  rate_(rate),
+  clear_screen_(clear),
+  verbose_(verbose)
 {
   RCLCPP_DEBUG(get_logger(), "Constructed mode manager");
   this->mode_inference_ = std::make_shared<ModeInference>(model_path);
 
   // Start plotting
-  timer_ = this->create_wall_timer(1s, [this]() {this->refresh();});
+  timer_ = this->create_wall_timer(std::chrono::milliseconds(rate_), [this]() {this->refresh();});
 }
 
 std::shared_ptr<ModeInference>
@@ -221,7 +226,7 @@ ModeMonitor::refresh() const
     cout << this->format_line(node, state_actual, state_infer, state_target, mode_infer,
       mode_target);
     auto mode = mode_inference_->get_mode(node, mode_infer);
-    if (mode) {
+    if (verbose_ && mode) {
       cout << MONITOR_TEXT_MODE << mode->print();
     }
     cout << endl;

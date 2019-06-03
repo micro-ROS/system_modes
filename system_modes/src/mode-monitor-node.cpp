@@ -60,6 +60,8 @@ using rcl_interfaces::msg::ParameterEvent;
 
 string modelfile, loglevel;
 bool debug = false;
+unsigned int rate = 1000;
+bool verbose = false;
 options_description options("Allowed options");
 
 shared_ptr<system_modes::ModeMonitor> monitor;
@@ -68,12 +70,16 @@ bool parseOptions(int argc, char * argv[])
 {
   options.add_options()("help", "Help message and options")("modelfile",
     value<string>(&modelfile), "Path to yaml model file")("__log_level",
-    value<string>(&loglevel), "ROS2 log level")("debug,d",
-    bool_switch(&debug), "Debug mode (don't clear screen)");
+    value<string>(&loglevel), "ROS 2 log level")
+    ("debug,d", bool_switch(&debug)->default_value(false), "Debug mode (don't clear screen)")
+    ("rate,r", value<unsigned int>(&rate)->default_value(1000), "Update rate in milliseconds")
+    ("verbose,v", bool_switch(&verbose)->default_value(false), "Verbose (displays mode parameters)");
 
   positional_options_description positional_options;
   positional_options.add("modelfile", 1);
-  positional_options.add("debug", 1);
+  positional_options.add("debug", 0);
+  positional_options.add("rate", 1);
+  positional_options.add("verbose", 0);
 
   variables_map map;
   store(command_line_parser(argc, argv)
@@ -166,7 +172,7 @@ int main(int argc, char * argv[])
   setvbuf(stdout, NULL, _IONBF, BUFSIZ);
   rclcpp::init(argc, argv);
 
-  monitor = make_shared<ModeMonitor>(modelfile, !debug);
+  monitor = make_shared<ModeMonitor>(modelfile, rate, verbose, !debug);
 
   vector<shared_ptr<rclcpp::Subscription<TransitionEvent>>>
   state_sub_;

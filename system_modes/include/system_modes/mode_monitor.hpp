@@ -37,7 +37,7 @@ namespace system_modes
 class ModeMonitor : public rclcpp::Node
 {
 public:
-  ModeMonitor(const std::string & model_path, bool clear);
+  ModeMonitor(const std::string & model_path, unsigned int rate, bool verbose, bool clear);
   ModeMonitor(const ModeMonitor &) = delete;
 
   std::shared_ptr<ModeInference> inference();
@@ -60,7 +60,8 @@ protected:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
 
-  bool clear_screen_;
+  unsigned int rate_;
+  bool clear_screen_, verbose_;
 };
 
 }  // namespace system_modes

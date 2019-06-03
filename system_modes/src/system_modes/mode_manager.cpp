@@ -340,7 +340,7 @@ ModeManager::change_state(
     " published info about request to %s %s",
     info->transition.label.c_str(),
     node_name.c_str());
-  this->state_request_pub_[node_name]->publish(info);
+  this->state_request_pub_[node_name]->publish(*info);
 
   if (!transitive) {
     return true;
@@ -384,7 +384,7 @@ ModeManager::change_mode(
   // Publish info about this request
   auto info = std::make_shared<ModeEvent>();
   info->goal_mode.label = mode_name;
-  this->mode_request_pub_[node_name]->publish(info);
+  this->mode_request_pub_[node_name]->publish(*info);
   RCLCPP_DEBUG(
     this->get_logger(),
     " published info about request to change %s to %s",
@@ -457,7 +457,7 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
     " published info about request to %s %s",
     transition_label_(transition).c_str(),
     node.c_str());
-  this->state_request_pub_[node]->publish(info);
+  this->state_request_pub_[node]->publish(*info);
 
   // Don't wait for the result, we can't do this inside a service
   this->state_change_clients_[node]->async_send_request(request);
@@ -478,7 +478,7 @@ ModeManager::change_part_mode(const string & node, const string & mode)
   // Publish info about this request
   auto info = std::make_shared<ModeEvent>();
   info->goal_mode.label = mode;
-  this->mode_request_pub_[node]->publish(info);
+  this->mode_request_pub_[node]->publish(*info);
   RCLCPP_DEBUG(
     this->get_logger(),
     " published info about request to change %s to %s",

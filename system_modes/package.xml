@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes</name>
-  <version>0.1.3</version>
+  <version>0.1.4</version>
   <description>Model-based distributed configuration handling.</description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>

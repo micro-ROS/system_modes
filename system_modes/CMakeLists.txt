@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(builtin_interfaces REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_lifecycle REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
@@ -51,7 +52,7 @@ ament_target_dependencies(mode
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "boost_program_options"
+  "Boost"
   "builtin_interfaces"
 )
 #rosidl_target_interfaces(mode

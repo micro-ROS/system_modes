@@ -63,7 +63,7 @@ public:
       }
       return result;
     };
-    this->register_param_change_callback(param_change_callback);
+    this->set_on_parameters_set_callback(param_change_callback);
   }
 
   Manipulator(const Manipulator &) = delete;

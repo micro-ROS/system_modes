@@ -38,7 +38,7 @@ ament_target_dependencies(drive_base
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "boost_program_options"
+  "Boost"
   "system_modes"
 )
 install(TARGETS drive_base
@@ -57,7 +57,7 @@ ament_target_dependencies(manipulator
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "boost_program_options"
+  "Boost"
   "system_modes"
 )
 install(TARGETS manipulator

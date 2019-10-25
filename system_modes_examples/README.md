@@ -23,13 +23,13 @@ Until this package provies a proper launch configruation, open 3 terminals to se
   $ `ros2 run system_modes_examples manipulator`  
 1. terminal 3: start the [mode-manager](../system_modes/README.md#mode-manager) with the provided example model file:  
   $ `ros2 run system_modes mode-manager --help`  
-  $ `ros2 run system_modes mode-manager system_modes_examples/share/example_modes.yaml`  
+  $ `ros2 run system_modes mode-manager [path/to]/example_modes.yaml` (If you installed the binary package directly, the example model file is located in `/opt/ros/[distribution]/share/system_modes_examples/`. If you built the package from source, the file is typically located in `install/system_modes_examples/share/system_modes_examples/`.)
   The mode manager parses the provided SHM model file and creates the necessary services and topics to manage the system modes of the two nodes as well as services and topics to manage the system modes *and* the lifecycle of the *actuation* system.
   ![mode-manager](./doc/screenshot-manager.png "Screenshot of the mode manager")
 
 In an additional fourth terminal, start the [mode-monitor](../system_modes/README.md#mode-monitor) to see the system modes inference in action:  
 * $ `ros2 run system_modes mode-monitor --help`  
-* $ `ros2 run system_modes mode-monitor system_modes_examples/share/example_modes.yaml`  
+* $ `ros2 run system_modes mode-monitor path/to/example_modes.yaml`  
 The monitor updates every second and displays the current lifecycle states and modes of the example system.
 ![mode-monitor](./doc/screenshot-monitor.png "Screenshot of the mode monitor")
 

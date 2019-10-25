@@ -66,7 +66,7 @@ install(TARGETS manipulator
 
 # mode file
 install(FILES example_modes.yaml
-  DESTINATION share
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 ament_package()

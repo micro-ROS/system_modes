@@ -29,7 +29,7 @@ Until this package provies a proper launch configruation, open 3 terminals to se
 
 In an additional fourth terminal, start the [mode-monitor](../system_modes/README.md#mode-monitor) to see the system modes inference in action:  
 * $ `ros2 run system_modes mode-monitor --help`  
-* $ `ros2 run system_modes mode-monitor path/to/example_modes.yaml`  
+* $ `ros2 run system_modes mode-monitor [path/to]/example_modes.yaml`  
 The monitor updates every second and displays the current lifecycle states and modes of the example system.
 ![mode-monitor](./doc/screenshot-monitor.png "Screenshot of the mode monitor")
 

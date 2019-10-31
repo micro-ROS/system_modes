@@ -251,7 +251,7 @@ int main(int argc, char * argv[])
 
   // Listen for parameter changes
   auto param_sub = monitor->create_subscription<ParameterEvent>("/parameter_events",
-      rclcpp::SystemDefaultsQoS(),
+      rclcpp::ParameterEventsQoS(),
       parameter_event_callback);
 
   rclcpp::executors::SingleThreadedExecutor exe;

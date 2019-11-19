@@ -241,6 +241,7 @@ ModeInference::infer_system(const string & part)
 
       // target: active
       auto inTargetMode = true;
+      
       for (auto partpart : mode->get_parts()) {
         auto stateAndMode = this->get_or_infer(partpart);
         auto targetStateAndMode = mode->get_part_mode(partpart);
@@ -251,7 +252,7 @@ ModeInference::infer_system(const string & part)
         }
 
         // TODO(anordman): overly complictated. intent: we are in our target
-        // mode, if actual and target state are the same OR they ca be
+        // mode, if actual and target state are the same OR they can be
         // considered same, i.e. unconfigured and inactive
         if (
           (stateAndMode.first != targetStateAndMode.first &&
@@ -387,9 +388,14 @@ ModeInference::infer_node(const string & part)
 std::pair<unsigned int, string>
 ModeInference::get_or_infer(const string & part)
 {
-  auto stateAndMode = this->get(part);
-  if (!stateAndMode.first == 0 && !stateAndMode.second.empty()) {
-    return stateAndMode;
+  pair<unsigned int, string> stateAndMode;
+  try {
+    stateAndMode = this->get(part);
+    if (stateAndMode.first != 0 && !stateAndMode.second.empty()) {
+      return stateAndMode;
+    }
+  } catch (...) {
+    // not a node, so try inference
   }
 
   try {
@@ -405,10 +411,9 @@ ModeInference::get_or_infer(const string & part)
   }
 
   if (stateAndMode.first == 0 && stateAndMode.second.empty()) {
-    throw std::runtime_error("Not able to infer anything on part " + part);
+    throw std::runtime_error("Not able to infer anything for part " + part);
   }
 
-  // We don't have any information about this part, so trying to infer
   return stateAndMode;
 }
 

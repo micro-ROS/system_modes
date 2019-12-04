@@ -241,7 +241,7 @@ ModeInference::infer_system(const string & part)
 
       // target: active
       auto inTargetMode = true;
-      
+
       for (auto partpart : mode->get_parts()) {
         auto stateAndMode = this->get_or_infer(partpart);
         auto targetStateAndMode = mode->get_part_mode(partpart);

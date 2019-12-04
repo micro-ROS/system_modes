@@ -70,7 +70,8 @@ static const string MONITOR_TEXT_WARN = "\033[21;"s + to_string(MONITOR_TEXT_WAR
 static const string MONITOR_SEPARATOR = MONITOR_TEXT_PLAIN + " | ";
 static const string MONITOR_SEPARATOR_BOLD = MONITOR_TEXT_BOLD + " | ";
 
-ModeMonitor::ModeMonitor(const string & model_path,
+ModeMonitor::ModeMonitor(
+  const string & model_path,
   unsigned int rate = 1000,
   bool verbose = false,
   bool clear = true)

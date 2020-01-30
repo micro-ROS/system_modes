@@ -23,25 +23,22 @@ import launch_ros
 
 
 def generate_launch_description():
-    shm_model_path = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
+    modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
                 '/example_modes.yaml')
 
-# Start as a normal node is currently not possible.
-# Path to SHM file should be passed as a ROS parameter.
-#    mode_manager_node = launch_ros.actions.Node(
-#        package='system_modes',
-#        node_executable='mode_manager',
-#        node_name='mode_manager',
-#        node_namespace='example',
-#        arguments=[shm_model_path],
-#        output='screen')
-# Hack: Launch the node directly as an executable.
-    mode_manager_executable = (ament_index_python.packages.get_package_prefix('system_modes') + 
-                 '/lib/system_modes/mode_manager')
-    mode_manager_node = launch.actions.ExecuteProcess(
-        cmd=[mode_manager_executable, shm_model_path])
-        
+# Hack to launch node simply as executable process and pass model file as plain argument.
+#    mode_manager_executable = (ament_index_python.packages.get_package_prefix('system_modes') + 
+#                 '/lib/system_modes/mode_manager')
+#    mode_manager = launch.actions.ExecuteProcess(
+#        cmd=[mode_manager_executable, modelfile])
+
+    mode_manager = launch.actions.IncludeLaunchDescription(
+        launch.launch_description_sources.PythonLaunchDescriptionSource(
+            ament_index_python.packages.get_package_share_directory(
+                'system_modes') + '/launch/mode_manager.launch.py'),
+        launch_arguments={'modelfile': modelfile}.items())
+
     description = launch.LaunchDescription()
-    description.add_action(mode_manager_node)
+    description.add_action(mode_manager)
 
     return description

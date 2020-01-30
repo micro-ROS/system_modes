@@ -82,8 +82,17 @@ ModeMonitor::ModeMonitor(
   clear_screen_(clear),
   verbose_(verbose)
 {
-  RCLCPP_DEBUG(get_logger(), "Constructed mode manager");
-  this->mode_inference_ = std::make_shared<ModeInference>(model_path);
+  RCLCPP_DEBUG(get_logger(), "Constructed mode monitor");
+
+  declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
+  if (model_path_.empty()) {
+    rclcpp::Parameter parameter = get_parameter("modelfile");
+    model_path_ = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
+    if (model_path_.empty()) {
+      throw std::invalid_argument("Need path to model file.");
+    }
+  }
+  mode_inference_ = std::make_shared<ModeInference>(model_path_);
 
   // Start plotting
   timer_ = this->create_wall_timer(std::chrono::milliseconds(rate_), [this]() {this->refresh();});

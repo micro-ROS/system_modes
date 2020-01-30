@@ -73,7 +73,9 @@ bool parseOptions(int argc, char * argv[])
     value<string>(&loglevel), "ROS 2 log level")
     ("debug,d", bool_switch(&debug)->default_value(false), "Debug mode (don't clear screen)")
     ("rate,r", value<unsigned int>(&rate)->default_value(1000), "Update rate in milliseconds")
-    ("verbose,v", bool_switch(&verbose)->default_value(false), "Verbose (displays mode parameters)");
+    ("verbose,v", bool_switch(&verbose)->default_value(false), "Verbose (displays mode parameters)")
+    ("ros-args", value<vector<string>>()->multitoken(), "ROS args")
+    ("params-file", value<vector<string>>()->multitoken(), "ROS params file");
 
   positional_options_description positional_options;
   positional_options.add("modelfile", 1);
@@ -92,9 +94,9 @@ bool parseOptions(int argc, char * argv[])
     return true;
   }
 
-  if (modelfile.empty()) {
-    throw invalid_argument("Need path to model file.");
-  }
+  // if (modelfile.empty()) {
+  //   throw invalid_argument("Need path to model file.");
+  // }
   return false;
 }
 
@@ -159,13 +161,15 @@ int main(int argc, char * argv[])
   try {
     if (parseOptions(argc, argv)) {
       cout << "Usage: mode_monitor MODELFILE" << endl;
-      cout << options << endl;
+      cout << options;
+      cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
       return EXIT_SUCCESS;
     }
   } catch (const exception & e) {
     cerr << "Error parsing command line: " << e.what() << endl;
     cout << "Usage: mode_monitor MODELFILE" << endl;
-    cout << options << endl;
+    cout << options;
+    cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
     return EXIT_FAILURE;
   }
 

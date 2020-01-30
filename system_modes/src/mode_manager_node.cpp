@@ -61,9 +61,11 @@ shared_ptr<ModeManager> manager;
 
 bool parseOptions(int argc, char * argv[])
 {
-  options.add_options()("help", "Help message and options")("modelfile",
-    value<string>(&modelfile), "Path to yaml model file")("__log_level",
-    value<string>(&loglevel), "ROS2 log level");
+  options.add_options()("help", "Help message and options")
+    ("modelfile", value<string>(&modelfile), "Path to yaml model file")
+    ("__log_level", value<string>(&loglevel), "ROS2 log level")
+    ("ros-args", value<vector<string>>()->multitoken(), "ROS args")
+    ("params-file", value<vector<string>>()->multitoken(), "ROS params file");
 
   positional_options_description positional_options;
   positional_options.add("modelfile", 1);
@@ -79,9 +81,9 @@ bool parseOptions(int argc, char * argv[])
     return true;
   }
 
-  if (modelfile.empty()) {
-    throw std::invalid_argument("Need path to model file.");
-  }
+  // if (modelfile.empty()) {
+  //  throw std::invalid_argument("Need path to model file.");
+  //}
   return false;
 }
 
@@ -146,13 +148,15 @@ int main(int argc, char * argv[])
   try {
     if (parseOptions(argc, argv)) {
       cout << "Usage: mode_manager MODELFILE" << std::endl;
-      cout << options << std::endl;
+      cout << options;
+      cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
       return EXIT_SUCCESS;
     }
   } catch (const std::exception & e) {
     cerr << "Error parsing command line: " << e.what() << std::endl;
-    cout << "Usage: mode_manager MODELFILE" << std::endl;
-    cout << options << std::endl;
+    cout << "Usage: mode_manager [MODELFILE]" << std::endl;
+    cout << options;
+    cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
     return EXIT_FAILURE;
   }
 

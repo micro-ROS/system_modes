@@ -30,14 +30,14 @@ def generate_launch_description():
 # Path to SHM file should be passed as a ROS parameter.
 #    mode_manager_node = launch_ros.actions.Node(
 #        package='system_modes',
-#        node_executable='mode-manager',
+#        node_executable='mode_manager',
 #        node_name='mode_manager',
 #        node_namespace='example',
 #        arguments=[shm_model_path],
 #        output='screen')
 # Hack: Launch the node directly as an executable.
     mode_manager_executable = (ament_index_python.packages.get_package_prefix('system_modes') + 
-                 '/lib/system_modes/mode-manager')
+                 '/lib/system_modes/mode_manager')
     mode_manager_node = launch.actions.ExecuteProcess(
         cmd=[mode_manager_executable, shm_model_path])
         

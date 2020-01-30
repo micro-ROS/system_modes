@@ -82,11 +82,11 @@ The [system_modes_examples](../system_modes_examples/) package shows a simple ex
 
 #### Mode Inference
 
-Since the introduced (sub-)systems are not concrete software entities, their state and mode has to be *inferred* from the states and modes of their parts. This inference mechanism is part of the system modes library and is used by the [mode manager](#mode-manager) and [mode monitor](#mode-monitor) that are also included in this package. We can show that system states and modes can be deterministically inferred under the following conditions:
+Since the introduced (sub-)systems are not concrete software entities, their state and mode has to be *inferred* from the states and modes of their parts. This inference mechanism is part of the system modes library and is used by the [mode manager](#mode_manager) and [mode monitor](#mode_monitor) that are also included in this package. We can show that system states and modes can be deterministically inferred under the following conditions:
 1. Nodes can be asked for their state, mode, and parameters
-  This is true, since the lifecycle nodes provide the according lifecycle state service (GetState) and the [mode manager](#mode-manager) provides the according mode service (GetMode).
+  This is true, since the lifecycle nodes provide the according lifecycle state service (GetState) and the [mode manager](#mode_manager) provides the according mode service (GetMode).
 1. *Target* states and modes are known
-  Before attempting a state or mode change for a system or node, the [mode manager](#mode-manager) publishes information about the request.
+  Before attempting a state or mode change for a system or node, the [mode manager](#mode_manager) publishes information about the request.
   The according topics might need to be *latched* in order to allow nodes to do the inference after joining a running system.
 
 ### Mode Manager
@@ -106,7 +106,7 @@ The mode manager is a ROS node that accepts an SHM file (see [above](#system-mod
   * `/{system_or_node}/mode_request_info` - [system_modes/ModeEvent](./msg/ModeEvent.msg)
 
 Running the manager:  
-$ `ros2 run system_modes mode-manager path/to/modelfile.yaml`
+$ `ros2 run system_modes mode_manager path/to/modelfile.yaml`
 
 ### Mode Monitor
 
@@ -115,7 +115,7 @@ The mode monitor is a ROS node that accepts an SHM file (see [above](#system-mod
 * `/{system_or_node}/mode_request_info` for all known (sub-)systems and nodes from the model file to monitor their target modes
 * `/parameter_events` to infer the current modes for all known nodes based on their parameter values
 
-![mode-monitor](../system_modes_examples/doc/screenshot-monitor.png "Screenshot of the mode monitor from system_modes_examples")
+![mode_monitor](../system_modes_examples/doc/screenshot-monitor.png "Screenshot of the mode monitor from system_modes_examples")
 
 Running the monitor:  
-$ `ros2 run system_modes mode-monitor path/to/modelfile.yaml`
+$ `ros2 run system_modes mode_monitor path/to/modelfile.yaml`

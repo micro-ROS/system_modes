@@ -158,13 +158,13 @@ int main(int argc, char * argv[])
   // Handle commandline arguments.
   try {
     if (parseOptions(argc, argv)) {
-      cout << "Usage: mode-monitor MODELFILE" << endl;
+      cout << "Usage: mode_monitor MODELFILE" << endl;
       cout << options << endl;
       return EXIT_SUCCESS;
     }
   } catch (const exception & e) {
     cerr << "Error parsing command line: " << e.what() << endl;
-    cout << "Usage: mode-monitor MODELFILE" << endl;
+    cout << "Usage: mode_monitor MODELFILE" << endl;
     cout << options << endl;
     return EXIT_FAILURE;
   }

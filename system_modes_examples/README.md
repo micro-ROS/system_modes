@@ -1,6 +1,5 @@
 General information about this repository, including legal information, build instructions and known issues/limitations, can be found in the [README](../README.md) of the repository root.
 
-
 # The system_modes_examples package
 
 This [ROS 2](https://index.ros.org/doc/ros2/) package provides a simple example for the use of the [system_modes](../system_modes/) package. It contains two ROS 2 LifecycleNodes, a *drive\_base* node and a *manipulator* node, as well as simple a model file (yaml).
@@ -8,6 +7,7 @@ This [ROS 2](https://index.ros.org/doc/ros2/) package provides a simple example 
 ## Example Model File
 
 The SMH file [example_modes.yaml](./example_modes.yaml) specifies an *actuation* system consisting of the *drive\_base* node and the *manipulator* node, system modes for the *actuation* system, as well as system modes for the two nodes:
+
 * The *manipulator* node has a default mode, a *STRONG* mode, and a *WEAK* mode, configuring different values for its *max_torque*.
 * The *drive\_base* node has a default mode, a *FAST* mode, and a *SLOW* mode, configuring different values for its *max_speed* and its controller (*PID* or *MPC*).
 * The *actuation* system comprises of these two nodes. It has a default mode, a *PERFORMANCE* mode, and a *MODERATE* mode, changing the modes of its two nodes accordingly.
@@ -17,19 +17,20 @@ The SMH file [example_modes.yaml](./example_modes.yaml) specifies an *actuation*
 ### Setup
 
 Until this package provies a proper launch configruation, open 3 terminals to set up your example system:
+
 1. terminal 1: start the *drive\_base* node:  
-  $ `ros2 run system_modes_examples drive_base`  
+  $ `ros2 launch system_modes_examples drive_base.launch.py`  
 1. terminal 2: start the *manipulator* node:  
-  $ `ros2 run system_modes_examples manipulator`  
+  $ `ros2 launch system_modes_examples manipulator.launch.py`  
 1. terminal 3: start the [mode_manager](../system_modes/README.md#mode_manager) with the provided example model file:  
-  $ `ros2 run system_modes mode_manager --help`  
-  $ `ros2 run system_modes mode_manager [path/to]/example_modes.yaml` (If you installed the binary package directly, the example model file is located in `/opt/ros/[distribution]/share/system_modes_examples/`. If you built the package from source, the file is typically located in `install/system_modes_examples/share/system_modes_examples/`.)
+  $ `ros2 launch system_modes mode_manager.launch.py modelfile:=[path/to]/example_modes.yaml` (If you installed the binary package directly, the example model file is located in `/opt/ros/[distribution]/share/system_modes_examples/`. If you built the package from source, the file is typically located in `install/system_modes_examples/share/system_modes_examples/`.)
   The mode manager parses the provided SHM model file and creates the necessary services and topics to manage the system modes of the two nodes as well as services and topics to manage the system modes *and* the lifecycle of the *actuation* system.
   ![mode_manager](./doc/screenshot-manager.png "Screenshot of the mode manager")
 
 In an additional fourth terminal, start the [mode_monitor](../system_modes/README.md#mode_monitor) to see the system modes inference in action:  
-* $ `ros2 run system_modes mode_monitor --help`  
-* $ `ros2 run system_modes mode_monitor [path/to]/example_modes.yaml`  
+
+* $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to]/example_modes.yaml`  
+
 The monitor updates every second and displays the current lifecycle states and modes of the example system.
 ![mode_monitor](./doc/screenshot-monitor.png "Screenshot of the mode monitor")
 
@@ -61,4 +62,3 @@ In an additional fifth terminal, you may mimic a planning/executive component to
   The mode monitor should display the following system state:
   ![mode_monitor](./doc/screenshot-monitor-moderate.png "Screenshot of the mode monitor")
   Note, that the mode monitor is able to infer that the system's *actual* mode is now *MODERATE*. This is based on the fact that both its nodes are active, the *drive\_base* is in its *SLOW* mode, and the manipulator is in its *WEAK* mode. However, the last requested mode for the *actuation* system is *PERFORMANCE*, so the monitor infers that the system is still transitioning into its target mode, indicating that the actual system state is *activating* (see [lifecycle](../system_modes/README.md#lifecycle)).
-

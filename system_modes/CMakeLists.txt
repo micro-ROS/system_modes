@@ -86,7 +86,6 @@ target_include_directories(mode_manager PUBLIC
 target_link_libraries(mode_manager mode)
 install(TARGETS mode_manager
   DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 # mode monitor
 add_executable(mode_monitor src/system_modes/mode_monitor.cpp
@@ -97,6 +96,9 @@ target_include_directories(mode_monitor PUBLIC
 target_link_libraries(mode_monitor mode)
 install(TARGETS mode_monitor
   DESTINATION lib/${PROJECT_NAME})
+
+  # launch
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

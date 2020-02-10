@@ -1,4 +1,4 @@
-# Copyright (c) 2020 - for information on the respective copyright owner
+# Copyright (c) 2019 - for information on the respective copyright owner
 # see the NOTICE file and/or the repository https://github.com/micro-ROS/system_modes.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,16 +23,17 @@ import launch_ros
 
 
 def generate_launch_description():
+    launch.actions.DeclareLaunchArgument('modelfile', description='Path to modelfile')
     modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
                 '/example_modes.yaml')
 
-    mode_manager = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.PythonLaunchDescriptionSource(
-            ament_index_python.packages.get_package_share_directory(
-                'system_modes') + '/launch/mode_manager.launch.py'),
-        launch_arguments={'modelfile': modelfile}.items())
+    node = launch_ros.actions.Node(
+        package='system_modes_examples',
+        node_executable='manipulator',
+        parameters=[{'modelfile': modelfile}],
+        output='screen')
 
     description = launch.LaunchDescription()
-    description.add_action(mode_manager)
+    description.add_action(node)
 
     return description

@@ -106,7 +106,7 @@ The mode manager is a ROS node that accepts an SHM file (see [above](#system-mod
   * `/{system_or_node}/mode_request_info` - [system_modes/ModeEvent](./msg/ModeEvent.msg)
 
 Running the manager:  
-$ `ros2 run system_modes mode_manager path/to/modelfile.yaml`
+$ `ros2 launch system_modes mode_manager.launch.py modelfile:=[path/to/modelfile.yaml]`
 
 ### Mode Monitor
 
@@ -119,4 +119,4 @@ The mode monitor is a ROS node that accepts an SHM file (see [above](#system-mod
 ![mode_monitor](../system_modes_examples/doc/screenshot-monitor.png "Screenshot of the mode monitor from system_modes_examples")
 
 Running the monitor:  
-$ `ros2 run system_modes mode_monitor path/to/modelfile.yaml`
+$ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to/modelfile.yaml]`

@@ -32,7 +32,24 @@ def generate_launch_description():
                 'system_modes') + '/launch/mode_manager.launch.py'),
         launch_arguments={'modelfile': modelfile}.items())
 
+    drive_base = launch.actions.IncludeLaunchDescription(
+        launch.launch_description_sources.PythonLaunchDescriptionSource(
+            ament_index_python.packages.get_package_share_directory(
+                'system_modes_examples') + '/launch/drive_base.launch.py'),
+        launch_arguments={'modelfile': modelfile}.items())
+
+    manipulator = launch.actions.IncludeLaunchDescription(
+        launch.launch_description_sources.PythonLaunchDescriptionSource(
+            ament_index_python.packages.get_package_share_directory(
+                'system_modes_examples') + '/launch/manipulator.launch.py'),
+        launch_arguments={'modelfile': modelfile}.items())
+
     description = launch.LaunchDescription()
+    print('Starting mode manager and example nodes...')
+    description.add_action(mode_manager)
+    description.add_action(drive_base)
+    description.add_action(manipulator)
+    print('Starting mode manager and example nodes...')
     description.add_action(mode_manager)
 
     return description

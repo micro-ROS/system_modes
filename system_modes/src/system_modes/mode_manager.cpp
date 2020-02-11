@@ -140,8 +140,9 @@ ModeManager::add_system(const std::string & system)
 
   service_name = system + "/get_mode";
   this->get_mode_srv_[system] =
-    this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
+    this->create_service<system_modes::srv::GetMode>(
+    service_name,
+    std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = system + "/get_available_modes";
   this->modes_srv_[system] = this->create_service<GetAvailableModes>(
@@ -176,8 +177,9 @@ ModeManager::add_node(const std::string & node)
 
   service_name = node + "/get_mode";
   this->get_mode_srv_[node] =
-    this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
+    this->create_service<system_modes::srv::GetMode>(
+    service_name,
+    std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = node + "/get_available_modes";
   this->modes_srv_[node] = this->create_service<GetAvailableModes>(

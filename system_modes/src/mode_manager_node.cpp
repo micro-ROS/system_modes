@@ -61,17 +61,20 @@ shared_ptr<ModeManager> manager;
 
 bool parseOptions(int argc, char * argv[])
 {
-  options.add_options()("help", "Help message and options")
-    ("modelfile", value<string>(&modelfile), "Path to yaml model file")
-    ("__log_level", value<string>(&loglevel), "ROS2 log level")
-    ("ros-args", value<vector<string>>()->multitoken(), "ROS args")
-    ("params-file", value<vector<string>>()->multitoken(), "ROS params file");
+  options.add_options()("help", "Help message and options")(
+    "modelfile", value<string>(&modelfile),
+    "Path to yaml model file")(
+    "__log_level", value<string>(&loglevel),
+    "ROS2 log level")(
+    "ros-args", value<vector<string>>()->multitoken(), "ROS args")(
+    "params-file", value<vector<string>>()->multitoken(), "ROS params file");
 
   positional_options_description positional_options;
   positional_options.add("modelfile", 1);
 
   variables_map map;
-  store(command_line_parser(argc, argv)
+  store(
+    command_line_parser(argc, argv)
     .options(options)
     .positional(positional_options)
     .run(), map);
@@ -80,10 +83,6 @@ bool parseOptions(int argc, char * argv[])
   if (map.count("help")) {
     return true;
   }
-
-  // if (modelfile.empty()) {
-  //  throw std::invalid_argument("Need path to model file.");
-  //}
   return false;
 }
 
@@ -107,10 +106,12 @@ void transition_request_callback(
   const string & node_name)
 {
   if (msg->goal_state.id != State::PRIMARY_STATE_ACTIVE) {
-    manager->inference()->update_target(node_name,
+    manager->inference()->update_target(
+      node_name,
       make_pair(msg->goal_state.id, ""));
   } else {
-    manager->inference()->update_target(node_name,
+    manager->inference()->update_target(
+      node_name,
       make_pair(msg->goal_state.id, DEFAULT_MODE));
   }
 }
@@ -119,7 +120,8 @@ void mode_request_callback(
   const ModeEvent::SharedPtr msg,
   const string & node_name)
 {
-  manager->inference()->update_target(node_name,
+  manager->inference()->update_target(
+    node_name,
     make_pair(State::PRIMARY_STATE_ACTIVE, msg->goal_mode.label.c_str()));
 }
 
@@ -194,9 +196,10 @@ int main(int argc, char * argv[])
     // Callback for mode transitions
     function<void(ModeEvent::SharedPtr)> mode_callback =
       bind(mode_change_callback, _1, node);
-    auto mode_sub = manager->create_subscription<ModeEvent>(mode_topic,
-        rclcpp::SystemDefaultsQoS(),
-        mode_callback);
+    auto mode_sub = manager->create_subscription<ModeEvent>(
+      mode_topic,
+      rclcpp::SystemDefaultsQoS(),
+      mode_callback);
     mode_sub_.push_back(mode_sub);
 
     // Callback for lifecycle transitions request info
@@ -211,9 +214,10 @@ int main(int argc, char * argv[])
     // Callback for mode transitions request info
     mode_callback =
       bind(mode_request_callback, _1, node);
-    mode_sub = manager->create_subscription<ModeEvent>(mode_request_topic,
-        rclcpp::SystemDefaultsQoS(),
-        mode_callback);
+    mode_sub = manager->create_subscription<ModeEvent>(
+      mode_request_topic,
+      rclcpp::SystemDefaultsQoS(),
+      mode_callback);
     mode_request_sub_.push_back(mode_sub);
   }
 
@@ -234,16 +238,18 @@ int main(int argc, char * argv[])
     // Callback for mode transitions request info
     function<void(ModeEvent::SharedPtr)> mode_callback =
       bind(mode_request_callback, _1, system);
-    auto mode_sub = manager->create_subscription<ModeEvent>(mode_request_topic,
-        rclcpp::SystemDefaultsQoS(),
-        mode_callback);
+    auto mode_sub = manager->create_subscription<ModeEvent>(
+      mode_request_topic,
+      rclcpp::SystemDefaultsQoS(),
+      mode_callback);
     mode_request_sub_.push_back(mode_sub);
   }
 
   // Listen for parameter changes
-  auto param_sub = manager->create_subscription<ParameterEvent>("/parameter_events",
-      rclcpp::ParameterEventsQoS(),
-      parameter_event_callback);
+  auto param_sub = manager->create_subscription<ParameterEvent>(
+    "/parameter_events",
+    rclcpp::ParameterEventsQoS(),
+    parameter_event_callback);
 
   rclcpp::executors::SingleThreadedExecutor exe;
   exe.add_node(manager);

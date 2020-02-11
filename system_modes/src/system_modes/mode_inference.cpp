@@ -181,7 +181,8 @@ ModeInference::infer_system(const string & part)
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
   auto default_mode = this->modes_[part][DEFAULT_MODE];
   if (!default_mode) {
-    throw std::out_of_range("Can't infer for system '" + part +
+    throw std::out_of_range(
+            "Can't infer for system '" + part +
             "', missing default mode.");
   }
 
@@ -202,7 +203,8 @@ ModeInference::infer_system(const string & part)
         state = stateAndMode.first;
       } else if (state != stateAndMode.first) {
         // not the same, we can't say anything
-        throw std::runtime_error("Inconsistent information about parts of the system '" + part +
+        throw std::runtime_error(
+                "Inconsistent information about parts of the system '" + part +
                 "', inference failed.");
       }
     }
@@ -313,7 +315,8 @@ ModeInference::infer_node(const string & part)
 
   auto default_mode = this->modes_[part][DEFAULT_MODE];
   if (!default_mode) {
-    throw std::out_of_range("Can't infer for node '" + part +
+    throw std::out_of_range(
+            "Can't infer for node '" + part +
             "', missing default mode.");
   }
 
@@ -491,7 +494,8 @@ ModeInference::read_modes_from_model(const string & model_path)
         if (!mode || mode->get_name().compare(mode_name) != 0) {
           if (mode_name.compare(DEFAULT_MODE) != 0) {
             if (!default_mode) {
-              throw std::runtime_error("Could not find default mode for mode '" +
+              throw std::runtime_error(
+                      "Could not find default mode for mode '" +
                       mode_name + "'. Make sure, default mode is defined first.");
             }
             mode = std::make_shared<Mode>(mode_name, default_mode);

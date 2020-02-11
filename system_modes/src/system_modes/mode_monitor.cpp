@@ -162,7 +162,8 @@ ModeMonitor::refresh() const
         ex.what());
     }
 
-    cout << this->format_line(system, state_actual, state_infer, state_target, mode_infer,
+    cout << this->format_line(
+      system, state_actual, state_infer, state_target, mode_infer,
       mode_target) << endl;
   }
 
@@ -233,7 +234,8 @@ ModeMonitor::refresh() const
         ex.what());
     }
     // print
-    cout << this->format_line(node, state_actual, state_infer, state_target, mode_infer,
+    cout << this->format_line(
+      node, state_actual, state_infer, state_target, mode_infer,
       mode_target);
     auto mode = mode_inference_->get_mode(node, mode_infer);
     if (verbose_ && mode) {

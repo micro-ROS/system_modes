@@ -45,11 +45,8 @@ def generate_launch_description():
         launch_arguments={'modelfile': modelfile}.items())
 
     description = launch.LaunchDescription()
-    print('Starting mode manager and example nodes...')
     description.add_action(mode_manager)
     description.add_action(drive_base)
     description.add_action(manipulator)
-    print('Starting mode manager and example nodes...')
-    description.add_action(mode_manager)
 
     return description

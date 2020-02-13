@@ -112,9 +112,9 @@ void
 ModeImpl::set_parameter(const Parameter & parameter)
 {
   std::string param_name = parameter.get_name();
-  std::size_t foundr = parameter.get_name().rfind(".");
+  std::size_t foundr = parameter.get_name().rfind("ros__parameters");
   if (foundr != std::string::npos) {
-    param_name = parameter.get_name().substr(foundr + 1);
+    param_name = parameter.get_name().substr(foundr + strlen("ros__parameters") + 1);
   }
 
   if (this->param_.find(param_name) == this->param_.end()) {

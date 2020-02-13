@@ -118,7 +118,8 @@ ModeImpl::set_parameter(const Parameter & parameter)
   }
 
   if (this->param_.find(param_name) == this->param_.end()) {
-    throw out_of_range("Parameter '" + param_name + "' not available in mode '" +
+    throw out_of_range(
+            "Parameter '" + param_name + "' not available in mode '" +
             this->name_ + "', has to be present in default mode.");
   }
 
@@ -147,7 +148,8 @@ ModeImpl::set_part_mode(
   const std::pair<unsigned int, std::string> stateAndMode)
 {
   if (this->part_modes_.find(part) == this->part_modes_.end()) {
-    throw out_of_range("Part mode for part '" + part + "' not available in mode '" +
+    throw out_of_range(
+            "Part mode for part '" + part + "' not available in mode '" +
             this->name_ + "', has to be present in default mode.");
   }
 

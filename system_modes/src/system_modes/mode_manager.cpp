@@ -55,12 +55,24 @@ namespace system_modes
 
 ModeManager::ModeManager(const string & model_path)
 : Node("__mode_manager"),
-  mode_inference_(new ModeInference(model_path)),
+  mode_inference_(nullptr),
   state_change_srv_(), get_state_srv_(), states_srv_(),
   mode_change_srv_(), get_mode_srv_(), modes_srv_(),
   state_change_clients_(), mode_change_clients_(),
   state_request_pub_(), mode_request_pub_()
 {
+  declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
+  if (model_path.empty()) {
+    rclcpp::Parameter parameter = get_parameter("modelfile");
+    std::string alt_model_path = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
+    if (alt_model_path.empty()) {
+      throw std::invalid_argument("Need path to model file.");
+    }
+    mode_inference_ = std::make_shared<ModeInference>(alt_model_path);
+  } else {
+    mode_inference_ = std::make_shared<ModeInference>(model_path);
+  }
+
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);
 
@@ -128,8 +140,9 @@ ModeManager::add_system(const std::string & system)
 
   service_name = system + "/get_mode";
   this->get_mode_srv_[system] =
-    this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
+    this->create_service<system_modes::srv::GetMode>(
+    service_name,
+    std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = system + "/get_available_modes";
   this->modes_srv_[system] = this->create_service<GetAvailableModes>(
@@ -164,8 +177,9 @@ ModeManager::add_node(const std::string & node)
 
   service_name = node + "/get_mode";
   this->get_mode_srv_[node] =
-    this->create_service<system_modes::srv::GetMode>(service_name,
-      std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
+    this->create_service<system_modes::srv::GetMode>(
+    service_name,
+    std::bind(&ModeManager::on_get_mode, this, _1, _2, _3));
 
   service_name = node + "/get_available_modes";
   this->modes_srv_[node] = this->create_service<GetAvailableModes>(

@@ -16,7 +16,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_lifecycle REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
@@ -64,9 +64,13 @@ install(TARGETS manipulator
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME})
 
-# mode file
+  # launch
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
+
+# SMH file
 install(FILES example_modes.yaml
   DESTINATION share/${PROJECT_NAME}/
 )
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()

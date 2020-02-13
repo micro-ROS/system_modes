@@ -2,13 +2,18 @@
 Changelog for package system_modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* integration with ROS 2 launch
+* updated docs
+
 0.1.6 (2019-10-31)
 -------------------
 * fixed QoS configuration for parameter event subscribers
 
 0.1.5 (2019-10-21)
 -------------------
-* migration to ros 2 eloquent elusor
+* migration to ROS 2 eloquent elusor
 
 0.1.2 (2019-03-18)
 -------------------

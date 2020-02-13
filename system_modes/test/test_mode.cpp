@@ -70,7 +70,8 @@ TEST_F(TestMode, construction_and_destruction) {
 
     Mode * mode;
 
-    EXPECT_THROW(mode = new Mode("MODE", default_mode_null),
+    EXPECT_THROW(
+      mode = new Mode("MODE", default_mode_null),
       std::runtime_error);
     EXPECT_NO_THROW(mode = new Mode("MODE", default_mode));
 

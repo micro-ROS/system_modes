@@ -78,24 +78,27 @@ install(
 )
 
 # mode manager
-add_executable(mode-manager src/system_modes/mode_manager.cpp
-                            src/mode-manager-node.cpp)
-target_include_directories(mode-manager PUBLIC
+add_executable(mode_manager src/system_modes/mode_manager.cpp
+                            src/mode_manager_node.cpp)
+target_include_directories(mode_manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_link_libraries(mode-manager mode)
-install(TARGETS mode-manager
+target_link_libraries(mode_manager mode)
+install(TARGETS mode_manager
   DESTINATION lib/${PROJECT_NAME})
 
 # mode monitor
-add_executable(mode-monitor src/system_modes/mode_monitor.cpp
-                            src/mode-monitor-node.cpp)
-target_include_directories(mode-monitor PUBLIC
+add_executable(mode_monitor src/system_modes/mode_monitor.cpp
+                            src/mode_monitor_node.cpp)
+target_include_directories(mode_monitor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_link_libraries(mode-monitor mode)
-install(TARGETS mode-monitor
+target_link_libraries(mode_monitor mode)
+install(TARGETS mode_monitor
   DESTINATION lib/${PROJECT_NAME})
+
+  # launch
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -55,7 +55,7 @@ protected:
   inline const std::string MONITOR_HLINE(const std::string & label) const;
 
   std::shared_ptr<ModeInference> mode_inference_;
-  const std::string model_path_;
+  std::string model_path_;
 
 private:
   rclcpp::TimerBase::SharedPtr timer_;

@@ -543,9 +543,9 @@ ModeInference::add_param_to_mode(ModeBasePtr mode, const Parameter & param)
 {
   // TODO(anordman): All of this has to be easier
   std::string param_name = param.get_name();
-  std::size_t foundr = param.get_name().rfind(".");
+  std::size_t foundr = param.get_name().rfind("ros__parameters");
   if (foundr != std::string::npos) {
-    param_name = param_name.substr(foundr + 1);
+    param_name = param_name.substr(foundr + strlen("ros__parameters") + 1);
   }
   auto paramMsg = param.to_parameter_msg();
   paramMsg.name = param_name;

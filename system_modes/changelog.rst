@@ -2,7 +2,7 @@
 Changelog for package system_modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
+0.2.0 (2020-02-13)
 -----------
 * integration with ROS 2 launch
 * updated docs

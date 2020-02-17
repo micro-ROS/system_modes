@@ -26,8 +26,8 @@ The introduced notion of (sub-)systems does not refer to a concrete software ent
 
 Within this package, we assume that nodes are [ROS 2 Lifecycle Nodes](http://design.ros2.org/articles/node_lifecycle.html). We extend the ROS 2 default lifecycle by the following aspects:
 
-1. We introduce **modes** that are specializations of the active state, see [System Modes](#system-modes).
-2. We introduce an optional transition from *active* to *activating* to allow changing modes without deactivating the node.
+1. We introduce **modes** that are specializations of the *ACTIVE* state, see [System Modes](#system-modes).
+2. We introduce an optional transition from *ACTIVE* to *activating* to allow changing modes without deactivating the node.
 
 ![system-modes-lifecycle](./doc/lifecycle-extended.png "Extended system modes lifecycle")
 
@@ -35,7 +35,7 @@ We additionally establish the same lifecycle for the (sub-)systems introduced [a
 
 #### System Modes
 
-System modes extend the *activate* state of the ROS 2 lifecycle and allow to specify different configurations of nodes and (sub-)systems:
+System modes extend the *ACTIVE* state of the ROS 2 lifecycle and allow to specify different configurations of nodes and (sub-)systems:
 
 * **Modes of nodes** consist of parameter values.
 * **Modes of (sub-)system)** consist of modes of their *parts*.

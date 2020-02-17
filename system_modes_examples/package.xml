@@ -12,7 +12,7 @@
   <depend>system_modes</depend>
   <depend>libboost-program-options-dev</depend>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <test_depend>ament_cmake</test_depend>
 

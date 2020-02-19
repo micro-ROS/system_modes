@@ -343,7 +343,7 @@ ModeManager::change_state(
   // Publish info about this request
   auto info = std::make_shared<TransitionEvent>();
   if (this->current_modes_.find(node_name) != this->current_modes_.end()) {
-    info->start_state.label = this->current_modes_.at(node_name).first;
+    info->start_state.label = this->current_modes_.at(node_name).state;
   }
   info->transition.label = transition_label_(transition_id);
   info->transition.id = transition_id;
@@ -407,7 +407,7 @@ ModeManager::change_mode(
 
   this->current_modes_.emplace(
     node_name,
-    std::make_pair(State::PRIMARY_STATE_ACTIVE, mode_name.c_str()));
+    StateAndMode(State::PRIMARY_STATE_ACTIVE, mode_name.c_str()));
 
   auto nodes = this->mode_inference_->get_nodes();
   if (std::find(nodes.begin(), nodes.end(), node_name) != nodes.end()) {
@@ -461,7 +461,7 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
   info->transition.label = transition_label_(transition);
   info->transition.id = transition;
   if (this->current_modes_.find(node) != this->current_modes_.end()) {
-    info->start_state.label = this->current_modes_.at(node).first;
+    info->start_state.label = this->current_modes_.at(node).state;
     info->start_state.id = state_id_(info->start_state.label);
   }
   info->goal_state.id = goal_state_(info->transition.id);
@@ -521,6 +521,44 @@ ModeManager::change_part_mode(const string & node, const string & mode)
         p.c_str());
     }
     this->param_change_clients_[node]->set_parameters(new_mode->get_parameters());
+  }
+}
+
+void
+ModeManager::handle_system_deviation(const std::string& reason)
+{
+  RCLCPP_INFO(
+    this->get_logger(),
+    "handle_system_deviation() based on %s",
+    reason.c_str());
+  auto deviation = this->mode_inference_->get_deviation();
+  if (deviation.empty()) {return;}
+  
+  std::map<std::string, bool> devs;
+  for (auto const& part : mode_inference_->get_all_parts()) {
+    devs[part] = false;
+  }
+  
+  // handle deviation
+  for (auto const& dev : deviation) {
+    RCLCPP_WARN(
+      this->get_logger(),
+      " Deviation detected in system or part '%s': should be %s:%s, but is %s:%s",
+      dev.first.c_str(),
+      state_label_(dev.second.first.state).c_str(), dev.second.first.mode.c_str(),
+      state_label_(dev.second.second.state).c_str(), dev.second.second.mode.c_str()
+      );
+    devs[dev.first] = true;
+  }
+  
+  for (auto const& part : mode_inference_->get_all_parts()) {
+    RCLCPP_INFO(
+      this->get_logger(),
+      "  Deviation in system or part '%s': %s (should be %s:%s, is %s:%s)",
+      part.c_str(),
+      (devs[part] ? "true" : "false"),
+      state_label_(deviation[part].first.state).c_str(), deviation[part].first.mode.c_str(),
+      state_label_(deviation[part].second.state).c_str(), deviation[part].second.mode.c_str());
   }
 }
 

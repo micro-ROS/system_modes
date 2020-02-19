@@ -38,7 +38,7 @@ struct StateAndMode {
     state = newstate;
     mode = newmode;
   }
-  bool operator!=(const StateAndMode& cmp) const
+  bool operator==(const StateAndMode& cmp) const
   {
     return (cmp.state == state                                       // same state
       && (cmp.mode.compare(mode) == 0                                // same mode

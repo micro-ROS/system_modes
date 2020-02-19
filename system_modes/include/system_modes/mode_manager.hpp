@@ -44,6 +44,7 @@ public:
   ModeManager(const ModeManager &) = delete;
 
   std::shared_ptr<ModeInference> inference();
+  virtual void handle_system_deviation(const std::string& reason);
 
   virtual ~ModeManager() = default;
 
@@ -85,7 +86,7 @@ protected:
 
   virtual void change_part_state(const std::string & node, unsigned int);
   virtual void change_part_mode(const std::string & node, const std::string & mode);
-
+  
 private:
   std::shared_ptr<ModeInference> mode_inference_;
 
@@ -122,7 +123,7 @@ private:
   mode_request_pub_;
 
   // Remember states and modes of the systems
-  std::map<std::string, std::pair<unsigned int, std::string>> current_modes_;
+  std::map<std::string, StateAndMode> current_modes_;
 };
 
 }  // namespace system_modes

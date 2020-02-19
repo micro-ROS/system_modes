@@ -635,4 +635,24 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
   return false;
 }
 
+Deviation
+ModeInference::get_deviation()
+{
+  Deviation deviation;
+  
+  for (auto const& part : get_all_parts()) {
+    try {
+      auto actual = get_or_infer(part);
+      auto target = get_target(part);
+      if (!(actual == target) && actual.state <= 8) {  // we ignore transition states
+        deviation[part] = std::make_pair(target, actual);
+      }
+    } catch (std::exception const& ex) {
+      std::cout << ex.what() << std::endl;
+    }
+  }
+  
+  return deviation;
+}
+
 }  // namespace system_modes

@@ -38,7 +38,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES builtin_interfaces
 )
 
-add_library(mode
+add_library(mode SHARED
   src/system_modes/mode.cpp
   src/system_modes/mode_impl.cpp
   src/system_modes/mode_inference.cpp)

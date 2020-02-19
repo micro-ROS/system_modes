@@ -128,8 +128,8 @@ ModeMonitor::refresh() const
 
     try {
       auto stateAndMode = mode_inference_->infer(system);
-      state_infer = stateAndMode.first;
-      mode_infer = stateAndMode.second;
+      state_infer = stateAndMode.state;
+      mode_infer = stateAndMode.mode;
     } catch (std::out_of_range & ex) {
       RCLCPP_DEBUG(
         get_logger(),
@@ -146,8 +146,8 @@ ModeMonitor::refresh() const
 
     try {
       auto stateAndMode = mode_inference_->get_target(system);
-      state_target = stateAndMode.first;
-      mode_target = stateAndMode.second;
+      state_target = stateAndMode.state;
+      mode_target = stateAndMode.mode;
     } catch (std::out_of_range & ex) {
       RCLCPP_DEBUG(
         get_logger(),
@@ -181,7 +181,7 @@ ModeMonitor::refresh() const
     // state/mode
     try {
       auto stateAndMode = mode_inference_->get(node);
-      state_actual = stateAndMode.first;
+      state_actual = stateAndMode.state;
     } catch (std::out_of_range & ex) {
       RCLCPP_DEBUG(
         get_logger(),
@@ -199,8 +199,8 @@ ModeMonitor::refresh() const
     // state/mode inference
     try {
       auto stateAndMode = mode_inference_->infer(node);
-      state_infer = stateAndMode.first;
-      mode_infer = stateAndMode.second;
+      state_infer = stateAndMode.state;
+      mode_infer = stateAndMode.mode;
     } catch (std::out_of_range & ex) {
       RCLCPP_DEBUG(
         get_logger(),
@@ -218,8 +218,8 @@ ModeMonitor::refresh() const
     // state/mode target
     try {
       auto stateAndMode = mode_inference_->get_target(node);
-      state_target = stateAndMode.first;
-      mode_target = stateAndMode.second;
+      state_target = stateAndMode.state;
+      mode_target = stateAndMode.mode;
     } catch (std::runtime_error & ex) {
       RCLCPP_DEBUG(
         get_logger(),

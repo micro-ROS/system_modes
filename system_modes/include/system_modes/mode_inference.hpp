@@ -30,6 +30,10 @@
 
 namespace system_modes
 {
+  
+typedef std::map<std::string, StateAndMode > StatesMap;
+typedef std::map<std::string, std::map<std::string, rclcpp::Parameter> > ParametersMap;
+typedef std::map<std::string, std::pair<StateAndMode, StateAndMode > > Deviation;
 
 class ModeInference
 {
@@ -46,16 +50,16 @@ public:
   virtual void update_state(const std::string &, unsigned int);
   virtual void update_mode(const std::string &, const std::string &);
   virtual void update_param(const std::string &, rclcpp::Parameter &);
-  virtual void update_target(const std::string &, std::pair<unsigned int, std::string>);
+  virtual void update_target(const std::string &, StateAndMode);
 
-  virtual std::pair<unsigned int, std::string> get(const std::string & part);
-  virtual std::pair<unsigned int, std::string> get_or_infer(const std::string & part);
+  virtual StateAndMode get(const std::string & part);
+  virtual StateAndMode get_or_infer(const std::string & part);
 
-  virtual std::pair<unsigned int, std::string> infer(const std::string & part);
-  virtual std::pair<unsigned int, std::string> infer_system(const std::string & part);
-  virtual std::pair<unsigned int, std::string> infer_node(const std::string & part);
+  virtual StateAndMode infer(const std::string & part);
+  virtual StateAndMode infer_system(const std::string & part);
+  virtual StateAndMode infer_node(const std::string & part);
 
-  virtual std::pair<unsigned int, std::string> get_target(const std::string & part);
+  virtual StateAndMode get_target(const std::string & part);
   virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode);
   virtual std::vector<std::string> get_available_modes(const std::string & part);
 
@@ -67,10 +71,10 @@ protected:
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
-  std::map<std::string, std::pair<unsigned int, std::string>> nodes_, nodes_target_;
-  std::map<std::string, std::pair<unsigned int, std::string>> systems_, systems_target_;
+  StatesMap nodes_, nodes_target_;
+  StatesMap systems_, systems_target_;
   std::map<std::string, ModeMap> modes_;
-  std::map<std::string, std::map<std::string, rclcpp::Parameter>> parameters_;
+  ParametersMap parameters_;
 
   mutable std::shared_timed_mutex
     nodes_mutex_, systems_mutex_,

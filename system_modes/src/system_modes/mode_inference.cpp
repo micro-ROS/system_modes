@@ -28,7 +28,6 @@
 #include <shared_mutex>
 
 using std::endl;
-using std::pair;
 using std::mutex;
 using std::string;
 using std::make_pair;
@@ -61,9 +60,9 @@ ModeInference::update_state(const string & node, unsigned int state)
   if (it != this->nodes_.end()) {
     string mode;
     if (state == State::PRIMARY_STATE_ACTIVE) {
-      mode = this->nodes_[node].second;
+      mode = this->nodes_[node].mode;
     }
-    this->nodes_[node] = make_pair(state, mode);
+    this->nodes_[node] = StateAndMode(state, mode);
   }
 }
 
@@ -74,7 +73,7 @@ ModeInference::update_mode(const string & node, const string & mode)
 
   auto it = this->nodes_.find(node);
   if (it != this->nodes_.end()) {
-    this->nodes_[node] = make_pair(this->nodes_[node].first, mode);
+    this->nodes_[node] = StateAndMode(this->nodes_[node].state, mode);
   }
 }
 
@@ -96,7 +95,7 @@ ModeInference::update_param(const string & node, Parameter & param)
 }
 
 void
-ModeInference::update_target(const string & part, std::pair<unsigned int, string> mode)
+ModeInference::update_target(const string & part, StateAndMode mode)
 {
   std::shared_lock<shared_mutex> nlock(this->nodes_mutex_);
   std::unique_lock<shared_mutex> ntlock(this->nodes_target_mutex_);
@@ -113,7 +112,7 @@ ModeInference::update_target(const string & part, std::pair<unsigned int, string
   }
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::get_target(const string & part)
 {
   std::shared_lock<shared_mutex> ntlock(this->nodes_target_mutex_);
@@ -133,7 +132,7 @@ ModeInference::get_target(const string & part)
   throw std::out_of_range("No information about target for system or node '" + part + "'.");
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::get(const string & part)
 {
   std::shared_lock<shared_mutex> nlock(this->nodes_mutex_);
@@ -143,14 +142,14 @@ ModeInference::get(const string & part)
     throw std::out_of_range("Unknown system or node '" + part + "'.");
   }
 
-  if (this->nodes_[part].first == 0 && this->nodes_[part].second.empty()) {
+  if (this->nodes_[part].state == 0 && this->nodes_[part].mode.empty()) {
     throw std::runtime_error("No solid information about state and mode of '" + part + "'.");
   }
 
   return this->nodes_[part];
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::infer(const string & part)
 {
   std::shared_lock<shared_mutex> slock(this->systems_mutex_);
@@ -172,7 +171,7 @@ ModeInference::infer(const string & part)
   }
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::infer_system(const string & part)
 {
   unsigned int state = 0;  // unknown
@@ -194,48 +193,48 @@ ModeInference::infer_system(const string & part)
       auto stateAndMode = this->get_or_infer(itspart);
 
       // error-processing?
-      if (stateAndMode.first == State::TRANSITION_STATE_ERRORPROCESSING) {
-        return make_pair(State::TRANSITION_STATE_ERRORPROCESSING, "");
+      if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+        return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
       // all parts of same state?
       if (state == 0) {
-        state = stateAndMode.first;
-      } else if (state != stateAndMode.first) {
+        state = stateAndMode.state;
+      } else if (state != stateAndMode.state) {
         // not the same, we can't say anything
         throw std::runtime_error(
                 "Inconsistent information about parts of the system '" + part +
                 "', inference failed.");
       }
     }
-    return make_pair(state, "");
+    return StateAndMode(state, "");
   }
 
   /** MAIN INFERENCE **/
   // state/mode-based
-  unsigned int targetState = stateAndModeTarget->second.first;
-  string targetMode = stateAndModeTarget->second.second;
+  unsigned int targetState = stateAndModeTarget->second.state;
+  string targetMode = stateAndModeTarget->second.mode;
   if (targetState == State::PRIMARY_STATE_INACTIVE) {
     // target: inactive
     for (auto part : default_mode->get_parts()) {
       auto stateAndMode = this->get_or_infer(part);
 
-      if (stateAndMode.first == State::TRANSITION_STATE_ERRORPROCESSING) {
+      if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
         // Note: If current entity was in an active mode that allowed a part to
         // be in error-processing (by dont-care) and the current entity is requested
         // to switch to inactive, then the actual state of the current entity will
         // go to error-processing until the mentioned part recovers.
-        return make_pair(State::TRANSITION_STATE_ERRORPROCESSING, "");
+        return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
       // If at least one part is not 'inactive', yet => we are still deactivating
-      if (stateAndMode.first != State::PRIMARY_STATE_INACTIVE &&
-        stateAndMode.first != State::PRIMARY_STATE_UNCONFIGURED)
+      if (stateAndMode.state != State::PRIMARY_STATE_INACTIVE &&
+        stateAndMode.state != State::PRIMARY_STATE_UNCONFIGURED)
       {
-        return make_pair(State::TRANSITION_STATE_DEACTIVATING, "");
+        return StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
       }
     }
-    return make_pair(State::PRIMARY_STATE_INACTIVE, "");
+    return StateAndMode(State::PRIMARY_STATE_INACTIVE, "");
   } else if (targetState == State::PRIMARY_STATE_ACTIVE) {
     ModeConstPtr mode;
     if (this->modes_[part].find(targetMode) != this->modes_[part].end()) {
@@ -249,19 +248,19 @@ ModeInference::infer_system(const string & part)
         auto targetStateAndMode = mode->get_part_mode(partpart);
 
         // TODO(anordman): consider DONT-CARE
-        if (stateAndMode.first == State::TRANSITION_STATE_ERRORPROCESSING) {
-          return make_pair(State::TRANSITION_STATE_ERRORPROCESSING, "");
+        if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
         // TODO(anordman): overly complictated. intent: we are in our target
         // mode, if actual and target state are the same OR they can be
         // considered same, i.e. unconfigured and inactive
         if (
-          (stateAndMode.first != targetStateAndMode.first &&
-          !(targetStateAndMode.first == State::PRIMARY_STATE_INACTIVE &&
-          stateAndMode.first == State::PRIMARY_STATE_UNCONFIGURED)) ||
-          (stateAndMode.first == State::PRIMARY_STATE_ACTIVE &&
-          stateAndMode.second.compare(targetStateAndMode.second) != 0))
+          (stateAndMode.state != targetStateAndMode.state &&
+          !(targetStateAndMode.state == State::PRIMARY_STATE_INACTIVE &&
+          stateAndMode.state == State::PRIMARY_STATE_UNCONFIGURED)) ||
+          (stateAndMode.state == State::PRIMARY_STATE_ACTIVE &&
+          stateAndMode.mode.compare(targetStateAndMode.mode) != 0))
         {
           // not in target state, or active but not in target mode
           inTargetMode = false;
@@ -270,7 +269,7 @@ ModeInference::infer_system(const string & part)
       }
       if (inTargetMode) {
         // Target state and target mode reached, all good!
-        return make_pair(State::PRIMARY_STATE_ACTIVE, targetMode);
+        return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
       }
     }
 
@@ -282,13 +281,13 @@ ModeInference::infer_system(const string & part)
         auto stateAndMode = this->get_or_infer(partpart);
 
         // TODO(anordman): consider DONT-CARE
-        if (stateAndMode.first == State::TRANSITION_STATE_ERRORPROCESSING) {
-          return make_pair(State::TRANSITION_STATE_ERRORPROCESSING, "");
+        if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
-        if (stateAndMode.first != targetStateAndMode.first ||
-          (stateAndMode.first == State::PRIMARY_STATE_ACTIVE &&
-          stateAndMode.second.compare(targetStateAndMode.second) != 0))
+        if (stateAndMode.state != targetStateAndMode.state ||
+          (stateAndMode.state == State::PRIMARY_STATE_ACTIVE &&
+          stateAndMode.mode.compare(targetStateAndMode.mode) != 0))
         {
           // not in target state, or active but not in target mode
           foundMode = false;
@@ -297,17 +296,17 @@ ModeInference::infer_system(const string & part)
       }
       if (foundMode) {
         // We are in a non-target mode, this means we are still activating
-        return make_pair(State::TRANSITION_STATE_ACTIVATING, mode.first);
+        return StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
       }
     }
 
-    return make_pair(State::TRANSITION_STATE_ACTIVATING, "?");
+    return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "?");
   }
 
   throw std::runtime_error("Inference failed.");
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::infer_node(const string & part)
 {
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
@@ -323,7 +322,7 @@ ModeInference::infer_node(const string & part)
   // Do we know the target mode?
   try {
     auto target = this->get_target(part);
-    string targetMode = target.second;
+    string targetMode = target.mode;
 
     if (!targetMode.empty()) {
       bool inTargetMode = true;
@@ -342,7 +341,7 @@ ModeInference::infer_node(const string & part)
           }
         }
         if (inTargetMode) {
-          return make_pair(State::PRIMARY_STATE_ACTIVE, targetMode);
+          return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
         }
       }
     }
@@ -363,7 +362,7 @@ ModeInference::infer_node(const string & part)
     }
   }
   if (inDefaultMode) {
-    return make_pair(State::PRIMARY_STATE_ACTIVE, DEFAULT_MODE);
+    return StateAndMode(State::PRIMARY_STATE_ACTIVE, DEFAULT_MODE);
   }
 
   // no target mode, not default mode, so we try our luck, infering any mode from parameters
@@ -381,20 +380,20 @@ ModeInference::infer_node(const string & part)
     }
     if (foundMode) {
       // We are in a non-target mode, this means we are still activating
-      return make_pair(State::PRIMARY_STATE_ACTIVE, mode.first);
+      return StateAndMode(State::PRIMARY_STATE_ACTIVE, mode.first);
     }
   }
 
   throw std::runtime_error("Inference failed for node '" + part + "'.");
 }
 
-std::pair<unsigned int, string>
+StateAndMode
 ModeInference::get_or_infer(const string & part)
 {
-  pair<unsigned int, string> stateAndMode;
+  StateAndMode stateAndMode;
   try {
     stateAndMode = this->get(part);
-    if (stateAndMode.first != 0 && !stateAndMode.second.empty()) {
+    if (stateAndMode.state != 0 && !stateAndMode.mode.empty()) {
       return stateAndMode;
     }
   } catch (...) {
@@ -403,17 +402,18 @@ ModeInference::get_or_infer(const string & part)
 
   try {
     auto stateAndModeInfer = this->infer(part);
-    if (stateAndMode.first == 0 && !stateAndModeInfer.first == 0) {
-      stateAndMode.first = stateAndModeInfer.first;
+    if (stateAndMode.state == 0 && !stateAndModeInfer.state == 0) {
+      stateAndMode.state = stateAndModeInfer.state;
+      stateAndMode.mode = stateAndModeInfer.mode;
     }
-    if (stateAndMode.second.empty() && !stateAndModeInfer.second.empty()) {
-      stateAndMode.second = stateAndModeInfer.second;
+    if (stateAndMode.mode.empty() && !stateAndModeInfer.mode.empty()) {
+      stateAndMode.mode = stateAndModeInfer.mode;
     }
   } catch (...) {
     // ignore, inference is optional
   }
 
-  if (stateAndMode.first == 0 && stateAndMode.second.empty()) {
+  if (stateAndMode.state == 0 && stateAndMode.mode.empty()) {
     throw std::runtime_error("Not able to infer anything for part " + part);
   }
 
@@ -523,15 +523,15 @@ ModeInference::read_modes_from_model(const string & model_path)
             smode = param.value_to_string().substr(foundr + 1);
           }
 
-          mode->set_part_mode(part_name, make_pair(state_id_(state), smode));
+          mode->set_part_mode(part_name, StateAndMode(state_id_(state), smode));
         }
         this->modes_[part_name].emplace(mode->get_name(), mode);
 
       } else {
         if (param.value_to_string().compare("node") != 0) {
-          this->systems_.emplace(part_name, make_pair(0, ""));
+          this->systems_.emplace(part_name, StateAndMode(0, ""));
         } else {
-          this->nodes_.emplace(part_name, make_pair(0, ""));
+          this->nodes_.emplace(part_name, StateAndMode(0, ""));
         }
       }
     }

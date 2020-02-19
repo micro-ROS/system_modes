@@ -137,15 +137,15 @@ ModeImpl::set_parameters(const vector<Parameter> & parameters)
 void
 ModeImpl::add_part_mode(
   const std::string & part,
-  const std::pair<unsigned int, std::string> stateAndMode)
+  const StateAndMode stateAndMode)
 {
-  this->part_modes_[part] = stateAndMode;
+  this->part_modes_[part] = {stateAndMode.state, stateAndMode.mode};
 }
 
 void
 ModeImpl::set_part_mode(
   const std::string & part,
-  const std::pair<unsigned int, std::string> stateAndMode)
+  const StateAndMode stateAndMode)
 {
   if (this->part_modes_.find(part) == this->part_modes_.end()) {
     throw out_of_range(
@@ -166,13 +166,13 @@ ModeImpl::get_parts() const
   return results;
 }
 
-const std::pair<unsigned int, std::string>
+const StateAndMode
 ModeImpl::get_part_mode(const std::string & part) const
 {
   if (this->part_modes_.count(part)) {
     return this->part_modes_.at(part);
   } else {
-    return std::make_pair(0, "");
+    return StateAndMode(0, "");
   }
 }
 

@@ -22,7 +22,6 @@
 #include <vector>
 #include <utility>
 
-using std::pair;
 using std::string;
 using std::vector;
 using std::to_string;
@@ -70,7 +69,7 @@ ModeBase::get_parts() const
   return this->mode_impl_.get_parts();
 }
 
-const pair<unsigned int, string>
+const StateAndMode
 ModeBase::get_part_mode(const string & part) const
 {
   return this->mode_impl_.get_part_mode(part);
@@ -100,7 +99,7 @@ ModeBase::print() const
       first = false;
     }
     auto stateAndMode = this->get_part_mode(p);
-    os << p << ":" << stateAndMode.first << stateAndMode.second;
+    os << p << ":" << stateAndMode.state << stateAndMode.mode;
   }
 
   os << ">";
@@ -127,10 +126,10 @@ DefaultMode::set_parameters(const vector<Parameter> & parameters)
 void
 DefaultMode::set_part_mode(
   const std::string & part,
-  const std::pair<unsigned int, std::string> stateAndMode)
+  const StateAndMode stateAndMode)
 {
-  if (stateAndMode.second.empty()) {
-    this->mode_impl_.add_part_mode(part, std::make_pair(stateAndMode.first, DEFAULT_MODE));
+  if (stateAndMode.mode.empty()) {
+    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, DEFAULT_MODE));
   } else {
     this->mode_impl_.add_part_mode(part, stateAndMode);
   }
@@ -169,10 +168,10 @@ Mode::set_parameters(const vector<Parameter> & parameters)
 void
 Mode::set_part_mode(
   const std::string & part,
-  const std::pair<unsigned int, std::string> stateAndMode)
+  const StateAndMode stateAndMode)
 {
-  if (stateAndMode.second.empty()) {
-    this->mode_impl_.add_part_mode(part, std::make_pair(stateAndMode.first, DEFAULT_MODE));
+  if (stateAndMode.mode.empty()) {
+    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, DEFAULT_MODE));
   } else {
     this->mode_impl_.add_part_mode(part, stateAndMode);
   }

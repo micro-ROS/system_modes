@@ -41,8 +41,6 @@ using DefaultModePtr = std::shared_ptr<DefaultMode>;
 
 using ModeMap = std::map<std::string, ModeConstPtr>;
 
-static const char DEFAULT_MODE[] = "__DEFAULT__";
-
 class ModeBase
 {
 public:
@@ -56,14 +54,14 @@ public:
   virtual void set_parameters(const std::vector<rclcpp::Parameter> & parameters) = 0;
   virtual void set_part_mode(
     const std::string & part,
-    const std::pair<unsigned int, std::string> stateAndMode) = 0;
+    const StateAndMode stateAndMode) = 0;
 
   virtual rclcpp::Parameter get_parameter(const std::string & param_name) const;
   virtual std::vector<std::string> get_parameter_names() const;
   virtual const std::vector<rclcpp::Parameter> get_parameters() const;
 
   virtual const std::vector<std::string> get_parts() const;
-  virtual const std::pair<unsigned int, std::string> get_part_mode(const std::string & part) const;
+  virtual const StateAndMode get_part_mode(const std::string & part) const;
 
   virtual std::string print() const;
 
@@ -83,7 +81,7 @@ public:
 
   virtual void set_part_mode(
     const std::string & part,
-    const std::pair<unsigned int, std::string> stateAndMode);
+    const StateAndMode stateAndMode);
 };
 
 class Mode : public ModeBase
@@ -100,7 +98,7 @@ public:
 
   virtual void set_part_mode(
     const std::string & part,
-    const std::pair<unsigned int, std::string> stateAndMode);
+    const StateAndMode stateAndMode);
 };
 
 inline std::ostream & operator<<(std::ostream & os, const Mode & mode)

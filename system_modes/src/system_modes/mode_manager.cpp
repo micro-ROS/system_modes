@@ -233,12 +233,12 @@ ModeManager::on_get_state(
   RCLCPP_INFO(this->get_logger(), "-> callback get_state of %s", system.c_str());
   try {
     auto stateAndMode = this->mode_inference_->infer(system);
-    if (stateAndMode.first == 0) {
+    if (stateAndMode.state == 0) {
       response->current_state.id = State::PRIMARY_STATE_UNCONFIGURED;
       response->current_state.label = "unconfigured";
     } else {
-      response->current_state.id = stateAndMode.first;
-      response->current_state.label = state_label_(stateAndMode.first);
+      response->current_state.id = stateAndMode.state;
+      response->current_state.label = state_label_(stateAndMode.state);
     }
   } catch (std::exception & ex) {
     response->current_state.id = State::PRIMARY_STATE_UNKNOWN;
@@ -301,7 +301,7 @@ ModeManager::on_get_mode(
   RCLCPP_INFO(this->get_logger(), "-> callback get_mode of %s", request->node_name.c_str());
   try {
     auto stateAndMode = this->mode_inference_->infer(request->node_name);
-    response->current_mode = stateAndMode.second;
+    response->current_mode = stateAndMode.mode;
   } catch (std::exception & ex) {
     response->current_mode = "unknown";
   }
@@ -422,16 +422,16 @@ ModeManager::change_mode(
     for (auto part : new_mode->get_parts()) {
       auto stateAndMode = new_mode->get_part_mode(part);
 
-      if (stateAndMode.first != State::PRIMARY_STATE_ACTIVE) {
+      if (stateAndMode.state != State::PRIMARY_STATE_ACTIVE) {
         this->change_part_state(part, Transition::TRANSITION_DEACTIVATE);
       } else {
         // TODO(anordman): This is not always correct. Find the correct
         // state/transition and mode via mode inference
         this->change_part_state(part, Transition::TRANSITION_ACTIVATE);
-        if (stateAndMode.second.empty()) {
+        if (stateAndMode.mode.empty()) {
           this->change_part_mode(part, DEFAULT_MODE);
         } else {
-          this->change_part_mode(part, stateAndMode.second);
+          this->change_part_mode(part, stateAndMode.mode);
         }
       }
     }

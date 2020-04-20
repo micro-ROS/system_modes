@@ -53,6 +53,7 @@ ament_target_dependencies(mode
   "rosidl_typesupport_cpp"
   "std_msgs"
   "Boost"
+  "Boost_PROGRAM_OPTIONS"
   "builtin_interfaces"
 )
 #rosidl_target_interfaces(mode
@@ -60,7 +61,7 @@ ament_target_dependencies(mode
 # TODO Should work with the two lines above, but doesn't
 include_directories(../../build/system_modes/rosidl_generator_cpp/)
 link_directories(../../build/system_modes/)
-target_link_libraries(mode system_modes__rosidl_typesupport_cpp boost_program_options)
+target_link_libraries(mode system_modes__rosidl_typesupport_cpp)
 
   # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.

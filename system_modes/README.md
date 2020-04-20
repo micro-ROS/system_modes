@@ -120,3 +120,11 @@ The mode monitor is a ROS node that accepts an SHM file (see [above](#system-mod
 
 Running the monitor:  
 $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to/modelfile.yaml]`
+
+## How to Apply
+
+When designing the hierarchy of your system, try to group parts semantically, e.g., everything that belongs to *perception* or *navigation*. You want to group those parts of a system that are often jointly managed (initialized, shutdown, configured).
+
+When designing system modes for your system, try to focus on platform-specific aspects (so those that are generally present) rather than aspects specific to a certain application. Good examples are *degraded* and *performance* modes of the platform, bad examples are system modes to encode the current number of (grasping) re-tries.
+
+Also, avoid *read-only* system modes, e.g., modes that discretize/encode a read-only internal state. An example for such a system mode specification to avoid is *low energy* and *full*, discretizing the charging level of a battery component. We currently don't distinguish *manageable* and *read-only* system modes in the SMH file, so this could lead to issues in the deliberation layer.

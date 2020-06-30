@@ -133,6 +133,16 @@ if(BUILD_TESTING)
     )
     target_link_libraries(test_mode mode)
   endif()
+
+  message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}/system_modes/")
+  ament_add_gtest(test_mode_inference test/test_mode_inference.cpp)
+  if(TARGET test_mode_inference)
+    target_include_directories(test_mode_inference PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_inference mode)
+  endif()
 endif()
 
 ament_export_include_directories(include)

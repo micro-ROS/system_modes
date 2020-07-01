@@ -52,6 +52,13 @@ ModeInference::ModeInference(const string & model_path)
 }
 
 void
+ModeInference::update(const string & node, const StateAndMode & sm)
+{
+  this->update_state(node, sm.state);
+  this->update_mode(node, sm.mode);
+}
+
+void
 ModeInference::update_state(const string & node, unsigned int state)
 {
   std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
@@ -63,6 +70,10 @@ ModeInference::update_state(const string & node, unsigned int state)
       mode = this->nodes_[node].mode;
     }
     this->nodes_[node] = StateAndMode(state, mode);
+  } else {
+    // TODO(anordman): Explicit message, when trying to update system
+    throw std::out_of_range(
+                 "Can't update state of '" + node + "', unknown node.");
   }
 }
 
@@ -74,6 +85,10 @@ ModeInference::update_mode(const string & node, const string & mode)
   auto it = this->nodes_.find(node);
   if (it != this->nodes_.end()) {
     this->nodes_[node] = StateAndMode(this->nodes_[node].state, mode);
+  } else {
+    // TODO(anordman): Explicit message, when trying to update system
+    throw std::out_of_range(
+                 "Can't update mode of '" + node + "', unknown node.");
   }
 }
 
@@ -300,7 +315,7 @@ ModeInference::infer_system(const string & part)
       }
     }
 
-    return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "?");
+    return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
   }
 
   throw std::runtime_error("Inference failed.");
@@ -322,9 +337,10 @@ ModeInference::infer_node(const string & part)
   // Do we know the target mode?
   try {
     auto target = this->get_target(part);
-    string targetMode = target.mode;
+    auto targetState = target.state;
+    auto targetMode = target.mode;
 
-    if (!targetMode.empty()) {
+    if (targetState != State::PRIMARY_STATE_ACTIVE || !targetMode.empty()) {
       bool inTargetMode = true;
 
       // we know the target mode, so check this one first

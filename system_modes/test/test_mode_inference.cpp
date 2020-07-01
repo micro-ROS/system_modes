@@ -103,7 +103,6 @@ TEST(TestModeInference, update) {
     StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
     StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
 
-    // system
     inference.update_target("system", active_default);
     EXPECT_THROW(inference.update_state("system", active_default.state), std::out_of_range);
     EXPECT_THROW(inference.update_mode("system", active_default.mode), std::out_of_range);
@@ -112,6 +111,16 @@ TEST(TestModeInference, update) {
     inference.update_mode("part1", active_default.mode);
     EXPECT_EQ(active_default.state, inference.get_or_infer("system").state);
     EXPECT_EQ(active_default.mode, inference.get_or_infer("system").mode);
+}
+
+TEST(TestModeInference, update_parameters) {
+    ModeInference inference(MODE_FILE_CORRECT);
+
+    StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+
+    inference.update_target("part0", active_default);
+    EXPECT_EQ(active_default.state, inference.get_or_infer("part0").state);
+
 }
 
 TEST(TestModeInference, inference) {

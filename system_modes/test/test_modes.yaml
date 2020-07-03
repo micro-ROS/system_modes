@@ -13,9 +13,9 @@ system:
         part1: active
       AA:
         part0: active.FOO
-        part1: active.BAR
+        part1: active.AAA
       BB:
-        part0: active.BBB
+        part0: active.BAR
         part1: active.BBB
 
 part0:

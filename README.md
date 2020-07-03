@@ -22,6 +22,8 @@ $ `colcon build --packages-select-regex system_modes`
 
 Have a look at the [system_modes_examples](./system_modes_examples/) documentation to try your installation.
 
+For using this package and designing system modes for your system, please refer to the [How to Apply](./system_modes/README.md#how-to-apply) section.
+
 ## License
 
 ROS 2 System Modes are open-sourced under the Apache-2.0 license. See the

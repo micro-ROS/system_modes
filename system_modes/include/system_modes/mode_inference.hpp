@@ -30,7 +30,7 @@
 
 namespace system_modes
 {
-  
+
 typedef std::map<std::string, StateAndMode > StatesMap;
 typedef std::map<std::string, std::map<std::string, rclcpp::Parameter> > ParametersMap;
 typedef std::map<std::string, std::pair<StateAndMode, StateAndMode > > Deviation;
@@ -47,6 +47,7 @@ public:
   virtual const std::vector<std::string> get_all_parts_of(
     const std::string & system) const;
 
+  virtual void update(const std::string &, const StateAndMode &);
   virtual void update_state(const std::string &, unsigned int);
   virtual void update_mode(const std::string &, const std::string &);
   virtual void update_param(const std::string &, rclcpp::Parameter &);

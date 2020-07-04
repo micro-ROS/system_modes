@@ -16,7 +16,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -38,7 +38,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES builtin_interfaces
 )
 
-add_library(mode
+add_library(mode SHARED
   src/system_modes/mode.cpp
   src/system_modes/mode_impl.cpp
   src/system_modes/mode_inference.cpp)
@@ -132,6 +132,16 @@ if(BUILD_TESTING)
       ${rclcpp_INCLUDE_DIRS}
     )
     target_link_libraries(test_mode mode)
+  endif()
+
+  message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}/system_modes/")
+  ament_add_gtest(test_mode_inference test/test_mode_inference.cpp)
+  if(TARGET test_mode_inference)
+    target_include_directories(test_mode_inference PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_inference mode)
   endif()
 endif()
 

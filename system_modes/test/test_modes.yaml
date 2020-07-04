@@ -5,20 +5,20 @@ system:
   ros__parameters:
     type: system
     parts:
-      testPart
-      testPart2
+      part0
+      part1
     modes:
       __DEFAULT__:
-        testPart: INACTIVE
-        testPart2: ACTIVE
+        part0: inactive
+        part1: active
       AA:
-        testPart: ACTIVE.WEAK
-        testPart2: ACTIVE.SLOW
+        part0: active.FOO
+        part1: active.AAA
       BB:
-        testPart: ACTIVE.STRONG
-        testPart2: ACTIVE.FAST
+        part0: active.BAR
+        part1: active.BBB
 
-testPart:
+part0:
   ros__parameters:
     type: node
     modes:
@@ -35,7 +35,7 @@ testPart:
           foo: 0.2
           bar: ERR
 
-testPart2:
+part1:
   ros__parameters:
     type: node
     modes:

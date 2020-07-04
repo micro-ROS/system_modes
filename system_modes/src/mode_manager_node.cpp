@@ -40,6 +40,7 @@ using std::shared_ptr;
 
 using system_modes::ModeManager;
 using system_modes::DEFAULT_MODE;
+using system_modes::StateAndMode;
 using system_modes::msg::ModeEvent;
 
 using lifecycle_msgs::msg::State;
@@ -108,11 +109,11 @@ void transition_request_callback(
   if (msg->goal_state.id != State::PRIMARY_STATE_ACTIVE) {
     manager->inference()->update_target(
       node_name,
-      make_pair(msg->goal_state.id, ""));
+      StateAndMode(msg->goal_state.id, ""));
   } else {
     manager->inference()->update_target(
       node_name,
-      make_pair(msg->goal_state.id, DEFAULT_MODE));
+      StateAndMode(msg->goal_state.id, DEFAULT_MODE));
   }
 }
 
@@ -122,7 +123,7 @@ void mode_request_callback(
 {
   manager->inference()->update_target(
     node_name,
-    make_pair(State::PRIMARY_STATE_ACTIVE, msg->goal_mode.label.c_str()));
+    StateAndMode(State::PRIMARY_STATE_ACTIVE, msg->goal_mode.label.c_str()));
 }
 
 void

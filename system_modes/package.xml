@@ -7,6 +7,8 @@
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>std_msgs</depend>
@@ -14,9 +16,6 @@
   <depend>rosidl_default_generators</depend>
   <depend>libboost-program-options-dev</depend>
 
-  <buildtool_depend>ament_cmake_ros</buildtool_depend>
-
-  <test_depend>ament_cmake</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_gmock</test_depend>
   <test_depend>ament_cmake_pep257</test_depend>

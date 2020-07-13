@@ -43,7 +43,7 @@ public:
   : LifecycleNode("manipulator")
   {
     RCLCPP_INFO(get_logger(), "Constructed lifecycle node '%s'", this->get_name());
-    
+
     // Parameter declaration
     this->declare_parameter("max_torque",
       rclcpp::ParameterValue(rclcpp::PARAMETER_NOT_SET),
@@ -63,7 +63,7 @@ public:
       }
       return result;
     };
-    this->set_on_parameters_set_callback(param_change_callback);
+    this->add_on_set_parameters_callback(param_change_callback);
   }
 
   Manipulator(const Manipulator &) = delete;

@@ -139,7 +139,7 @@ ModeImpl::add_part_mode(
   const std::string & part,
   const StateAndMode stateAndMode)
 {
-  this->part_modes_[part] = {stateAndMode.state, stateAndMode.mode};
+  this->part_modes_[part] = StateAndMode(stateAndMode.state, stateAndMode.mode);
 }
 
 void
@@ -173,8 +173,8 @@ ModeImpl::get_part_mode(const std::string & part) const
     return this->part_modes_.at(part);
   } else {
     throw std::out_of_range(
-                 "Can't receive modes for part '" + part +
-                 "', part not specified.");
+            "Can't receive modes for part '" + part +
+            "', part not specified.");
   }
 }
 

@@ -31,9 +31,9 @@
 namespace system_modes
 {
 
-typedef std::map<std::string, StateAndMode > StatesMap;
-typedef std::map<std::string, std::map<std::string, rclcpp::Parameter> > ParametersMap;
-typedef std::map<std::string, std::pair<StateAndMode, StateAndMode > > Deviation;
+typedef std::map<std::string, StateAndMode> StatesMap;
+typedef std::map<std::string, std::map<std::string, rclcpp::Parameter>> ParametersMap;
+typedef std::map<std::string, std::pair<StateAndMode, StateAndMode>> Deviation;
 
 class ModeInference
 {

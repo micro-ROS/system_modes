@@ -63,7 +63,8 @@ public:
       }
       return result;
     };
-    this->add_on_set_parameters_callback(param_change_callback);
+    
+    param_change_callback_handle_ = this->add_on_set_parameters_callback(param_change_callback);
   }
 
   Manipulator(const Manipulator &) = delete;
@@ -100,6 +101,9 @@ public:
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   };
+
+private:
+  rclcpp::Node::OnSetParametersCallbackHandle::SharedPtr param_change_callback_handle_;
 };
 
 }  // namespace examples

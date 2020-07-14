@@ -73,7 +73,7 @@ ModeInference::update_state(const string & node, unsigned int state)
   } else {
     // TODO(anordman): Explicit message, when trying to update system
     throw std::out_of_range(
-                 "Can't update state of '" + node + "', unknown node.");
+            "Can't update state of '" + node + "', unknown node.");
   }
 }
 
@@ -88,7 +88,7 @@ ModeInference::update_mode(const string & node, const string & mode)
   } else {
     // TODO(anordman): Explicit message, when trying to update system
     throw std::out_of_range(
-                 "Can't update mode of '" + node + "', unknown node.");
+            "Can't update mode of '" + node + "', unknown node.");
   }
 }
 

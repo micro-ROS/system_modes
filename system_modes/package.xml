@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes</name>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <description>Model-based distributed configuration handling.</description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>
@@ -24,7 +24,7 @@
   <test_depend>ament_cmake_cppcheck</test_depend>
   <test_depend>ament_cmake_uncrustify</test_depend>
   <test_depend>ament_lint_auto</test_depend>
-  
+
   <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>

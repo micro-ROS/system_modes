@@ -39,12 +39,18 @@ struct StateAndMode
     state = newstate;
     mode = newmode;
   }
+
   bool operator!=(const StateAndMode & cmp) const
   {
     return cmp.state == state &&                                     // same state
            (cmp.mode.compare(mode) == 0 ||                           // same mode
            (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
            (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
+  }
+
+  bool operator==(const StateAndMode & cmp) const
+  {
+    return !(*this != cmp);
   }
 };
 

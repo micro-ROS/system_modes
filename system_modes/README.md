@@ -134,3 +134,12 @@ then:
 
 if _actual_ state/mode and _target_ state/mode diverge, but there is no rule for this exact situation, the bottom-up rules will just try to return the system/part to its _target_ state/mode.
 TODO: dangerous: what's happening, if the system is already on its way. E.g., a system or part was just commanded to transition to _ACTIVE.foo_, but is currently _activating_ (so doing everything right). In this case we have to avoid that the bottom-up rules will trigger.
+
+## How to Apply
+
+When designing the hierarchy of your system, try to group parts semantically, e.g., everything that belongs to *perception* or *navigation*. You want to group those parts of a system that are often jointly managed (initialized, shutdown, configured). Hierarchies don't necessarily need to be designed in one big tree, but can form several parallel trees.
+
+When designing system modes for your system, try to focus on platform-specific aspects (so those that are generally present) rather than aspects specific to a certain application. Good examples are *degraded* and *performance* modes of the platform, bad examples are system modes to encode the current number of (grasping) re-tries.
+
+Also, do not model any "read-only" system modes, e.g., modes that discretize/encode a read-only internal state. An example for such a mode specification to avoid is *low energy* and *full*, discretizing the charging level of a battery component. The System Modes concept assumes that the activatability of a system mode of a given node or subsystem should depend only on the states and modes of the other nodes and subsystems (and on the higher-level task executed by some deliberation layer). Note that the same applies to the ROS 2 node lifecycle states (*Unconfigured*, *Inactive*, etc.). The only exception is the *ErrorProcessing* state, which can be entered autonomously by the node itself. Within the mode inference, if a node performs a transition to *ErrorProcessing*, this is automatically propagated upwards as inferred state along the hierarchy. It is up to the deliberation layer to handle the failure of this node or subsystem.
+

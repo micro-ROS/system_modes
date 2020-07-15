@@ -655,19 +655,20 @@ Deviation
 ModeInference::get_deviation()
 {
   Deviation deviation;
-  
+
   for (auto const& part : get_all_parts()) {
     try {
       auto actual = get_or_infer(part);
       auto target = get_target(part);
-      if (!(actual == target) && actual.state <= 8) {  // we ignore transition states
+      if (actual != target && actual.state <= 8) {  // we ignore transition states
+        printf("get_deviation() %d:%s != %d:%s", actual.state, actual.mode.c_str(), target.state, target.mode.c_str());
         deviation[part] = std::make_pair(target, actual);
       }
     } catch (std::exception const& ex) {
       std::cout << ex.what() << std::endl;
     }
   }
-  
+
   return deviation;
 }
 

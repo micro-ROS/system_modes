@@ -533,12 +533,12 @@ ModeManager::handle_system_deviation(const std::string& reason)
     reason.c_str());
   auto deviation = this->mode_inference_->get_deviation();
   if (deviation.empty()) {return;}
-  
+
   std::map<std::string, bool> devs;
   for (auto const& part : mode_inference_->get_all_parts()) {
     devs[part] = false;
   }
-  
+
   // handle deviation
   for (auto const& dev : deviation) {
     RCLCPP_WARN(
@@ -550,7 +550,7 @@ ModeManager::handle_system_deviation(const std::string& reason)
       );
     devs[dev.first] = true;
   }
-  
+
   for (auto const& part : mode_inference_->get_all_parts()) {
     RCLCPP_INFO(
       this->get_logger(),

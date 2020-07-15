@@ -63,7 +63,7 @@ public:
   virtual StateAndMode get_target(const std::string & part);
   virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode);
   virtual std::vector<std::string> get_available_modes(const std::string & part);
-  
+
   virtual Deviation get_deviation();
 
   virtual ~ModeInference() = default;

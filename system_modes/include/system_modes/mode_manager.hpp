@@ -86,7 +86,7 @@ protected:
 
   virtual void change_part_state(const std::string & node, unsigned int);
   virtual void change_part_mode(const std::string & node, const std::string & mode);
-  
+
 private:
   std::shared_ptr<ModeInference> mode_inference_;
 

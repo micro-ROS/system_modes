@@ -29,21 +29,22 @@ namespace system_modes
 
 static const char DEFAULT_MODE[] = "__DEFAULT__";
 
-struct StateAndMode {
+struct StateAndMode
+{
   unsigned int state;
   std::string mode;
 
-  StateAndMode(unsigned int newstate = 0, const std::string& newmode = "")
+  explicit StateAndMode(unsigned int newstate = 0, const std::string & newmode = "")
   {
     state = newstate;
     mode = newmode;
   }
-  bool operator!=(const StateAndMode& cmp) const
+  bool operator!=(const StateAndMode & cmp) const
   {
-    return (cmp.state == state                                       // same state
-      && (cmp.mode.compare(mode) == 0                                // same mode
-        || (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty())     // we consider empty and
-        || (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty())));  // DEFAULT_MODE the same
+    return cmp.state == state &&                                     // same state
+           (cmp.mode.compare(mode) == 0 ||                           // same mode
+           (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
+           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
   }
 };
 

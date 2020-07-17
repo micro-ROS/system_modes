@@ -40,7 +40,7 @@ struct StateAndMode
     mode = newmode;
   }
 
-  bool operator!=(const StateAndMode & cmp) const
+  bool operator==(const StateAndMode & cmp) const
   {
     return cmp.state == state &&                                     // same state
            (cmp.mode.compare(mode) == 0 ||                           // same mode
@@ -48,9 +48,9 @@ struct StateAndMode
            (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
   }
 
-  bool operator==(const StateAndMode & cmp) const
+  bool operator!=(const StateAndMode & cmp) const
   {
-    return !(*this != cmp);
+    return !(*this == cmp);
   }
 };
 

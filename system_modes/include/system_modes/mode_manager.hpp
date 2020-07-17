@@ -89,6 +89,7 @@ protected:
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;
+  rclcpp::TimerBase::SharedPtr periodic_timer_;
 
   // Lifecycle change services
   std::map<std::string, rclcpp::Service<lifecycle_msgs::srv::ChangeState>::SharedPtr>

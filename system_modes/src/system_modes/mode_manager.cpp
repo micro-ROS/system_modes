@@ -50,6 +50,8 @@ using system_modes::msg::ModeEvent;
 using system_modes::srv::ChangeMode;
 using system_modes::srv::GetAvailableModes;
 
+using namespace std::chrono_literals;
+
 namespace system_modes
 {
 
@@ -92,6 +94,13 @@ ModeManager::ModeManager(const string & model_path)
     RCLCPP_INFO(get_logger(), "  - %s/get_mode", node.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/get_available_modes", node.c_str());
   }
+
+  // rules timer
+  periodic_timer_ = this->create_wall_timer(
+    200ms,
+    [this]() {
+      this->handle_system_deviation("timer");
+    });
 }
 
 std::shared_ptr<ModeInference>

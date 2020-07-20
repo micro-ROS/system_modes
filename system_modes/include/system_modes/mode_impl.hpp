@@ -29,6 +29,15 @@ namespace system_modes
 
 static const char DEFAULT_MODE[] = "__DEFAULT__";
 
+
+unsigned int state_id_(const std::string & state_label);
+const std::string state_label_(unsigned int state_id);
+
+unsigned int transition_id_(const std::string & transition_label);
+const std::string transition_label_(unsigned int transition_id);
+
+unsigned int goal_state_(unsigned int transition_id);
+
 struct StateAndMode
 {
   unsigned int state;
@@ -51,6 +60,16 @@ struct StateAndMode
   bool operator!=(const StateAndMode & cmp) const
   {
     return !(*this == cmp);
+  }
+
+  void from_string(const std::string & sam) {
+    auto dot = sam.find(".");
+    if (dot != std::string::npos) {
+      state = state_id_(sam.substr(0, dot));
+      mode = sam.substr(dot + 1);
+    } else {
+      state = state_id_(sam);
+    }
   }
 };
 

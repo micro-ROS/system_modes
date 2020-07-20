@@ -24,7 +24,6 @@
 
 using std::string;
 using std::vector;
-using std::to_string;
 using std::out_of_range;
 using std::runtime_error;
 using rclcpp::Parameter;
@@ -174,94 +173,6 @@ Mode::set_part_mode(
     this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, DEFAULT_MODE));
   } else {
     this->mode_impl_.add_part_mode(part, stateAndMode);
-  }
-}
-
-// TODO(anordman): Can we get this from the rcl default state machine?
-static const std::map<unsigned int, string> STATES_ = {
-  {State::PRIMARY_STATE_UNKNOWN, "unknown"},
-  {State::PRIMARY_STATE_UNCONFIGURED, "unconfigured"},
-  {State::PRIMARY_STATE_INACTIVE, "inactive"},
-  {State::PRIMARY_STATE_ACTIVE, "active"},
-  {State::PRIMARY_STATE_FINALIZED, "finalized"},
-  {State::TRANSITION_STATE_CONFIGURING, "configuring"},
-  {State::TRANSITION_STATE_CLEANINGUP, "cleaningup"},
-  {State::TRANSITION_STATE_SHUTTINGDOWN, "shuttingdown"},
-  {State::TRANSITION_STATE_ACTIVATING, "activating"},
-  {State::TRANSITION_STATE_DEACTIVATING, "deactivating"},
-  {State::TRANSITION_STATE_ERRORPROCESSING, "errorprocessing"}
-};
-
-static const std::map<unsigned int, string> TRANSITIONS_ = {
-  {Transition::TRANSITION_CREATE, "create"},
-  {Transition::TRANSITION_CONFIGURE, "configure"},
-  {Transition::TRANSITION_CLEANUP, "cleanup"},
-  {Transition::TRANSITION_ACTIVATE, "activate"},
-  {Transition::TRANSITION_DEACTIVATE, "deactivate"},
-  {Transition::TRANSITION_INACTIVE_SHUTDOWN, "inactive_shutdown"},
-  {Transition::TRANSITION_ACTIVE_SHUTDOWN, "active_shutdown"},
-  {Transition::TRANSITION_DESTROY, "destroy"}
-};
-
-static const std::map<unsigned int, unsigned int> GOAL_STATES_ = {
-  {Transition::TRANSITION_CREATE, State::PRIMARY_STATE_UNCONFIGURED},
-  {Transition::TRANSITION_CONFIGURE, State::PRIMARY_STATE_INACTIVE},
-  {Transition::TRANSITION_CLEANUP, State::PRIMARY_STATE_UNCONFIGURED},
-  {Transition::TRANSITION_ACTIVATE, State::PRIMARY_STATE_ACTIVE},
-  {Transition::TRANSITION_DEACTIVATE, State::PRIMARY_STATE_INACTIVE},
-  {Transition::TRANSITION_INACTIVE_SHUTDOWN, State::PRIMARY_STATE_FINALIZED},
-  {Transition::TRANSITION_ACTIVE_SHUTDOWN, State::PRIMARY_STATE_FINALIZED}
-};
-
-const std::string
-state_label_(unsigned int state_id)
-{
-  try {
-    return STATES_.at(state_id);
-  } catch (...) {
-    return "unknown";
-  }
-}
-
-unsigned int
-state_id_(const std::string & state_label)
-{
-  for (auto id : STATES_) {
-    if (id.second.compare(state_label) == 0) {
-      return id.first;
-    }
-  }
-  return 0;
-}
-
-const std::string
-transition_label_(unsigned int transition_id)
-{
-  try {
-    return TRANSITIONS_.at(transition_id);
-  } catch (...) {
-    throw out_of_range(string("Unknown transition id ") + to_string(transition_id));
-  }
-}
-
-unsigned int
-transition_id_(const std::string & transition_label)
-{
-  for (auto id : TRANSITIONS_) {
-    if (id.second.compare(transition_label) == 0) {
-      return id.first;
-    }
-  }
-  throw out_of_range("Unknown transition " + transition_label);
-}
-
-unsigned int
-goal_state_(unsigned int transition_id)
-{
-  try {
-    return GOAL_STATES_.at(transition_id);
-  } catch (...) {
-    throw out_of_range(string("Unknown transition id ") + to_string(transition_id));
   }
 }
 

@@ -42,7 +42,8 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: nodes_(), nodes_target_(),
+: mode_handling_(new ModeHandling(model_path)),
+  nodes_(), nodes_target_(),
   systems_(), systems_target_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
@@ -494,6 +495,7 @@ ModeInference::read_modes_from_model(const string & model_path)
       if (param.get_name().compare("type") != 0) {
         string mode_name;
 
+        // Parse mode definitions
         std::size_t foundm = param.get_name().find("modes.");
         if (foundm != string::npos) {
           std::size_t foundmr = param.get_name().find(".", 6);

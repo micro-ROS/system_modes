@@ -27,9 +27,37 @@
 #include <utility>
 
 #include "system_modes/mode.hpp"
+#include "system_modes/mode_impl.hpp"
 
 namespace system_modes
 {
+
+struct ModeRule
+{
+  std::string system_;
+  StateAndMode system_target_;
+
+  std::string part_;
+  StateAndMode part_actual_;
+
+  StateAndMode new_system_target_;
+
+/*explicit ModeRule(
+    const std::string & system,
+    StateAndMode system_target,
+    const std::string & part,
+    StateAndMode part_actual,
+    StateAndMode new_system_target)
+  {
+    system_ = system;
+    system_target_ = system_target;
+    part_ = part;
+    part_actual_ = part_actual;
+    new_system_target_ = new_system_target;
+  }*/
+};
+
+using RulesMap = std::map<std::string, ModeRule>;
 
 class ModeHandling
 {
@@ -40,12 +68,21 @@ public:
   virtual ~ModeHandling() = default;
 
 protected:
-  virtual void add_rule(const std::string & part, const rclcpp::Parameter & param);
-
   mutable std::shared_timed_mutex rules_mutex_;
 
 private:
-  std::map<std::string, ModeMap> rules_;
+  std::map<std::string, RulesMap> rules_;
+
+  virtual void read_rules_from_model(const std::string & model_path);
+  virtual void parse_rule(
+    const std::string & part,
+    const std::string & rule_name,
+    const rclcpp::Parameter & rule);
+  virtual void add_rule(
+    const std::string & part,
+    const std::string & rule_name,
+    const std::string & rule_part,
+    const rclcpp::Parameter & rule);
 };
 
 }  // namespace system_modes

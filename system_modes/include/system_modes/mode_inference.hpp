@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "system_modes/mode.hpp"
+#include "system_modes/mode_handling.hpp"
 
 namespace system_modes
 {
@@ -74,6 +75,8 @@ protected:
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
+  ModeHandling * mode_handling_;
+
   StatesMap nodes_, nodes_target_;
   StatesMap systems_, systems_target_;
   std::map<std::string, ModeMap> modes_;

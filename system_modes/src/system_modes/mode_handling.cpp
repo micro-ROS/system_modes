@@ -54,8 +54,10 @@ ModeHandling::read_rules_from_model(const string & model_path)
   if (!rcl_parse_yaml_file(model_path.c_str(), yaml_params)) {
     throw std::runtime_error("Failed to parse rules from " + model_path);
   }
-  //rcl_yaml_node_struct_print(yaml_params);
+
   rclcpp::ParameterMap param_map = rclcpp::parameter_map_from(yaml_params);
+  rcl_yaml_node_struct_fini(yaml_params);
+
   ParameterMap::iterator it;
   for (it = param_map.begin(); it != param_map.end(); it++) {
     string part_name(it->first.substr(1));
@@ -63,40 +65,24 @@ ModeHandling::read_rules_from_model(const string & model_path)
       string param_name(param.get_name());
 
       if (param_name.find("rules.") != string::npos) {
-        this->parse_rule(part_name, param_name.substr(6), param);
+        this->add_rule(part_name, param_name.substr(6), param);
       }
     }
   }
-
-/*
-  for (unsigned int n = 0; n < yaml_params->num_nodes; ++n) {
-    string part_name = yaml_params->node_names[n];
-
-    for (unsigned int i = 0; i < yaml_params->params[n].num_params; ++i) {
-      string param_name = yaml_params->params[n].parameter_names[i];
-      rcl_variant_t * param_value =
-        rcl_yaml_node_struct_get(part_name.c_str(), param_name.c_str(), yaml_params);
-
-      if (param_name.find("rules.") != string::npos) {
-        this->parse_rule(part_name, param_name.substr(6), param_value);
-      }
-    }
-  }*/
-
-  rcl_yaml_node_struct_fini(yaml_params);
-
 }
 
 void
-ModeHandling::parse_rule(
+ModeHandling::add_rule(
   const string & part,
   const string & rule_name,
-  const rclcpp::Parameter & rule)
+  const rclcpp::Parameter & rule_param)
 {
+  std::unique_lock<shared_mutex> mlock(this->rules_mutex_);
+
   // Rule specification
   std::size_t split = rule_name.find(".");
   if (split == string::npos) {
-    throw std::runtime_error("ModeHandling::parse_rule() can't parse rule.");
+    throw std::runtime_error("ModeHandling::add_rule() can't parse rule.");
   }
   string rule_spec = rule_name.substr(split + 1);
   string rule_name_ = rule_name.substr(0, split);
@@ -104,28 +90,19 @@ ModeHandling::parse_rule(
   if (rule_spec.compare("if_target") != 0 &&
       rule_spec.compare("if_part") != 0 &&
       rule_spec.compare("new_target") != 0) {
-    throw std::runtime_error("ModeHandling::parse_rule() can't parse rule spec.");
+    throw std::runtime_error("ModeHandling::add_rule() can't parse rule spec.");
   }
 
-  if (rule.get_type() != ParameterType::PARAMETER_STRING &&
-      rule.get_type() != ParameterType::PARAMETER_STRING_ARRAY) {
-    throw std::runtime_error("ModeHandling::parse_rule() rule is neither string nor string array.");
+  if (rule_param.get_type() != ParameterType::PARAMETER_STRING &&
+      rule_param.get_type() != ParameterType::PARAMETER_STRING_ARRAY) {
+    throw std::runtime_error("ModeHandling::add_rule() rule is neither string nor string array.");
   }
-
-  this->add_rule(part, rule_name_, rule_spec, rule);
-}
-
-void
-ModeHandling::add_rule(const string & part,
-    const std::string & rule_name,
-    const std::string & rule_spec,
-    const rclcpp::Parameter & rule_param)
-{
-  std::unique_lock<shared_mutex> mlock(this->rules_mutex_);
 
   // Insert rule if not existing already
-  this->rules_.insert(std::make_pair(part, RulesMap()));
-  auto it = this->rules_[part].insert(std::make_pair(rule_name, ModeRule()));
+  auto itr = this->rules_.insert(std::make_pair(part, RulesMap()));
+  if (itr.second) { printf("created new rulesmap for %s.\n", part.c_str()); }
+  auto it = this->rules_[part].insert(std::make_pair(rule_name_, ModeRule()));
+  if (it.second) { printf("created new moderule for %s: %s.\n", part.c_str(), rule_name_.c_str()); }
   auto rule = it.first->second;
 
   rule.system_ = part;
@@ -133,24 +110,54 @@ ModeHandling::add_rule(const string & part,
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING) {
       throw std::runtime_error("ModeHandling::parse_rule() if_target expects string.");
     }
-    rule.system_target_ = StateAndMode();
     rule.system_target_.from_string(rule_param.as_string());
+    /*printf(
+      " found if_target: %s -> %s:%s.\n",
+      rule_param.as_string().c_str(),
+      state_label_(rule.system_target_.state).c_str(), rule.system_target_.mode.c_str());*/
   } else if (rule_spec.compare("if_part") == 0) {
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING_ARRAY) {
       throw std::runtime_error("ModeHandling::parse_rule() if_part expects string array.");
     }
     auto spec = rule_param.as_string_array();
     rule.part_ = spec[0];
-    rule.system_target_ = StateAndMode();
     rule.system_target_.from_string(spec[1]);
   } else if (rule_spec.compare("new_target") == 0) {
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING) {
       throw std::runtime_error("ModeHandling::parse_rule() new_target expects string.");
     }
-    rule.new_system_target_ = StateAndMode();
     rule.new_system_target_.from_string(rule_param.as_string());
   }
-  this->rules_[part][rule_name] = rule;
+  this->rules_[part][rule_name_] = rule;
+
+  printf("parsed rule is for %s, target %s:%s, part %s, actual %s:%s.\n",
+    rule.system_.c_str(),
+    state_label_(rule.system_target_.state).c_str(),
+    rule.system_target_.mode.c_str(),
+    rule.part_.c_str(),
+    state_label_(rule.part_actual_.state).c_str(),
+    rule.part_actual_.mode.c_str()
+  );
+}
+
+const std::vector<ModeRule>
+ModeHandling::get_rules_for(const std::string & system, const StateAndMode & target)
+{
+  std::vector<ModeRule> rules;
+  printf("ModeHandling::get_rules_for(%s, %s)\n",
+    system.c_str(), target.as_string().c_str());
+  try {
+    auto rulesmap = this->rules_[system];
+    for (auto rule : rulesmap) {
+      if (target == rule.second.system_target_) {
+        rules.push_back(rule.second);
+      }
+    }
+  } catch (...) {
+    // no problem, if we don't find any rule
+  }
+
+  return rules;
 }
 
 }  // namespace system_modes

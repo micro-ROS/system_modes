@@ -66,6 +66,9 @@ public:
   RCLCPP_DISABLE_COPY(ModeHandling)
 
   virtual ~ModeHandling() = default;
+  virtual const std::vector<ModeRule> get_rules_for(
+    const std::string & system,
+    const StateAndMode & target);
 
 protected:
   mutable std::shared_timed_mutex rules_mutex_;
@@ -74,15 +77,10 @@ private:
   std::map<std::string, RulesMap> rules_;
 
   virtual void read_rules_from_model(const std::string & model_path);
-  virtual void parse_rule(
-    const std::string & part,
-    const std::string & rule_name,
-    const rclcpp::Parameter & rule);
   virtual void add_rule(
     const std::string & part,
     const std::string & rule_name,
-    const std::string & rule_part,
-    const rclcpp::Parameter & rule);
+    const rclcpp::Parameter & rule_param);
 };
 
 }  // namespace system_modes

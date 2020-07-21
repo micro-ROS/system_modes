@@ -64,16 +64,17 @@ ModeManager::ModeManager(const string & model_path)
   state_request_pub_(), mode_request_pub_()
 {
   declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
-  if (model_path.empty()) {
+  std::string mpath = model_path;
+
+  if (mpath.empty()) {
     rclcpp::Parameter parameter = get_parameter("modelfile");
-    std::string alt_model_path = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
-    if (alt_model_path.empty()) {
+    std::string mpath = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
+    if (mpath.empty()) {
       throw std::invalid_argument("Need path to model file.");
     }
-    mode_inference_ = std::make_shared<ModeInference>(alt_model_path);
-  } else {
-    mode_inference_ = std::make_shared<ModeInference>(model_path);
   }
+  mode_inference_ = std::make_shared<ModeInference>(mpath);
+  mode_handling_ = std::make_shared<ModeHandling>(mpath);
 
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);
@@ -336,7 +337,6 @@ ModeManager::on_get_available_modes(
   }
 }
 
-
 bool
 ModeManager::change_state(
   const std::string & node_name,
@@ -534,12 +534,8 @@ ModeManager::change_part_mode(const string & node, const string & mode)
 }
 
 void
-ModeManager::handle_system_deviation(const std::string& reason)
+ModeManager::handle_system_deviation(const std::string &)
 {
-  RCLCPP_INFO(
-    this->get_logger(),
-    "handle_system_deviation() based on %s",
-    reason.c_str());
   auto deviation = this->mode_inference_->get_deviation();
   if (deviation.empty()) {return;}
 
@@ -552,22 +548,21 @@ ModeManager::handle_system_deviation(const std::string& reason)
   for (auto const& dev : deviation) {
     RCLCPP_WARN(
       this->get_logger(),
-      " Deviation detected in system or part '%s': should be %s:%s, but is %s:%s",
+      "Deviation detected in system or part '%s': should be %s:%s, but is %s:%s.",
       dev.first.c_str(),
       state_label_(dev.second.first.state).c_str(), dev.second.first.mode.c_str(),
-      state_label_(dev.second.second.state).c_str(), dev.second.second.mode.c_str()
-      );
-    devs[dev.first] = true;
-  }
+      state_label_(dev.second.second.state).c_str(), dev.second.second.mode.c_str());
 
-  for (auto const& part : mode_inference_->get_all_parts()) {
-    RCLCPP_INFO(
-      this->get_logger(),
-      "  Deviation in system or part '%s': %s (should be %s:%s, is %s:%s)",
-      part.c_str(),
-      (devs[part] ? "true" : "false"),
-      state_label_(deviation[part].first.state).c_str(), deviation[part].first.mode.c_str(),
-      state_label_(deviation[part].second.state).c_str(), deviation[part].second.mode.c_str());
+    auto rules = this->mode_handling_->get_rules_for(dev.first, dev.second.first);
+    for (auto const &rule : rules) {
+      RCLCPP_INFO(
+        this->get_logger(),
+        "Found potential rule for: '%s' target is %s:%s but it's not, its part %s actually is %s:%s.",
+        rule.system_.c_str(),
+        state_label_(rule.system_target_.state).c_str(), rule.system_target_.mode.c_str(),
+        rule.part_.c_str(),
+        state_label_(rule.part_actual_.state).c_str(), rule.part_actual_.mode.c_str());
+    }
   }
 }
 

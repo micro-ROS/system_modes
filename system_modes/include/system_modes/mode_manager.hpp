@@ -28,6 +28,7 @@
 #include <memory>
 #include <utility>
 
+#include "system_modes/mode_handling.hpp"
 #include "system_modes/mode_inference.hpp"
 #include "system_modes/srv/change_mode.hpp"
 #include "system_modes/srv/get_mode.hpp"
@@ -89,6 +90,7 @@ protected:
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;
+  std::shared_ptr<ModeHandling> mode_handling_;
   rclcpp::TimerBase::SharedPtr periodic_timer_;
 
   // Lifecycle change services

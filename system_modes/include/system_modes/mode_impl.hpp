@@ -69,7 +69,16 @@ struct StateAndMode
       mode = sam.substr(dot + 1);
     } else {
       state = state_id_(sam);
+      mode = "";
     }
+  }
+
+  std::string as_string() const
+  {
+    if (mode.empty()) {
+      return state_label_(state);
+    }
+    return state_label_(state) + "." + mode;
   }
 };
 

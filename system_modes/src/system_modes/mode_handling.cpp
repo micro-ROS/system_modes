@@ -99,57 +99,43 @@ ModeHandling::add_rule(
   }
 
   // Insert rule if not existing already
-  auto itr = this->rules_.insert(std::make_pair(part, RulesMap()));
-  if (itr.second) { printf("created new rulesmap for %s.\n", part.c_str()); }
+  this->rules_.insert(std::make_pair(part, RulesMap()));
   auto it = this->rules_[part].insert(std::make_pair(rule_name_, ModeRule()));
-  if (it.second) { printf("created new moderule for %s: %s.\n", part.c_str(), rule_name_.c_str()); }
   auto rule = it.first->second;
 
-  rule.system_ = part;
+  rule.system = part;
   if (rule_spec.compare("if_target") == 0) {
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING) {
       throw std::runtime_error("ModeHandling::parse_rule() if_target expects string.");
     }
-    rule.system_target_.from_string(rule_param.as_string());
-    /*printf(
-      " found if_target: %s -> %s:%s.\n",
-      rule_param.as_string().c_str(),
-      state_label_(rule.system_target_.state).c_str(), rule.system_target_.mode.c_str());*/
+    rule.name = rule_name_;
+    rule.system_target.from_string(rule_param.as_string());
   } else if (rule_spec.compare("if_part") == 0) {
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING_ARRAY) {
       throw std::runtime_error("ModeHandling::parse_rule() if_part expects string array.");
     }
     auto spec = rule_param.as_string_array();
-    rule.part_ = spec[0];
-    rule.system_target_.from_string(spec[1]);
+    rule.name = rule_name_;
+    rule.part = spec[0];
+    rule.part_actual.from_string(spec[1]);
   } else if (rule_spec.compare("new_target") == 0) {
     if (rule_param.get_type() != ParameterType::PARAMETER_STRING) {
       throw std::runtime_error("ModeHandling::parse_rule() new_target expects string.");
     }
-    rule.new_system_target_.from_string(rule_param.as_string());
+    rule.name = rule_name_;
+    rule.new_system_target.from_string(rule_param.as_string());
   }
   this->rules_[part][rule_name_] = rule;
-
-  printf("parsed rule is for %s, target %s:%s, part %s, actual %s:%s.\n",
-    rule.system_.c_str(),
-    state_label_(rule.system_target_.state).c_str(),
-    rule.system_target_.mode.c_str(),
-    rule.part_.c_str(),
-    state_label_(rule.part_actual_.state).c_str(),
-    rule.part_actual_.mode.c_str()
-  );
 }
 
 const std::vector<ModeRule>
 ModeHandling::get_rules_for(const std::string & system, const StateAndMode & target)
 {
   std::vector<ModeRule> rules;
-  printf("ModeHandling::get_rules_for(%s, %s)\n",
-    system.c_str(), target.as_string().c_str());
   try {
     auto rulesmap = this->rules_[system];
     for (auto rule : rulesmap) {
-      if (target == rule.second.system_target_) {
+      if (target == rule.second.system_target) {
         rules.push_back(rule.second);
       }
     }

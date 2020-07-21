@@ -34,27 +34,15 @@ namespace system_modes
 
 struct ModeRule
 {
-  std::string system_;
-  StateAndMode system_target_;
+  std::string name;
 
-  std::string part_;
-  StateAndMode part_actual_;
+  std::string system;
+  StateAndMode system_target;
 
-  StateAndMode new_system_target_;
+  std::string part;
+  StateAndMode part_actual;
 
-/*explicit ModeRule(
-    const std::string & system,
-    StateAndMode system_target,
-    const std::string & part,
-    StateAndMode part_actual,
-    StateAndMode new_system_target)
-  {
-    system_ = system;
-    system_target_ = system_target;
-    part_ = part;
-    part_actual_ = part_actual;
-    new_system_target_ = new_system_target;
-  }*/
+  StateAndMode new_system_target;
 };
 
 using RulesMap = std::map<std::string, ModeRule>;

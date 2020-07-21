@@ -539,29 +539,21 @@ ModeManager::handle_system_deviation(const std::string &)
   auto deviation = this->mode_inference_->get_deviation();
   if (deviation.empty()) {return;}
 
-  std::map<std::string, bool> devs;
-  for (auto const& part : mode_inference_->get_all_parts()) {
-    devs[part] = false;
-  }
-
   // handle deviation
   for (auto const& dev : deviation) {
     RCLCPP_WARN(
       this->get_logger(),
-      "Deviation detected in system or part '%s': should be %s:%s, but is %s:%s.",
+      "Deviation detected in system or part '%s': should be %s, but is %s.",
       dev.first.c_str(),
-      state_label_(dev.second.first.state).c_str(), dev.second.first.mode.c_str(),
-      state_label_(dev.second.second.state).c_str(), dev.second.second.mode.c_str());
+      dev.second.first.as_string().c_str(),
+      dev.second.second.as_string().c_str());
 
     auto rules = this->mode_handling_->get_rules_for(dev.first, dev.second.first);
     for (auto const &rule : rules) {
-      RCLCPP_INFO(
-        this->get_logger(),
-        "Found potential rule for: '%s' target is %s:%s but it's not, its part %s actually is %s:%s.",
-        rule.system_.c_str(),
-        state_label_(rule.system_target_.state).c_str(), rule.system_target_.mode.c_str(),
-        rule.part_.c_str(),
-        state_label_(rule.part_actual_.state).c_str(), rule.part_actual_.mode.c_str());
+      auto part_actual = mode_inference_->get_or_infer(rule.part);
+      if (rule.part_actual == part_actual) {
+        RCLCPP_INFO(this->get_logger(), "Rule %s is applicable!", rule.name.c_str());
+      }
     }
   }
 }

@@ -17,12 +17,16 @@
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include <rclcpp/parameter_map.hpp>
 
+#include <lifecycle_msgs/msg/state.hpp>
+
 #include <map>
 #include <mutex>
 #include <vector>
 #include <string>
 #include <memory>
 #include <utility>
+
+using lifecycle_msgs::msg::State;
 
 namespace system_modes
 {
@@ -51,6 +55,11 @@ struct StateAndMode
 
   bool operator==(const StateAndMode & cmp) const
   {
+    if (cmp.state != State::PRIMARY_STATE_ACTIVE &&
+        cmp.state == state) {
+      return true;
+    }
+
     return cmp.state == state &&                                     // same state
            (cmp.mode.compare(mode) == 0 ||                           // same mode
            (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and

@@ -17,12 +17,16 @@
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include <rclcpp/parameter_map.hpp>
 
+#include <lifecycle_msgs/msg/state.hpp>
+
 #include <map>
 #include <mutex>
 #include <vector>
 #include <string>
 #include <memory>
 #include <utility>
+
+using lifecycle_msgs::msg::State;
 
 namespace system_modes
 {
@@ -49,17 +53,22 @@ struct StateAndMode
     mode = newmode;
   }
 
-  bool operator!=(const StateAndMode & cmp) const
+  bool operator==(const StateAndMode & cmp) const
   {
-    return cmp.state == state &&                                     // same state
-           (cmp.mode.compare(mode) == 0 ||                           // same mode
+    if (cmp.state != state) {
+      return false;
+    } else if (cmp.state != State::PRIMARY_STATE_ACTIVE) {
+      return true;
+    }
+
+    return (cmp.mode.compare(mode) == 0 ||                           // same mode
            (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
            (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
   }
 
-  bool operator==(const StateAndMode & cmp) const
+  bool operator!=(const StateAndMode & cmp) const
   {
-    return !(*this != cmp);
+    return !(*this == cmp);
   }
 
   void from_string(const std::string & sam) {
@@ -73,9 +82,8 @@ struct StateAndMode
     }
   }
 
-  std::string as_string() const
-  {
-    if (mode.empty()) {
+  std::string as_string() const {
+    if (state != State::PRIMARY_STATE_ACTIVE || mode.empty()) {
       return state_label_(state);
     }
     return state_label_(state) + "." + mode;

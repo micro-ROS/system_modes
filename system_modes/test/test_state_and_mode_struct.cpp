@@ -60,15 +60,20 @@ TEST_F(TestStateAndMode, comparison) {
     EXPECT_NE(active, active_foo);
     EXPECT_NE(active_default, active_foo);
     EXPECT_NE(active_default, inactive);
+
+    active_foo.state = State::PRIMARY_STATE_INACTIVE;
+    EXPECT_EQ(inactive, active_foo);
   }
 }
 
 TEST_F(TestStateAndMode, string_getter) {
   {
+    EXPECT_EQ("inactive"s, inactive.as_string());
     EXPECT_EQ("active"s, active.as_string());
     EXPECT_EQ("active.__DEFAULT__"s, active_default.as_string());
     EXPECT_EQ("active.FOO"s, active_foo.as_string());
-    EXPECT_EQ("inactive"s, inactive.as_string());
+    active_foo.state = State::PRIMARY_STATE_INACTIVE;
+    EXPECT_EQ("inactive"s, active_foo.as_string());
   }
 }
 

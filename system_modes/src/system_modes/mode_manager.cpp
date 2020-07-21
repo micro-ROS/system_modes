@@ -550,9 +550,31 @@ ModeManager::handle_system_deviation(const std::string &)
 
     auto rules = this->mode_handling_->get_rules_for(dev.first, dev.second.first);
     for (auto const &rule : rules) {
-      auto part_actual = mode_inference_->get_or_infer(rule.part);
-      if (rule.part_actual == part_actual) {
-        RCLCPP_INFO(this->get_logger(), "Rule %s is applicable!", rule.name.c_str());
+      try {
+        auto part_actual = mode_inference_->get_or_infer(rule.part);
+        if (rule.part_actual == part_actual) {
+          RCLCPP_INFO(this->get_logger(), " applying rule %s...", rule.name.c_str());
+
+          auto system_actual = mode_inference_->get_or_infer(rule.system);
+          if (system_actual.state != rule.new_system_target.state) {
+            // TODO(anordman): this is hacky and needs lifecycle servicing
+            if ((system_actual.state == State::PRIMARY_STATE_ACTIVE
+                || State::TRANSITION_STATE_ACTIVATING) &&
+                rule.new_system_target.state == State::PRIMARY_STATE_INACTIVE) {
+              change_state(rule.system, transition_id_("deactivate"), true);
+            } else if (system_actual.state == State::PRIMARY_STATE_INACTIVE &&
+                rule.new_system_target.state == State::PRIMARY_STATE_ACTIVE) {
+              change_state(rule.system, transition_id_("activate"), true);
+            }
+            if (!rule.new_system_target.mode.empty()) {
+              change_mode(rule.system, rule.new_system_target.mode);
+            }
+          } else {
+            change_mode(rule.system, rule.new_system_target.mode);
+          }
+        }
+      } catch (...) {
+        // If we can't infer anything about the system, it's okay to wait
       }
     }
   }

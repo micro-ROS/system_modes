@@ -665,8 +665,8 @@ ModeInference::get_deviation()
       if (actual != target) {
         deviation[part] = std::make_pair(target, actual);
       }
-    } catch (std::exception const& ex) {
-      std::cout << ex.what() << std::endl;
+    } catch (...) {
+      // We can't get deviations, if we can't infer the system state
     }
   }
 

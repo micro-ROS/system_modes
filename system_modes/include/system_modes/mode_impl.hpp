@@ -55,13 +55,13 @@ struct StateAndMode
 
   bool operator==(const StateAndMode & cmp) const
   {
-    if (cmp.state != State::PRIMARY_STATE_ACTIVE &&
-        cmp.state == state) {
+    if (cmp.state != state) {
+      return false;
+    } else if (cmp.state != State::PRIMARY_STATE_ACTIVE) {
       return true;
     }
 
-    return cmp.state == state &&                                     // same state
-           (cmp.mode.compare(mode) == 0 ||                           // same mode
+    return (cmp.mode.compare(mode) == 0 ||                           // same mode
            (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
            (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
   }
@@ -82,9 +82,8 @@ struct StateAndMode
     }
   }
 
-  std::string as_string() const
-  {
-    if (mode.empty()) {
+  std::string as_string() const {
+    if (state != State::PRIMARY_STATE_ACTIVE || mode.empty()) {
       return state_label_(state);
     }
     return state_label_(state) + "." + mode;

@@ -343,7 +343,7 @@ ModeManager::change_state(
   // Publish info about this request
   auto info = std::make_shared<TransitionEvent>();
   if (this->current_modes_.find(node_name) != this->current_modes_.end()) {
-    info->start_state.label = this->current_modes_.at(node_name).first;
+    info->start_state.label = this->current_modes_.at(node_name).state;
   }
   info->transition.label = transition_label_(transition_id);
   info->transition.id = transition_id;
@@ -407,7 +407,7 @@ ModeManager::change_mode(
 
   this->current_modes_.emplace(
     node_name,
-    std::make_pair(State::PRIMARY_STATE_ACTIVE, mode_name.c_str()));
+    StateAndMode(State::PRIMARY_STATE_ACTIVE, mode_name.c_str()));
 
   auto nodes = this->mode_inference_->get_nodes();
   if (std::find(nodes.begin(), nodes.end(), node_name) != nodes.end()) {
@@ -461,7 +461,7 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
   info->transition.label = transition_label_(transition);
   info->transition.id = transition;
   if (this->current_modes_.find(node) != this->current_modes_.end()) {
-    info->start_state.label = this->current_modes_.at(node).first;
+    info->start_state.label = this->current_modes_.at(node).state;
     info->start_state.id = state_id_(info->start_state.label);
   }
   info->goal_state.id = goal_state_(info->transition.id);

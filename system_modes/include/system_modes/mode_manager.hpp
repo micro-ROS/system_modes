@@ -122,7 +122,7 @@ private:
   mode_request_pub_;
 
   // Remember states and modes of the systems
-  std::map<std::string, std::pair<unsigned int, std::string>> current_modes_;
+  std::map<std::string, StateAndMode> current_modes_;
 };
 
 }  // namespace system_modes

@@ -118,6 +118,14 @@ if(BUILD_TESTING)
   configure_file(test/modefiles.h.in ${CMAKE_CURRENT_BINARY_DIR}/system_modes/modefiles.h)
   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+  ament_add_gtest(test_state_and_mode_struct test/test_state_and_mode_struct.cpp)
+  if(TARGET test_state_and_mode_struct)
+    target_include_directories(test_state_and_mode_struct PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+    )
+    target_link_libraries(test_state_and_mode_struct mode)
+  endif()
+
   ament_add_gtest(test_default_mode test/test_default_mode.cpp)
   if(TARGET test_default_mode)
     target_include_directories(test_default_mode PUBLIC
@@ -134,7 +142,6 @@ if(BUILD_TESTING)
     target_link_libraries(test_mode mode)
   endif()
 
-  message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}/system_modes/")
   ament_add_gtest(test_mode_inference test/test_mode_inference.cpp)
   if(TARGET test_mode_inference)
     target_include_directories(test_mode_inference PUBLIC

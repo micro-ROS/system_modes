@@ -73,7 +73,8 @@ In order to see the [Error Handling and Rules](../system_modes/README.md#error-h
   $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
 1. Deactivate the manipulator node with the following command:  
   $ `ros2 service call /manipulator/change_state lifecycle_msgs/ChangeState "{transition: {id: 4, label: deactivate}}"`  
-  The system will detect a deviation between the *intended* and the *actual* system state for which it recognizes a rule, i.e. the *degrade_from_PERFORMANCE* rule from the SMH file [example_modes.yaml](./example_modes.yaml). The mode manager will send the *actuation* system into its default mode, where the *manipulator* node is inactive anyway.
+  The system will detect a deviation between the *intended* and the *actual* system state for which it recognizes a rule, i.e. the *degrade_from_PERFORMANCE* rule from the SMH file [example_modes.yaml](./example_modes.yaml). Following this rule, the mode manager sends the *actuation* system into its default mode. This is visible in the logging output of the terminal running the mode manager:  
+  ![mode_manager](./doc/screenshot-manager-deviation.png "Screenshot of the mode manager")
 1. To try another rule, bring the system back into its *PERFORMANCE* mode with the following command:  
   $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
 1. This time, deactivate the drive_base node with the following command:  

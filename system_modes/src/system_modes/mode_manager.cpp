@@ -58,23 +58,22 @@ namespace system_modes
 ModeManager::ModeManager(const string & model_path)
 : Node("__mode_manager"),
   mode_inference_(nullptr),
+  model_path_(model_path),
   state_change_srv_(), get_state_srv_(), states_srv_(),
   mode_change_srv_(), get_mode_srv_(), modes_srv_(),
   state_change_clients_(), mode_change_clients_(),
   state_request_pub_(), mode_request_pub_()
 {
   declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
-  std::string mpath = model_path;
-
-  if (mpath.empty()) {
+  if (model_path_.empty()) {
     rclcpp::Parameter parameter = get_parameter("modelfile");
-    std::string mpath = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
-    if (mpath.empty()) {
+    model_path_ = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
+    if (model_path_.empty()) {
       throw std::invalid_argument("Need path to model file.");
     }
   }
-  mode_inference_ = std::make_shared<ModeInference>(mpath);
-  mode_handling_ = std::make_shared<ModeHandling>(mpath);
+  mode_inference_ = std::make_shared<ModeInference>(model_path_);
+  mode_handling_ = std::make_shared<ModeHandling>(model_path_);
 
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);

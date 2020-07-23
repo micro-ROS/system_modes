@@ -108,12 +108,4 @@ inline std::ostream & operator<<(std::ostream & os, const Mode & mode)
   return os;
 }
 
-unsigned int state_id_(const std::string & state_label);
-const std::string state_label_(unsigned int state_id);
-
-unsigned int transition_id_(const std::string & transition_label);
-const std::string transition_label_(unsigned int transition_id);
-
-unsigned int goal_state_(unsigned int transition_id);
-
 }  // namespace system_modes

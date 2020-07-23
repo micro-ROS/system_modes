@@ -2,7 +2,12 @@
 Changelog for package system_modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.2.3 (2020-02-13)
+0.3.0 (2020-07-23)
+-----------
+* changed mode service specifications (less redundancy)
+* https://github.com/micro-ROS/system_modes/issues/24
+
+0.2.3 (2020-07-23)
 -----------
 * improved StateAndMode struct
 * testing

@@ -103,9 +103,6 @@ bool parseOptions(int argc, char * argv[])
     return true;
   }
 
-  // if (modelfile.empty()) {
-  //   throw invalid_argument("Need path to model file.");
-  // }
   return false;
 }
 
@@ -121,7 +118,7 @@ void mode_change_callback(
   const string & node_name)
 {
   monitor->inference()->update_state(node_name, State::PRIMARY_STATE_ACTIVE);
-  monitor->inference()->update_mode(node_name, msg->goal_mode.label.c_str());
+  monitor->inference()->update_mode(node_name, msg->goal_mode.label);
 }
 
 void transition_request_callback(
@@ -145,7 +142,7 @@ void mode_request_callback(
 {
   monitor->inference()->update_target(
     node_name,
-    StateAndMode(State::PRIMARY_STATE_ACTIVE, msg->goal_mode.label.c_str()));
+    StateAndMode(State::PRIMARY_STATE_ACTIVE, msg->goal_mode.label));
 }
 
 void

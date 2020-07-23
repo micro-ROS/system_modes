@@ -2,6 +2,15 @@
 Changelog for package system_modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.3 (2020-02-13)
+-----------
+* improved StateAndMode struct
+* testing
+
+0.2.2 (2020-07-13)
+-----------
+* introduced StateAndMode struct to bundle lifecycle state and system mode
+
 0.2.0 (2020-02-13)
 -----------
 * integration with ROS 2 launch

@@ -19,12 +19,11 @@ import launch
 import launch.actions
 import launch.launch_description_sources
 import launch.substitutions
-import launch_ros
 
 
 def generate_launch_description():
     modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
-                '/example_modes.yaml')
+                 '/example_modes.yaml')
 
     mode_manager = launch.actions.IncludeLaunchDescription(
         launch.launch_description_sources.PythonLaunchDescriptionSource(

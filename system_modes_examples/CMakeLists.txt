@@ -74,4 +74,17 @@ install(FILES example_modes.yaml
 )
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_cmake_gmock REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # remove the line when a copyright and license is present in all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # remove the line when this package is a git repo
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
 ament_package()

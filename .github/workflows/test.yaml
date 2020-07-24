@@ -1,0 +1,21 @@
+name: Test diagnostics
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: ros-tooling/setup-ros@master
+      - uses: ros-tooling/action-ros-ci@master
+        with:
+          package-name: system_modes system_modes_examples
+          colcon-mixin-name: coverage-gcc
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml

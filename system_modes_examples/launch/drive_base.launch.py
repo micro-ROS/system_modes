@@ -25,7 +25,7 @@ import launch_ros
 def generate_launch_description():
     launch.actions.DeclareLaunchArgument('modelfile', description='Path to modelfile')
     modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
-                '/example_modes.yaml')
+                 '/example_modes.yaml')
 
     node = launch_ros.actions.Node(
         package='system_modes_examples',

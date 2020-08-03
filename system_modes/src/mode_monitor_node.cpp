@@ -120,7 +120,7 @@ int main(int argc, char * argv[])
   setvbuf(stdout, NULL, _IONBF, BUFSIZ);
   rclcpp::init(argc, argv);
 
-  monitor = make_shared<ModeMonitor>(modelfile, rate, verbose, !debug);
+  monitor = make_shared<ModeMonitor>();
 
   vector<shared_ptr<rclcpp::Subscription<TransitionEvent>>>
   state_sub_;

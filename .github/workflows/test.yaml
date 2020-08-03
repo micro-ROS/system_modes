@@ -1,4 +1,4 @@
-name: Test diagnostics
+name: Test system modes
 on:
   pull_request:
   push:
@@ -13,9 +13,10 @@ jobs:
       matrix:
         os: [ubuntu-18.04, macos-latest, windows-latest]
     steps:
-      - uses: ros-tooling/setup-ros@master
-      - uses: ros-tooling/action-ros-ci@master
+      - uses: ros-tooling/setup-ros@0.0.25
+      - uses: ros-tooling/action-ros-ci@0.0.15
         with:
           package-name: system_modes system_modes_examples
+          target-ros2-distro: foxy
           colcon-mixin-name: coverage-gcc
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml

@@ -25,7 +25,7 @@ def generate_launch_description():
 
     node = launch_ros.actions.Node(
         package='system_modes',
-        node_executable='mode_manager',
+        executable='mode_manager',
         parameters=[{'modelfile': launch.substitutions.LaunchConfiguration('modelfile')}],
         output='screen')
 

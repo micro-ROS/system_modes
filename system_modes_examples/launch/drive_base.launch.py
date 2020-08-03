@@ -29,7 +29,7 @@ def generate_launch_description():
 
     node = launch_ros.actions.Node(
         package='system_modes_examples',
-        node_executable='drive_base',
+        executable='drive_base',
         parameters=[{'modelfile': modelfile}],
         output='screen')
 

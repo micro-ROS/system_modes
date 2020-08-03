@@ -29,7 +29,7 @@ def generate_launch_description():
 
     node = launch_ros.actions.Node(
         package='system_modes_examples',
-        node_executable='manipulator',
+        executable='manipulator',
         parameters=[{'modelfile': modelfile}],
         output='screen')
 

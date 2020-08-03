@@ -21,28 +21,28 @@ import launch_ros.actions
 
 def generate_launch_description():
     return launch.LaunchDescription([
-      launch.actions.DeclareLaunchArgument(
-        'modelfile',
-        description='Path to modelfile'),
-      launch.actions.DeclareLaunchArgument(
-        'debug',
-        default_value='false',
-        description='Debug'),
-      launch.actions.DeclareLaunchArgument(
-        'verbose',
-        default_value='false',
-        description='Print mode parametrization'),
-      launch.actions.DeclareLaunchArgument(
-        'rate',
-        default_value='1000',
-        description='Monitor refresh rate in ms'),
-      launch_ros.actions.Node(
-        package='system_modes',
-        executable='mode_monitor',
-        parameters=[{
-            'modelfile': launch.substitutions.LaunchConfiguration('modelfile'),
-            'debug': launch.substitutions.LaunchConfiguration('debug'),
-            'verbose': launch.substitutions.LaunchConfiguration('verbose'),
-            'rate': launch.substitutions.LaunchConfiguration('rate')
-            }],
-        output='screen')])
+        launch.actions.DeclareLaunchArgument(
+            'modelfile',
+            description='Path to modelfile'),
+        launch.actions.DeclareLaunchArgument(
+            'debug',
+            default_value='false',
+            description='Debug'),
+        launch.actions.DeclareLaunchArgument(
+            'verbose',
+            default_value='false',
+            description='Print mode parametrization'),
+        launch.actions.DeclareLaunchArgument(
+            'rate',
+            default_value='1000',
+            description='Monitor refresh rate in ms'),
+        launch_ros.actions.Node(
+            package='system_modes',
+            executable='mode_monitor',
+            parameters=[{
+                'modelfile': launch.substitutions.LaunchConfiguration('modelfile'),
+                'debug': launch.substitutions.LaunchConfiguration('debug'),
+                'verbose': launch.substitutions.LaunchConfiguration('verbose'),
+                'rate': launch.substitutions.LaunchConfiguration('rate')
+                }],
+            output='screen')])

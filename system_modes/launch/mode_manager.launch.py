@@ -21,15 +21,12 @@ import launch_ros.actions
 
 
 def generate_launch_description():
-    launch.actions.DeclareLaunchArgument('modelfile', description='Path to modelfile')
-
-    node = launch_ros.actions.Node(
-        package='system_modes',
-        node_executable='mode_manager',
-        parameters=[{'modelfile': launch.substitutions.LaunchConfiguration('modelfile')}],
-        output='screen')
-
-    description = launch.LaunchDescription()
-    description.add_action(node)
-
-    return description
+    return launch.LaunchDescription([
+        launch.actions.DeclareLaunchArgument(
+            'modelfile',
+            description='Path to modelfile'),
+        launch_ros.actions.Node(
+            package='system_modes',
+            executable='mode_manager',
+            parameters=[{'modelfile': launch.substitutions.LaunchConfiguration('modelfile')}],
+            output='screen')])

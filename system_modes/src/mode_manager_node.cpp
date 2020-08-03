@@ -18,8 +18,6 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition_event.hpp>
 
-#include <boost/program_options.hpp>
-
 #include <chrono>
 #include <memory>
 #include <string>
@@ -46,46 +44,11 @@ using system_modes::msg::ModeEvent;
 using lifecycle_msgs::msg::State;
 using lifecycle_msgs::msg::TransitionEvent;
 
-using boost::program_options::value;
-using boost::program_options::variables_map;
-using boost::program_options::command_line_parser;
-using boost::program_options::options_description;
-using boost::program_options::positional_options_description;
-
 using rcl_interfaces::msg::ParameterType;
 using rcl_interfaces::msg::ParameterEvent;
 
 string modelfile, loglevel;
-options_description options("Allowed options");
-
 shared_ptr<ModeManager> manager;
-
-bool parseOptions(int argc, char * argv[])
-{
-  options.add_options()("help", "Help message and options")(
-    "modelfile", value<string>(&modelfile),
-    "Path to yaml model file")(
-    "__log_level", value<string>(&loglevel),
-    "ROS2 log level")(
-    "ros-args", value<vector<string>>()->multitoken(), "ROS args")(
-    "params-file", value<vector<string>>()->multitoken(), "ROS params file");
-
-  positional_options_description positional_options;
-  positional_options.add("modelfile", 1);
-
-  variables_map map;
-  store(
-    command_line_parser(argc, argv)
-    .options(options)
-    .positional(positional_options)
-    .run(), map);
-  notify(map);
-
-  if (map.count("help")) {
-    return true;
-  }
-  return false;
-}
 
 void transition_callback(
   const TransitionEvent::SharedPtr msg,
@@ -147,26 +110,10 @@ int main(int argc, char * argv[])
 {
   using namespace std::placeholders;
 
-  // Handle commandline arguments.
-  try {
-    if (parseOptions(argc, argv)) {
-      cout << "Usage: mode_manager MODELFILE" << std::endl;
-      cout << options;
-      cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
-      return EXIT_SUCCESS;
-    }
-  } catch (const std::exception & e) {
-    cerr << "Error parsing command line: " << e.what() << std::endl;
-    cout << "Usage: mode_manager [MODELFILE]" << std::endl;
-    cout << options;
-    cout << "Or specify the MODELFILE by ROS parameter 'modelfile'." << std::endl << std::endl;
-    return EXIT_FAILURE;
-  }
-
   setvbuf(stdout, NULL, _IONBF, BUFSIZ);
   rclcpp::init(argc, argv);
 
-  manager = std::make_shared<ModeManager>(modelfile);
+  manager = std::make_shared<ModeManager>();
 
   vector<shared_ptr<rclcpp::Subscription<TransitionEvent>>>
   state_sub_;

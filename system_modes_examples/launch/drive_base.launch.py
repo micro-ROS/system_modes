@@ -21,11 +21,12 @@ import launch_ros
 
 
 def generate_launch_description():
-  default_modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
-                '/example_modes.yaml')
-  return launch.LaunchDescription([
-    launch_ros.actions.Node(
-      package='system_modes_examples',
-      executable='drive_base',
-      parameters=[{'modelfile': default_modelfile}],
-      output='screen')])
+    default_modelfile = (
+        ament_index_python.packages.get_package_share_directory('system_modes_examples') +
+        '/example_modes.yaml')
+    return launch.LaunchDescription([
+        launch_ros.actions.Node(
+            package='system_modes_examples',
+            executable='drive_base',
+            parameters=[{'modelfile': default_modelfile}],
+            output='screen')])

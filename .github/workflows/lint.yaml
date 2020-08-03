@@ -7,9 +7,9 @@ jobs:
     name: ament_xmllint
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
-    - uses: ros-tooling/setup-ros@master
-    - uses: ros-tooling/action-ros-lint@master
+    - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: xmllint
         package-name: system_modes system_modes_examples
@@ -22,9 +22,9 @@ jobs:
       matrix:
           linter: [cppcheck, cpplint, uncrustify]
     steps:
-    - uses: actions/checkout@master
-    - uses: ros-tooling/setup-ros@master
-    - uses: ros-tooling/action-ros-lint@master
+    - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: ${{ matrix.linter }}
         package-name: system_modes system_modes_examples
@@ -37,9 +37,9 @@ jobs:
       matrix:
         linter: [flake8, pep257]
     steps:
-    - uses: actions/checkout@master
-    - uses: ros-tooling/setup-ros@master
-    - uses: ros-tooling/action-ros-lint@master
+    - uses: actions/checkout@v2
+    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: ${{ matrix.linter }}
         package-name: system_modes system_modes_examples

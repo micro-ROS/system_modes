@@ -37,7 +37,7 @@ namespace system_modes
 class ModeMonitor : public rclcpp::Node
 {
 public:
-  ModeMonitor(const std::string & model_path, unsigned int rate, bool verbose, bool clear);
+  ModeMonitor();
   ModeMonitor(const ModeMonitor &) = delete;
 
   std::shared_ptr<ModeInference> inference();

@@ -40,7 +40,7 @@ namespace system_modes
 class ModeManager : public rclcpp::Node
 {
 public:
-  explicit ModeManager(const std::string & model_path);
+  ModeManager();
   ModeManager(const ModeManager &) = delete;
 
   std::shared_ptr<ModeInference> inference();
@@ -65,26 +65,30 @@ protected:
 
   // Mode service callbacks
   virtual void on_change_mode(
-    const std::shared_ptr<rmw_request_id_t>,
+    const std::string &,
     const std::shared_ptr<system_modes::srv::ChangeMode::Request>,
     std::shared_ptr<system_modes::srv::ChangeMode::Response>);
   virtual void on_get_mode(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<system_modes::srv::GetMode::Request>,
+    const std::string &,
     std::shared_ptr<system_modes::srv::GetMode::Response>);
   virtual void on_get_available_modes(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<system_modes::srv::GetAvailableModes::Request>,
+    const std::string &,
     std::shared_ptr<system_modes::srv::GetAvailableModes::Response>);
 
   virtual bool change_state(
-    const std::string & node,
+    const std::string &,
     unsigned int,
     bool transitive = true);
-  virtual bool change_mode(const std::string & node, const std::string & mode);
+  virtual bool change_mode(
+    const std::string &,
+    const std::string &);
 
-  virtual void change_part_state(const std::string & node, unsigned int);
-  virtual void change_part_mode(const std::string & node, const std::string & mode);
+  virtual void change_part_state(
+    const std::string &,
+    unsigned int);
+  virtual void change_part_mode(
+    const std::string &,
+    const std::string &);
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;

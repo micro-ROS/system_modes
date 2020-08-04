@@ -17,23 +17,16 @@ import ament_index_python.packages
 
 import launch
 import launch.actions
-import launch.launch_description_sources
-import launch.substitutions
 import launch_ros
 
 
 def generate_launch_description():
-    launch.actions.DeclareLaunchArgument('modelfile', description='Path to modelfile')
-    modelfile = (ament_index_python.packages.get_package_share_directory('system_modes_examples') +
-                '/example_modes.yaml')
-
-    node = launch_ros.actions.Node(
-        package='system_modes_examples',
-        node_executable='manipulator',
-        parameters=[{'modelfile': modelfile}],
-        output='screen')
-
-    description = launch.LaunchDescription()
-    description.add_action(node)
-
-    return description
+    default_modelfile = (
+        ament_index_python.packages.get_package_share_directory('system_modes_examples') +
+        '/example_modes.yaml')
+    return launch.LaunchDescription([
+        launch_ros.actions.Node(
+            package='system_modes_examples',
+            executable='manipulator',
+            parameters=[{'modelfile': default_modelfile}],
+            output='screen')])

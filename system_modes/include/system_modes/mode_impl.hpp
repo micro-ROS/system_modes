@@ -17,6 +17,8 @@
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include <rclcpp/parameter_map.hpp>
 
+#include <lifecycle_msgs/msg/state.hpp>
+
 #include <map>
 #include <mutex>
 #include <vector>
@@ -24,10 +26,21 @@
 #include <memory>
 #include <utility>
 
+using lifecycle_msgs::msg::State;
+
 namespace system_modes
 {
 
 static const char DEFAULT_MODE[] = "__DEFAULT__";
+
+
+unsigned int state_id_(const std::string & state_label);
+const std::string state_label_(unsigned int state_id);
+
+unsigned int transition_id_(const std::string & transition_label);
+const std::string transition_label_(unsigned int transition_id);
+
+unsigned int goal_state_(unsigned int transition_id);
 
 struct StateAndMode
 {
@@ -39,12 +52,43 @@ struct StateAndMode
     state = newstate;
     mode = newmode;
   }
+
+  bool operator==(const StateAndMode & cmp) const
+  {
+    if (cmp.state != state) {
+      return false;
+    } else if (cmp.state != State::PRIMARY_STATE_ACTIVE) {
+      return true;
+    }
+
+    return cmp.mode.compare(mode) == 0 ||                            // same mode
+           (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
+           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty());    // DEFAULT_MODE the same
+  }
+
   bool operator!=(const StateAndMode & cmp) const
   {
-    return cmp.state == state &&                                     // same state
-           (cmp.mode.compare(mode) == 0 ||                           // same mode
-           (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
-           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
+    return !(*this == cmp);
+  }
+
+  void from_string(const std::string & sam)
+  {
+    auto dot = sam.find(".");
+    if (dot != std::string::npos) {
+      state = state_id_(sam.substr(0, dot));
+      mode = sam.substr(dot + 1);
+    } else {
+      state = state_id_(sam);
+      mode = "";
+    }
+  }
+
+  std::string as_string() const
+  {
+    if (state != State::PRIMARY_STATE_ACTIVE || mode.empty()) {
+      return state_label_(state);
+    }
+    return state_label_(state) + "." + mode;
   }
 };
 

@@ -47,8 +47,10 @@ TEST(TestModeFilesParse, parsing) {
   EXPECT_EQ(3u, inference->get_all_parts().size());
 }
 
-TEST(TestModeFilesParse, initializing) {
-  ModeInference * inference = new ModeInference(MODE_FILE_CORRECT);
+TEST(TestModeFilesParse, initialization) {
+  ModeInference * inference;
+
+  EXPECT_NO_THROW(inference = new ModeInference(MODE_FILE_CORRECT));
 
   // parts
   EXPECT_EQ(3u, inference->get_all_parts().size());

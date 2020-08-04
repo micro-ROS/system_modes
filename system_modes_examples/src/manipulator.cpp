@@ -18,11 +18,8 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 
-#include <chrono>
-#include <iostream>
 #include <memory>
-#include <string>
-#include <thread>
+#include <vector>
 
 using lifecycle_msgs::msg::State;
 using lifecycle_msgs::msg::Transition;
@@ -39,30 +36,30 @@ namespace examples
 class Manipulator : public LifecycleNode
 {
 public:
-  explicit Manipulator()
+  Manipulator()
   : LifecycleNode("manipulator")
   {
     RCLCPP_INFO(get_logger(), "Constructed lifecycle node '%s'", this->get_name());
-    
+
     // Parameter declaration
-    this->declare_parameter("max_torque",
+    this->declare_parameter(
+      "max_torque",
       rclcpp::ParameterValue(rclcpp::PARAMETER_NOT_SET),
       rcl_interfaces::msg::ParameterDescriptor());
 
     auto param_change_callback =
-    [this](std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult
-    {
-      auto result = rcl_interfaces::msg::SetParametersResult();
-      result.successful = true;
-      for (auto parameter : parameters) {
-        RCLCPP_INFO(this->get_logger(),
-          "parameter '%s' is now: %s",
-          parameter.get_name().c_str(),
-          parameter.value_to_string().c_str()
-          );
-      }
-      return result;
-    };
+      [this](std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult
+      {
+        auto result = rcl_interfaces::msg::SetParametersResult();
+        result.successful = true;
+        for (auto parameter : parameters) {
+          RCLCPP_INFO(this->get_logger(),
+            "parameter '%s' is now: %s",
+            parameter.get_name().c_str(),
+            parameter.value_to_string().c_str());
+        }
+        return result;
+      };
     this->set_on_parameters_set_callback(param_change_callback);
   }
 
@@ -75,7 +72,7 @@ public:
     RCLCPP_INFO(get_logger(), "on_configure()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  };
+  }
 
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_activate(const rclcpp_lifecycle::State &)
@@ -83,7 +80,7 @@ public:
     RCLCPP_INFO(get_logger(), "on_activate()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  };
+  }
 
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_deactivate(const rclcpp_lifecycle::State &)
@@ -91,7 +88,7 @@ public:
     RCLCPP_INFO(get_logger(), "on_deactivate()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  };
+  }
 
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_cleanup(const rclcpp_lifecycle::State &)
@@ -99,7 +96,7 @@ public:
     RCLCPP_INFO(get_logger(), "on_cleanup()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  };
+  }
 };
 
 }  // namespace examples

@@ -1,10 +1,30 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package system_modes_examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package system_modes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.3.0 (2020-07-23)
+-----------
+* removed boost dependencies (was: program options)
+* changed mode service specifications (less redundancy)
+* https://github.com/micro-ROS/system_modes/issues/24
+
+0.2.3 (2020-07-23)
+-----------
+* improved StateAndMode struct
+* testing
+
+0.2.2 (2020-07-13)
+-----------
+* introduced StateAndMode struct to bundle lifecycle state and system mode
 
 0.2.0 (2020-02-13)
 -----------
 * integration with ROS 2 launch
+* updated docs
+
+0.1.6 (2019-10-31)
+-------------------
+* fixed QoS configuration for parameter event subscribers
 
 0.1.5 (2019-10-21)
 -------------------
@@ -16,4 +36,4 @@ Changelog for package system_modes_examples
 
 0.1.1 (2019-03-08)
 -------------------
-* first public release for ROS 2 system modes examples
+* first public release for ROS 2 system modes

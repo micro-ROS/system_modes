@@ -24,7 +24,6 @@ find_package(std_msgs REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(system_modes REQUIRED)
 
 # drive_base
@@ -39,7 +38,6 @@ ament_target_dependencies(drive_base
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "Boost"
   "system_modes"
 )
 install(TARGETS drive_base
@@ -58,7 +56,6 @@ ament_target_dependencies(manipulator
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "Boost"
   "system_modes"
 )
 install(TARGETS manipulator

@@ -56,7 +56,7 @@ using namespace std::chrono_literals;
 namespace system_modes
 {
 
-ModeManager::ModeManager(const string & model_path)
+ModeManager::ModeManager()
 : Node("__mode_manager"),
   mode_inference_(nullptr),
   state_change_srv_(), get_state_srv_(), states_srv_(),
@@ -65,16 +65,11 @@ ModeManager::ModeManager(const string & model_path)
   state_request_pub_(), mode_request_pub_()
 {
   declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
+  std::string model_path = get_parameter("modelfile").as_string();
   if (model_path.empty()) {
-    rclcpp::Parameter parameter = get_parameter("modelfile");
-    std::string alt_model_path = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
-    if (alt_model_path.empty()) {
-      throw std::invalid_argument("Need path to model file.");
-    }
-    mode_inference_ = std::make_shared<ModeInference>(alt_model_path);
-  } else {
-    mode_inference_ = std::make_shared<ModeInference>(model_path);
+    throw std::invalid_argument("Need path to model file.");
   }
+  mode_inference_ = std::make_shared<ModeInference>(model_path);
 
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);

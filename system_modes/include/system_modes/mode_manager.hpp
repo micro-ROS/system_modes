@@ -40,7 +40,7 @@ namespace system_modes
 class ModeManager : public rclcpp::Node
 {
 public:
-  explicit ModeManager(const std::string & model_path);
+  ModeManager();
   ModeManager(const ModeManager &) = delete;
 
   std::shared_ptr<ModeInference> inference();

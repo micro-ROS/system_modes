@@ -51,6 +51,10 @@ using namespace std::literals::string_literals;
 namespace system_modes
 {
 
+static const bool MONITOR_DEFAULT_VERBOSITY = false;
+static const bool MONITOR_DEFAULT_DEBUG = false;
+static const unsigned int MONITOR_DEFAULT_RATE_MS = 1000;
+
 static const unsigned int MONITOR_WIDTH_PART = 25;
 static const unsigned int MONITOR_WIDTH_STATE = 30;
 static const unsigned int MONITOR_WIDTH_MODE = 30;
@@ -70,27 +74,29 @@ static const string MONITOR_TEXT_WARN = "\033[21;"s + to_string(MONITOR_TEXT_WAR
 static const string MONITOR_SEPARATOR = MONITOR_TEXT_PLAIN + " | ";
 static const string MONITOR_SEPARATOR_BOLD = MONITOR_TEXT_BOLD + " | ";
 
-ModeMonitor::ModeMonitor(
-  const string & model_path,
-  unsigned int rate = 1000,
-  bool verbose = false,
-  bool clear = true)
+ModeMonitor::ModeMonitor()
 : Node("__mode_monitor"),
-  mode_inference_(),
-  model_path_(model_path),
-  rate_(rate),
-  clear_screen_(clear),
-  verbose_(verbose)
+  mode_inference_()
 {
-  RCLCPP_DEBUG(get_logger(), "Constructed mode monitor");
+  declare_parameter(
+    "modelfile",
+    rclcpp::ParameterValue(std::string("")));
+  declare_parameter(
+    "rate",
+    rclcpp::ParameterValue(static_cast<int>(MONITOR_DEFAULT_RATE_MS)));
+  declare_parameter(
+    "debug",
+    rclcpp::ParameterValue(static_cast<bool>(MONITOR_DEFAULT_DEBUG)));
+  declare_parameter(
+    "verbose",
+    rclcpp::ParameterValue(static_cast<bool>(MONITOR_DEFAULT_VERBOSITY)));
 
-  declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
+  rate_ = get_parameter("rate").as_int();
+  clear_screen_ = !get_parameter("debug").as_bool();
+  verbose_ = get_parameter("verbose").as_bool();
+  model_path_ = get_parameter("modelfile").as_string();
   if (model_path_.empty()) {
-    rclcpp::Parameter parameter = get_parameter("modelfile");
-    model_path_ = parameter.get_value<rclcpp::ParameterType::PARAMETER_STRING>();
-    if (model_path_.empty()) {
-      throw std::invalid_argument("Need path to model file.");
-    }
+    throw std::invalid_argument("Need path to model file.");
   }
   mode_inference_ = std::make_shared<ModeInference>(model_path_);
 

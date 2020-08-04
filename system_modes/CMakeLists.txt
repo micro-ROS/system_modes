@@ -25,7 +25,6 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 
 # generate service
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -52,8 +51,6 @@ ament_target_dependencies(mode
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "Boost"
-  "Boost_PROGRAM_OPTIONS"
   "builtin_interfaces"
 )
 #rosidl_target_interfaces(mode

@@ -42,13 +42,11 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: nodes_(), nodes_target_(),
-  systems_(), systems_target_(),
-  systems_transitions_(),
+: nodes_(), nodes_target_(), nodes_cache_(),
+  systems_(), systems_target_(), systems_cache_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
-  nodes_target_mutex_(), systems_target_mutex_(),
-  systems_transitions_mutex_()
+  nodes_target_mutex_(), systems_target_mutex_()
 {
   this->read_modes_from_model(model_path);
 }
@@ -167,7 +165,7 @@ ModeInference::get(const string & part) const
 }
 
 StateAndMode
-ModeInference::infer(const string & part) const
+ModeInference::infer(const string & part)
 {
   std::shared_lock<shared_mutex> slock(this->systems_mutex_);
   std::shared_lock<shared_mutex> nlock(this->nodes_mutex_);
@@ -189,7 +187,7 @@ ModeInference::infer(const string & part) const
 }
 
 StateAndMode
-ModeInference::infer_system(const string & part) const
+ModeInference::infer_system(const string & part)
 {
   unsigned int state = 0;  // unknown
   string mode = "";
@@ -211,6 +209,7 @@ ModeInference::infer_system(const string & part) const
 
       // error-processing?
       if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -224,6 +223,7 @@ ModeInference::infer_system(const string & part) const
                 "', inference failed.");
       }
     }
+    this->systems_[part] = StateAndMode(state, "");
     return StateAndMode(state, "");
   }
 
@@ -241,6 +241,7 @@ ModeInference::infer_system(const string & part) const
         // be in error-processing (by dont-care) and the current entity is requested
         // to switch to inactive, then the actual state of the current entity will
         // go to error-processing until the mentioned part recovers.
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -248,6 +249,7 @@ ModeInference::infer_system(const string & part) const
       if (stateAndMode.state != State::PRIMARY_STATE_INACTIVE &&
         stateAndMode.state != State::PRIMARY_STATE_UNCONFIGURED)
       {
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
         return StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
       }
     }
@@ -266,6 +268,7 @@ ModeInference::infer_system(const string & part) const
 
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -286,6 +289,7 @@ ModeInference::infer_system(const string & part) const
       }
       if (inTargetMode) {
         // Target state and target mode reached, all good!
+        this->systems_[part] = StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
         return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
       }
     }
@@ -299,6 +303,7 @@ ModeInference::infer_system(const string & part) const
 
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -313,10 +318,12 @@ ModeInference::infer_system(const string & part) const
       }
       if (foundMode) {
         // We are in a non-target mode, this means we are still activating
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
         return StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
       }
     }
 
+    this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
     return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
   }
 
@@ -324,7 +331,7 @@ ModeInference::infer_system(const string & part) const
 }
 
 StateAndMode
-ModeInference::infer_node(const string & part) const
+ModeInference::infer_node(const string & part)
 {
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
   std::shared_lock<shared_mutex> prlock(this->param_mutex_);
@@ -406,7 +413,7 @@ ModeInference::infer_node(const string & part) const
 }
 
 StateAndMode
-ModeInference::get_or_infer(const string & part) const
+ModeInference::get_or_infer(const string & part)
 {
   StateAndMode stateAndMode;
   try {
@@ -652,6 +659,64 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
   // TODO(anordman): More types
 
   return false;
+}
+
+Deviation
+ModeInference::infer_transitions()
+{
+  Deviation transitions;
+
+  {
+    std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
+    std::unique_lock<shared_mutex> nclock(this->nodes_cache_mutex_);
+    StatesMap::iterator it;
+    for (it = nodes_.begin(); it != nodes_.end(); it++) {
+      if (nodes_cache_.count(it->first) < 1) {
+        nodes_cache_[it->first] = nodes_.at(it->first);
+      }
+      try {
+        auto sm_current = infer_node(it->first);
+        if (sm_current.state == State::PRIMARY_STATE_ACTIVE &&
+          sm_current.mode.compare(nodes_cache_.at(it->first).mode) != 0)
+        {
+          // Detected a mode transition
+          transitions[it->first] = make_pair(nodes_cache_.at(it->first), sm_current);
+
+          // Cache newly inferred state and mode for next inference of transitions
+          nodes_cache_[it->first] = sm_current;
+        }
+      } catch (...) {
+        // inference may not work due to too little information
+        continue;
+      }
+    }
+  }
+
+  {
+    std::unique_lock<shared_mutex> slock(this->systems_mutex_);
+    std::unique_lock<shared_mutex> sclock(this->systems_cache_mutex_);
+    StatesMap::iterator it;
+    for (it = systems_.begin(); it != systems_.end(); it++) {
+      if (systems_cache_.count(it->first) < 1) {
+        systems_cache_[it->first] = systems_.at(it->first);
+      }
+      try {
+        auto sm_current = infer_system(it->first);
+        if (sm_current != systems_cache_[it->first]) {
+          // Detected a transition
+          transitions[it->first] = make_pair(systems_cache_.at(it->first), sm_current);
+
+          // Cache newly inferred state and mode for next inference of transitions
+          systems_cache_[it->first] = sm_current;
+        }
+      } catch (...) {
+        // inference may not work due to too little information
+        continue;
+      }
+    }
+  }
+
+  return transitions;
 }
 
 }  // namespace system_modes

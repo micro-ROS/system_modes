@@ -90,6 +90,8 @@ protected:
     const std::string &,
     const std::string &);
 
+  virtual void publish_transitions();
+
 private:
   std::shared_ptr<ModeInference> mode_inference_;
 
@@ -117,16 +119,23 @@ private:
   std::map<std::string, rclcpp::AsyncParametersClient::SharedPtr>
   param_change_clients_;
 
-  // Lifecycle transition request
+  // Lifecycle transition publisher
+  std::map<std::string, rclcpp::Publisher<lifecycle_msgs::msg::TransitionEvent>::SharedPtr>
+  transition_pub_;
   std::map<std::string, rclcpp::Publisher<lifecycle_msgs::msg::TransitionEvent>::SharedPtr>
   state_request_pub_;
 
-  // Mode transition request publisher
+  // Mode transition publisher
+  std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
+  mode_transition_pub_;
   std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
   mode_request_pub_;
 
   // Remember states and modes of the systems
   std::map<std::string, StateAndMode> current_modes_;
+
+  // Timer to check for and publish recent transitions
+  rclcpp::TimerBase::SharedPtr transition_timer_;
 };
 
 }  // namespace system_modes

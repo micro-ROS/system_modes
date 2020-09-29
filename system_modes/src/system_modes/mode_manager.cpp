@@ -62,7 +62,8 @@ ModeManager::ModeManager()
   state_change_srv_(), get_state_srv_(), states_srv_(),
   mode_change_srv_(), get_mode_srv_(), modes_srv_(),
   state_change_clients_(), mode_change_clients_(),
-  state_request_pub_(), mode_request_pub_()
+  transition_pub_(), state_request_pub_(),
+  mode_transition_pub_(), mode_request_pub_()
 {
   declare_parameter("modelfile", rclcpp::ParameterValue(std::string("")));
   std::string model_path = get_parameter("modelfile").as_string();
@@ -90,6 +91,12 @@ ModeManager::ModeManager()
     RCLCPP_INFO(get_logger(), "  - %s/get_mode", node.c_str());
     RCLCPP_INFO(get_logger(), "  - %s/get_available_modes", node.c_str());
   }
+
+  transition_timer_ = this->create_wall_timer(
+    1s,
+    [this]() {
+      this->publish_transitions();
+    });
 }
 
 std::shared_ptr<ModeInference>
@@ -101,122 +108,126 @@ ModeManager::inference()
 void
 ModeManager::add_system(const std::string & system)
 {
-  string service_name;
+  string topic_name;
 
   // Lifecycle services
-  service_name = system + "/change_state";
+  topic_name = system + "/change_state";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<ChangeState::Request>,
     std::shared_ptr<ChangeState::Response>)> state_change_callback =
     std::bind(&ModeManager::on_change_state, this, system, _2, _3);
   this->state_change_srv_[system] = this->create_service<ChangeState>(
-    service_name,
+    topic_name,
     state_change_callback);
 
-  service_name = system + "/get_state";
+  topic_name = system + "/get_state";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetState::Request>,
     std::shared_ptr<GetState::Response>)> state_get_callback =
     std::bind(&ModeManager::on_get_state, this, system, _3);
   this->get_state_srv_[system] = this->create_service<GetState>(
-    service_name,
+    topic_name,
     state_get_callback);
 
-  service_name = system + "/get_available_states";
+  topic_name = system + "/get_available_states";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetAvailableStates::Request>,
     std::shared_ptr<GetAvailableStates::Response>)> state_avail_callback =
     std::bind(&ModeManager::on_get_available_states, this, system, _3);
   this->states_srv_[system] = this->create_service<GetAvailableStates>(
-    service_name,
+    topic_name,
     state_avail_callback);
 
   // Mode services
-  service_name = system + "/change_mode";
+  topic_name = system + "/change_mode";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<ChangeMode::Request>,
     std::shared_ptr<ChangeMode::Response>)> mode_change_callback =
     std::bind(&ModeManager::on_change_mode, this, system, _2, _3);
   this->mode_change_srv_[system] = this->create_service<ChangeMode>(
-    service_name,
+    topic_name,
     mode_change_callback);
 
-  service_name = system + "/get_mode";
+  topic_name = system + "/get_mode";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetMode::Request>,
     std::shared_ptr<GetMode::Response>)> mode_get_callback =
     std::bind(&ModeManager::on_get_mode, this, system, _3);
   this->get_mode_srv_[system] =
     this->create_service<system_modes::srv::GetMode>(
-    service_name,
+    topic_name,
     mode_get_callback);
 
-  service_name = system + "/get_available_modes";
+  topic_name = system + "/get_available_modes";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetAvailableModes::Request>,
     std::shared_ptr<GetAvailableModes::Response>)> mode_avail_callback =
     std::bind(&ModeManager::on_get_available_modes, this, system, _3);
   this->modes_srv_[system] = this->create_service<GetAvailableModes>(
-    service_name,
+    topic_name,
     mode_avail_callback);
 
   // Lifecycle change clients
-  service_name = system + "/change_state";
-  this->state_change_clients_[system] = this->create_client<ChangeState>(service_name);
+  topic_name = system + "/change_state";
+  this->state_change_clients_[system] = this->create_client<ChangeState>(topic_name);
 
   // Mode change clients
-  service_name = system + "/change_mode";
-  this->mode_change_clients_[system] = this->create_client<ChangeMode>(service_name);
+  topic_name = system + "/change_mode";
+  this->mode_change_clients_[system] = this->create_client<ChangeMode>(topic_name);
 
-  // State request publisher
-  service_name = system + "/transition_request_info";
-  this->state_request_pub_[system] = this->create_publisher<TransitionEvent>(service_name, 1);
+  // Lifecycle transition publisher
+  topic_name = system + "/transition_event";
+  this->transition_pub_[system] = this->create_publisher<TransitionEvent>(topic_name, 1);
+  topic_name = system + "/transition_request_info";
+  this->state_request_pub_[system] = this->create_publisher<TransitionEvent>(topic_name, 1);
 
-  // Mode request publisher
-  service_name = system + "/mode_request_info";
-  this->mode_request_pub_[system] = this->create_publisher<ModeEvent>(service_name, 1);
+  // Mode transition publisher
+  topic_name = system + "/mode_event";
+  this->mode_transition_pub_[system] = this->create_publisher<ModeEvent>(topic_name, 1);
+  topic_name = system + "/mode_request_info";
+  this->mode_request_pub_[system] = this->create_publisher<ModeEvent>(topic_name, 1);
 }
 
 void
 ModeManager::add_node(const std::string & node)
 {
-  string service_name;
+  string topic_name;
 
   // Mode services
-  service_name = node + "/change_mode";
+  topic_name = node + "/change_mode";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<ChangeMode::Request>,
     std::shared_ptr<ChangeMode::Response>)> mode_change_callback =
     std::bind(&ModeManager::on_change_mode, this, node, _2, _3);
   this->mode_change_srv_[node] = this->create_service<ChangeMode>(
-    service_name,
+    topic_name,
     mode_change_callback);
 
-  service_name = node + "/get_mode";
+  topic_name = node + "/get_mode";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetMode::Request>,
     std::shared_ptr<GetMode::Response>)> mode_get_callback =
     std::bind(&ModeManager::on_get_mode, this, node, _3);
   this->get_mode_srv_[node] =
     this->create_service<system_modes::srv::GetMode>(
-    service_name,
+    topic_name,
     mode_get_callback);
 
-  service_name = node + "/get_available_modes";
+  topic_name = node + "/get_available_modes";
   std::function<void(const std::shared_ptr<rmw_request_id_t>,
     const std::shared_ptr<GetAvailableModes::Request>,
     std::shared_ptr<GetAvailableModes::Response>)> mode_avail_callback =
     std::bind(&ModeManager::on_get_available_modes, this, node, _3);
   this->modes_srv_[node] = this->create_service<GetAvailableModes>(
-    service_name,
+    topic_name,
     mode_avail_callback);
 
   // Lifecycle change clients
-  service_name = node + "/change_state";
-  this->state_change_clients_[node] = this->create_client<ChangeState>(service_name);
+  topic_name = node + "/change_state";
+  this->state_change_clients_[node] = this->create_client<ChangeState>(topic_name);
 
   // Parameter change clients
-  service_name = node + "/set_parameters_atomically";
+  topic_name = node + "/set_parameters_atomically";
   this->param_change_clients_[node] = std::make_shared<rclcpp::AsyncParametersClient>(
     this->get_node_base_interface(),
     this->get_node_topics_interface(),
@@ -225,12 +236,14 @@ ModeManager::add_node(const std::string & node)
     node);
 
   // State request publisher
-  service_name = node + "/transition_request_info";
-  this->state_request_pub_[node] = this->create_publisher<TransitionEvent>(service_name, 1);
+  topic_name = node + "/transition_request_info";
+  this->state_request_pub_[node] = this->create_publisher<TransitionEvent>(topic_name, 1);
 
   // Mode request publisher
-  service_name = node + "/mode_request_info";
-  this->mode_request_pub_[node] = this->create_publisher<ModeEvent>(service_name, 1);
+  topic_name = node + "/mode_event";
+  this->mode_transition_pub_[node] = this->create_publisher<ModeEvent>(topic_name, 1);
+  topic_name = node + "/mode_request_info";
+  this->mode_request_pub_[node] = this->create_publisher<ModeEvent>(topic_name, 1);
 }
 
 void
@@ -544,6 +557,41 @@ ModeManager::change_part_mode(const string & node, const string & mode)
         p.c_str());
     }
     this->param_change_clients_[node]->set_parameters(new_mode->get_parameters());
+  }
+}
+
+void
+ModeManager::publish_transitions()
+{
+  auto transitions = mode_inference_->infer_transitions();
+  auto systems = mode_inference_->get_systems();
+
+  for (auto dev = transitions.begin(); dev != transitions.end(); dev++) {
+    auto part = dev->first;
+    auto from = dev->second.first;
+    auto to = dev->second.second;
+    RCLCPP_DEBUG(
+      this->get_logger(),
+      "publish transition of %s from %s to %s.\n",
+      part.c_str(), from.as_string().c_str(), to.as_string().c_str());
+
+    if (std::find(systems.begin(), systems.end(), part) != systems.end() &&
+      from.state != to.state)
+    {
+      auto info = std::make_shared<TransitionEvent>();
+      info->start_state.id = from.state;
+      info->start_state.label = state_label_(from.state);
+      info->goal_state.id = to.state;
+      info->goal_state.label = state_label_(to.state);
+      this->transition_pub_[part]->publish(TransitionEvent());
+      this->transition_pub_[part]->publish(*info);
+    }
+    if (from.mode.compare(to.mode) != 0) {
+      auto info = std::make_shared<ModeEvent>();
+      info->start_mode.label = from.mode;
+      info->goal_mode.label = to.mode;
+      this->mode_transition_pub_[part]->publish(*info);
+    }
   }
 }
 

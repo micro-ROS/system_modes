@@ -1,6 +1,11 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package system_modes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package system_modes_examples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.4.0 (2020-09-30)
+-----------
+* publish inferred state and mode transitions
+* https://github.com/micro-ROS/system_modes/issues/42
 
 0.3.0 (2020-07-23)
 -----------

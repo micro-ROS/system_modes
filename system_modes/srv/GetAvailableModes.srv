@@ -1,2 +1,3 @@
 ---
 string[] available_modes
+string[] reachable_modes

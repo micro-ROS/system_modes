@@ -2,8 +2,14 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes</name>
-  <version>0.3.0</version>
-  <description>Model-based distributed configuration handling.</description>
+  <version>0.4.0</version>
+  <description>
+    The system modes concept assumes that a robotics system is built
+    from components with a lifecycle. It adds a notion of (sub-)systems,
+    hiararchically grouping these nodes, as well as a notion of modes
+    that determine the configuration of these nodes and (sub-)systems in
+    terms of their parameter values.
+  </description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>
 

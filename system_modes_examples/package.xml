@@ -2,8 +2,11 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes_examples</name>
-  <version>0.3.0</version>
-  <description>Simple example system for system_modes package.</description>
+  <version>0.4.0</version>
+  <description>
+    Simple example system and according launch files for the system_modes
+    package.
+  </description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>
 

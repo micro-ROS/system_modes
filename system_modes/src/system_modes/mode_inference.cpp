@@ -42,8 +42,8 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: nodes_(), nodes_target_(),
-  systems_(), systems_target_(),
+: nodes_(), nodes_target_(), nodes_cache_(),
+  systems_(), systems_target_(), systems_cache_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
   nodes_target_mutex_(), systems_target_mutex_()
@@ -128,7 +128,7 @@ ModeInference::update_target(const string & part, StateAndMode mode)
 }
 
 StateAndMode
-ModeInference::get_target(const string & part)
+ModeInference::get_target(const string & part) const
 {
   std::shared_lock<shared_mutex> ntlock(this->nodes_target_mutex_);
   std::shared_lock<shared_mutex> stlock(this->systems_target_mutex_);
@@ -137,10 +137,10 @@ ModeInference::get_target(const string & part)
   auto its = this->systems_target_.find(part);
   if (it != this->nodes_target_.end()) {
     // we know this node
-    return this->nodes_target_[part];
+    return this->nodes_target_.at(part);
   } else if (its != this->systems_target_.end()) {
     // we know the system, probably from a mode manager
-    return this->systems_target_[part];
+    return this->systems_target_.at(part);
   }
 
   // might be a system without explicit mode manager, trying to infer the mode
@@ -148,7 +148,7 @@ ModeInference::get_target(const string & part)
 }
 
 StateAndMode
-ModeInference::get(const string & part)
+ModeInference::get(const string & part) const
 {
   std::shared_lock<shared_mutex> nlock(this->nodes_mutex_);
 
@@ -157,11 +157,11 @@ ModeInference::get(const string & part)
     throw std::out_of_range("Unknown system or node '" + part + "'.");
   }
 
-  if (this->nodes_[part].state == 0 && this->nodes_[part].mode.empty()) {
+  if (this->nodes_.at(part).state == 0 && this->nodes_.at(part).mode.empty()) {
     throw std::runtime_error("No solid information about state and mode of '" + part + "'.");
   }
 
-  return this->nodes_[part];
+  return this->nodes_.at(part);
 }
 
 StateAndMode
@@ -193,7 +193,7 @@ ModeInference::infer_system(const string & part)
   string mode = "";
 
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
-  auto default_mode = this->modes_[part][DEFAULT_MODE];
+  auto default_mode = this->modes_.at(part).at(DEFAULT_MODE);
   if (!default_mode) {
     throw std::out_of_range(
             "Can't infer for system '" + part +
@@ -209,6 +209,7 @@ ModeInference::infer_system(const string & part)
 
       // error-processing?
       if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -222,6 +223,7 @@ ModeInference::infer_system(const string & part)
                 "', inference failed.");
       }
     }
+    this->systems_[part] = StateAndMode(state, "");
     return StateAndMode(state, "");
   }
 
@@ -239,6 +241,7 @@ ModeInference::infer_system(const string & part)
         // be in error-processing (by dont-care) and the current entity is requested
         // to switch to inactive, then the actual state of the current entity will
         // go to error-processing until the mentioned part recovers.
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -246,14 +249,15 @@ ModeInference::infer_system(const string & part)
       if (stateAndMode.state != State::PRIMARY_STATE_INACTIVE &&
         stateAndMode.state != State::PRIMARY_STATE_UNCONFIGURED)
       {
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
         return StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
       }
     }
     return StateAndMode(State::PRIMARY_STATE_INACTIVE, "");
   } else if (targetState == State::PRIMARY_STATE_ACTIVE) {
     ModeConstPtr mode;
-    if (this->modes_[part].find(targetMode) != this->modes_[part].end()) {
-      auto mode = this->modes_[part][targetMode];
+    if (this->modes_.at(part).find(targetMode) != this->modes_.at(part).end()) {
+      auto mode = this->modes_.at(part).at(targetMode);
 
       // target: active
       auto inTargetMode = true;
@@ -264,6 +268,7 @@ ModeInference::infer_system(const string & part)
 
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -284,12 +289,13 @@ ModeInference::infer_system(const string & part)
       }
       if (inTargetMode) {
         // Target state and target mode reached, all good!
+        this->systems_[part] = StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
         return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
       }
     }
 
     // Check all remaining modes. Are we in any mode at all?
-    for (auto mode : this->modes_[part]) {
+    for (auto mode : this->modes_.at(part)) {
       bool foundMode = true;
       for (auto partpart : default_mode->get_parts()) {
         auto targetStateAndMode = mode.second->get_part_mode(partpart);
@@ -297,6 +303,7 @@ ModeInference::infer_system(const string & part)
 
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
+          this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -311,10 +318,12 @@ ModeInference::infer_system(const string & part)
       }
       if (foundMode) {
         // We are in a non-target mode, this means we are still activating
+        this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
         return StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
       }
     }
 
+    this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
     return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
   }
 
@@ -327,7 +336,7 @@ ModeInference::infer_node(const string & part)
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
   std::shared_lock<shared_mutex> prlock(this->param_mutex_);
 
-  auto default_mode = this->modes_[part][DEFAULT_MODE];
+  auto default_mode = this->modes_.at(part).at(DEFAULT_MODE);
   if (!default_mode) {
     throw std::out_of_range(
             "Can't infer for node '" + part +
@@ -344,13 +353,13 @@ ModeInference::infer_node(const string & part)
       bool inTargetMode = true;
 
       // we know the target mode, so check this one first
-      if (this->modes_[part].find(targetMode) != this->modes_[part].end()) {
-        auto mode = this->modes_[part][targetMode];
+      if (this->modes_.at(part).find(targetMode) != this->modes_.at(part).end()) {
+        auto mode = this->modes_.at(part).at(targetMode);
 
         for (auto param : mode->get_parameter_names()) {
           if (!matching_parameters(
               mode->get_parameter(param),
-              parameters_[part][param]))
+              parameters_.at(part).at(param)))
           {
             inTargetMode = false;
             continue;
@@ -367,11 +376,11 @@ ModeInference::infer_node(const string & part)
 
   // no target mode, so next we check the default mode
   bool inDefaultMode = true;
-  auto defaultMode = this->modes_[part][DEFAULT_MODE];
+  auto defaultMode = this->modes_.at(part).at(DEFAULT_MODE);
   for (auto param : defaultMode->get_parameter_names()) {
     if (!matching_parameters(
         defaultMode->get_parameter(param),
-        parameters_[part][param]))
+        parameters_.at(part).at(param)))
     {
       inDefaultMode = false;
       continue;
@@ -382,13 +391,13 @@ ModeInference::infer_node(const string & part)
   }
 
   // no target mode, not default mode, so we try our luck, infering any mode from parameters
-  for (auto mode : this->modes_[part]) {
-    auto m = this->modes_[part][mode.first];
+  for (auto mode : this->modes_.at(part)) {
+    auto m = this->modes_.at(part).at(mode.first);
     bool foundMode = true;
     for (auto param : defaultMode->get_parameter_names()) {
       if (!matching_parameters(
           m->get_parameter(param),
-          parameters_[part][param]))
+          parameters_.at(part).at(param)))
       {
         foundMode = false;
         continue;
@@ -437,16 +446,16 @@ ModeInference::get_or_infer(const string & part)
 }
 
 ModeConstPtr
-ModeInference::get_mode(const string & part, const string & mode)
+ModeInference::get_mode(const string & part, const string & mode) const
 {
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
 
   auto it = this->modes_.find(part);
   if (it != this->modes_.end()) {
     // We know this part
-    auto its = this->modes_[part].find(mode);
-    if (its != this->modes_[part].end()) {
-      return this->modes_[part][mode];
+    auto its = this->modes_.at(part).find(mode);
+    if (its != this->modes_.at(part).end()) {
+      return this->modes_.at(part).at(mode);
     }
     return nullptr;
   }
@@ -454,10 +463,10 @@ ModeInference::get_mode(const string & part, const string & mode)
 }
 
 std::vector<std::string>
-ModeInference::get_available_modes(const std::string & part)
+ModeInference::get_available_modes(const std::string & part) const
 {
   std::vector<std::string> modes;
-  for (auto mode : this->modes_[part]) {
+  for (auto mode : this->modes_.at(part)) {
     modes.push_back(mode.first);
   }
   return modes;
@@ -614,7 +623,7 @@ ModeInference::get_all_parts_of(const string & system) const
 }
 
 bool
-ModeInference::matching_parameters(const Parameter & target, const Parameter & actual)
+ModeInference::matching_parameters(const Parameter & target, const Parameter & actual) const
 {
   // TODO(anordman): consider DONTCARE and value ranges
 
@@ -650,6 +659,64 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
   // TODO(anordman): More types
 
   return false;
+}
+
+Deviation
+ModeInference::infer_transitions()
+{
+  Deviation transitions;
+
+  {
+    std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
+    std::unique_lock<shared_mutex> nclock(this->nodes_cache_mutex_);
+    StatesMap::iterator it;
+    for (it = nodes_.begin(); it != nodes_.end(); it++) {
+      if (nodes_cache_.count(it->first) < 1) {
+        nodes_cache_[it->first] = nodes_.at(it->first);
+      }
+      try {
+        auto sm_current = infer_node(it->first);
+        if (sm_current.state == State::PRIMARY_STATE_ACTIVE &&
+          sm_current.mode.compare(nodes_cache_.at(it->first).mode) != 0)
+        {
+          // Detected a mode transition
+          transitions[it->first] = make_pair(nodes_cache_.at(it->first), sm_current);
+
+          // Cache newly inferred state and mode for next inference of transitions
+          nodes_cache_[it->first] = sm_current;
+        }
+      } catch (...) {
+        // inference may not work due to too little information
+        continue;
+      }
+    }
+  }
+
+  {
+    std::unique_lock<shared_mutex> slock(this->systems_mutex_);
+    std::unique_lock<shared_mutex> sclock(this->systems_cache_mutex_);
+    StatesMap::iterator it;
+    for (it = systems_.begin(); it != systems_.end(); it++) {
+      if (systems_cache_.count(it->first) < 1) {
+        systems_cache_[it->first] = systems_.at(it->first);
+      }
+      try {
+        auto sm_current = infer_system(it->first);
+        if (sm_current != systems_cache_[it->first]) {
+          // Detected a transition
+          transitions[it->first] = make_pair(systems_cache_.at(it->first), sm_current);
+
+          // Cache newly inferred state and mode for next inference of transitions
+          systems_cache_[it->first] = sm_current;
+        }
+      } catch (...) {
+        // inference may not work due to too little information
+        continue;
+      }
+    }
+  }
+
+  return transitions;
 }
 
 }  // namespace system_modes

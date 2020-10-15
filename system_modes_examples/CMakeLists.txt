@@ -24,7 +24,6 @@ find_package(std_msgs REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
-find_package(Boost 1.58 COMPONENTS program_options REQUIRED)
 find_package(system_modes REQUIRED)
 
 # drive_base
@@ -39,7 +38,6 @@ ament_target_dependencies(drive_base
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "Boost"
   "system_modes"
 )
 install(TARGETS drive_base
@@ -58,7 +56,6 @@ ament_target_dependencies(manipulator
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
   "std_msgs"
-  "Boost"
   "system_modes"
 )
 install(TARGETS manipulator
@@ -73,5 +70,18 @@ install(FILES example_modes.yaml
   DESTINATION share/${PROJECT_NAME}/
 )
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_cmake_gmock REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # remove the line when a copyright and license is present in all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # remove the line when this package is a git repo
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package()

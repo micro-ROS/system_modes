@@ -1,8 +1,8 @@
+General information about this repository, including legal information, build instructions and known issues/limitations, can be found in the [README](../README.md) of the repository root.
+
 # The system_modes_examples package
 
 This [ROS 2](https://index.ros.org/doc/ros2/) package provides a simple example for the use of the [system_modes](../system_modes/) package. It contains two ROS 2 LifecycleNodes, a *drive\_base* node and a *manipulator* node, as well as simple a model file (yaml).
-
-General information about this repository, including legal information, build instructions and known issues/limitations, can be found in the [README](../README.md) of the repository root.
 
 ## Example Model File
 
@@ -11,8 +11,6 @@ The SMH file [example_modes.yaml](./example_modes.yaml) specifies an *actuation*
 * The *manipulator* node has a default mode, a *STRONG* mode, and a *WEAK* mode, configuring different values for its *max_torque*.
 * The *drive\_base* node has a default mode, a *FAST* mode, and a *SLOW* mode, configuring different values for its *max_speed* and its controller (*PID* or *MPC*).
 * The *actuation* system comprises of these two nodes. It has a default mode, a *PERFORMANCE* mode, and a *MODERATE* mode, changing the modes of its two nodes accordingly.
-
-The SMH file additionally specifies four [Error Handling Rules](../system_modes/README.md#error-handling-and-rules) that specify how the system reacts to situation where the actual system state is diverging from the intended state. The four exemplary rules specify how the *actuation* system goes into a degraded mode or deactivates depending on which of its parts becomes inactive.
 
 ## Running the Example
 
@@ -52,15 +50,15 @@ In an additional fifth terminal, you may mimic a planning/executive component to
   The mode monitor should display the following system state:  
   ![mode_monitor](./doc/screenshot-monitor-active.png "Screenshot of the mode monitor")
 1. Set your system into *PERFORMANCE* mode with the following ROS 2 command:  
-  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
+  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{mode_name: 'PERFORMANCE'}"`  
   To change the *actuation* system into its *PERFORMANCE* mode, the mode manager will change the *drive\_base* to *FAST* mode and activate the *manipulator* node in its *STRONG* mode.
   The mode monitor should display the following system state:  
   ![mode_monitor](./doc/screenshot-monitor-performance.png "Screenshot of the mode monitor")
   Note, that the system state and mode as well as the node modes are indicated to be *inferred*, as explained in the [mode inference](../system_modes/README.md#mode-inference) section of the [system_modes](../system_modes/) package.
-1. You can further play around with the mode inference. For example, change the mode of the two nodes explicitly so that the target mode and actual mode of the *actuation* system diverge. Execute the following two ROS 2 commands:  
-  $ `ros2 service call /drive_base/change_mode system_modes/ChangeMode "{node_name: 'drive_base', mode_name: 'SLOW'}"`  
+2. You can further play around with the mode inference. For example, change the mode of the two nodes explicitly so that the target mode and actual mode of the *actuation* system diverge. Execute the following two ROS 2 commands:  
+  $ `ros2 service call /drive_base/change_mode system_modes/ChangeMode "{mode_name: 'SLOW'}"`  
   and  
-  $ `ros2 service call /manipulator/change_mode system_modes/ChangeMode "{node_name: 'manipulator', mode_name: 'WEAK'}"`  
+  $ `ros2 service call /manipulator/change_mode system_modes/ChangeMode "{mode_name: 'WEAK'}"`  
   The mode monitor should display the following system state:  
   ![mode_monitor](./doc/screenshot-monitor-moderate.png "Screenshot of the mode monitor")
   Note, that the mode monitor is able to infer that the system's *actual* mode is now *MODERATE*. This is based on the fact that both its nodes are active, the *drive\_base* is in its *SLOW* mode, and the manipulator is in its *WEAK* mode. However, the last requested mode for the *actuation* system is *PERFORMANCE*, so the monitor infers that the system is still transitioning into its target mode, indicating that the actual system state is *activating* (see [lifecycle](../system_modes/README.md#lifecycle)).
@@ -70,13 +68,13 @@ In an additional fifth terminal, you may mimic a planning/executive component to
 In order to see the [Error Handling and Rules](../system_modes/README.md#error-handling-and-rules) in action, try the following:
 
 1. Bring the system back into its *PERFORMANCE* mode with the following command:  
-  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
-1. Deactivate the manipulator node with the following command:  
+  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{mode_name: 'PERFORMANCE'}"`  
+2. Deactivate the manipulator node with the following command:  
   $ `ros2 service call /manipulator/change_state lifecycle_msgs/ChangeState "{transition: {id: 4, label: deactivate}}"`  
   The system will detect a deviation between the *intended* and the *actual* system state for which it recognizes a rule, i.e. the *degrade_from_PERFORMANCE* rule from the SMH file [example_modes.yaml](./example_modes.yaml). Following this rule, the mode manager sends the *actuation* system into its default mode. This is visible in the logging output of the terminal running the mode manager:  
   ![mode_manager](./doc/screenshot-manager-deviation.png "Screenshot of the mode manager")
 1. To try another rule, bring the system back into its *PERFORMANCE* mode with the following command:  
-  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{node_name: 'actuation', mode_name: 'PERFORMANCE'}"`  
-1. This time, deactivate the drive_base node with the following command:  
-  $ `ros2 service call /drive_base/change_state lifecycle_msgs/ChangeState "{transition: {id: 4l, label: deactivate}}"`  
+  $ `ros2 service call /actuation/change_mode system_modes/ChangeMode "{mode_name: 'PERFORMANCE'}"`  
+2. This time, deactivate the drive_base node with the following command:  
+  $ `ros2 service call /drive_base/change_state lifecycle_msgs/ChangeState "{transition: {id: 4, label: deactivate}}"`  
   The system will again detect a deviation between the *intended* and the *actual* system state for which it recognizes the *inactive_from_PERFORMANCE* rule. The mode manager will therefore deactivate the *actuation* system.

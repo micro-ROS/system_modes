@@ -61,9 +61,9 @@ struct StateAndMode
       return true;
     }
 
-    return (cmp.mode.compare(mode) == 0 ||                           // same mode
+    return cmp.mode.compare(mode) == 0 ||                            // same mode
            (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
-           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty()));   // DEFAULT_MODE the same
+           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty());    // DEFAULT_MODE the same
   }
 
   bool operator!=(const StateAndMode & cmp) const
@@ -71,7 +71,8 @@ struct StateAndMode
     return !(*this == cmp);
   }
 
-  void from_string(const std::string & sam) {
+  void from_string(const std::string & sam)
+  {
     auto dot = sam.find(".");
     if (dot != std::string::npos) {
       state = state_id_(sam.substr(0, dot));
@@ -82,7 +83,8 @@ struct StateAndMode
     }
   }
 
-  std::string as_string() const {
+  std::string as_string() const
+  {
     if (state != State::PRIMARY_STATE_ACTIVE || mode.empty()) {
       return state_label_(state);
     }

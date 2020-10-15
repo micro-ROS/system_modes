@@ -31,6 +31,8 @@ using rclcpp::Parameter;
 
 using system_modes::ModeInference;
 using system_modes::StateAndMode;
+using system_modes::Deviation;
+
 using lifecycle_msgs::msg::State;
 
 /*
@@ -141,7 +143,8 @@ TEST(TestModeInference, inference) {
   inference.update_target("system", active_default);
   inference.update("part0", inactive);
   inference.update("part1", active_default);
-  printf("-----------------\n");
+
+  // System inference
   StateAndMode sm = inference.get_or_infer("system");
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, sm.state);
   EXPECT_EQ("__DEFAULT__", sm.mode);
@@ -163,4 +166,52 @@ TEST(TestModeInference, inference) {
 
   // System inference
   EXPECT_EQ(State::TRANSITION_STATE_ACTIVATING, inference.infer("system").state);
+}
+
+TEST(TestModeInference, infer_transitions) {
+  ModeInference inference(MODE_FILE_CORRECT);
+
+  // update node modes, test inferred system mode
+  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
+  inference.update_target("system", active_default);
+  inference.update("part0", inactive);
+  inference.update("part1", active_default);
+
+  // Expect to have one initial transition
+  EXPECT_EQ(1u, inference.infer_transitions().size());
+  EXPECT_EQ(0u, inference.infer_transitions().size());
+
+  // Expect to have one transition of part0
+  Parameter foo("foo", 0.2);
+  Parameter bar("bar", "DBG");
+  inference.update_param("part1", foo);
+  inference.update_param("part1", bar);
+  auto transitions = inference.infer_transitions();
+  EXPECT_EQ(1u, transitions.size());
+  EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part1"].first.state);
+  EXPECT_EQ("__DEFAULT__", transitions["part1"].first.mode);
+  EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part1"].second.state);
+  EXPECT_EQ("AAA", transitions["part1"].second.mode);
+
+  // Expect to have cleared transitions
+  EXPECT_EQ(0u, inference.infer_transitions().size());
+
+  // Expect two have two transitions: part1 and system
+  Parameter foo2("foo", 0.1);
+  Parameter bar2("bar", "DBG");
+  inference.update_state("part0", State::PRIMARY_STATE_ACTIVE);
+  inference.update_param("part0", foo2);
+  inference.update_param("part0", bar2);
+  transitions = inference.infer_transitions();
+  EXPECT_EQ(2u, transitions.size());
+  EXPECT_EQ(State::PRIMARY_STATE_INACTIVE, transitions["part0"].first.state);
+  EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part0"].second.state);
+  EXPECT_EQ("FOO", transitions["part0"].second.mode);
+  EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["system"].first.state);
+  EXPECT_EQ("__DEFAULT__", transitions["system"].first.mode);
+  EXPECT_EQ(State::TRANSITION_STATE_ACTIVATING, transitions["system"].second.state);
+
+  // Expect to have cleared transitions
+  EXPECT_EQ(0u, inference.infer_transitions().size());
 }

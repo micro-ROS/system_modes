@@ -41,11 +41,11 @@ namespace system_modes
 class ModeManager : public rclcpp::Node
 {
 public:
-  explicit ModeManager(const std::string & model_path);
+  ModeManager();
   ModeManager(const ModeManager &) = delete;
 
   std::shared_ptr<ModeInference> inference();
-  virtual void handle_system_deviation(const std::string& reason);
+  virtual void handle_system_deviation(const std::string & reason);
 
   virtual ~ModeManager() = default;
 
@@ -67,26 +67,32 @@ protected:
 
   // Mode service callbacks
   virtual void on_change_mode(
-    const std::shared_ptr<rmw_request_id_t>,
+    const std::string &,
     const std::shared_ptr<system_modes::srv::ChangeMode::Request>,
     std::shared_ptr<system_modes::srv::ChangeMode::Response>);
   virtual void on_get_mode(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<system_modes::srv::GetMode::Request>,
+    const std::string &,
     std::shared_ptr<system_modes::srv::GetMode::Response>);
   virtual void on_get_available_modes(
-    const std::shared_ptr<rmw_request_id_t>,
-    const std::shared_ptr<system_modes::srv::GetAvailableModes::Request>,
+    const std::string &,
     std::shared_ptr<system_modes::srv::GetAvailableModes::Response>);
 
   virtual bool change_state(
-    const std::string & node,
+    const std::string &,
     unsigned int,
     bool transitive = true);
-  virtual bool change_mode(const std::string & node, const std::string & mode);
+  virtual bool change_mode(
+    const std::string &,
+    const std::string &);
 
-  virtual void change_part_state(const std::string & node, unsigned int);
-  virtual void change_part_mode(const std::string & node, const std::string & mode);
+  virtual void change_part_state(
+    const std::string &,
+    unsigned int);
+  virtual void change_part_mode(
+    const std::string &,
+    const std::string &);
+
+  virtual void publish_transitions();
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;
@@ -118,16 +124,23 @@ private:
   std::map<std::string, rclcpp::AsyncParametersClient::SharedPtr>
   param_change_clients_;
 
-  // Lifecycle transition request
+  // Lifecycle transition publisher
+  std::map<std::string, rclcpp::Publisher<lifecycle_msgs::msg::TransitionEvent>::SharedPtr>
+  transition_pub_;
   std::map<std::string, rclcpp::Publisher<lifecycle_msgs::msg::TransitionEvent>::SharedPtr>
   state_request_pub_;
 
-  // Mode transition request publisher
+  // Mode transition publisher
+  std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
+  mode_transition_pub_;
   std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
   mode_request_pub_;
 
   // Remember states and modes of the systems
   std::map<std::string, StateAndMode> current_modes_;
+
+  // Timer to check for and publish recent transitions
+  rclcpp::TimerBase::SharedPtr transition_timer_;
 };
 
 }  // namespace system_modes

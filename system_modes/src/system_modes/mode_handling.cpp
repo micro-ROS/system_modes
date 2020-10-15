@@ -88,13 +88,15 @@ ModeHandling::add_rule(
   string rule_name_ = rule_name.substr(0, split);
 
   if (rule_spec.compare("if_target") != 0 &&
-      rule_spec.compare("if_part") != 0 &&
-      rule_spec.compare("new_target") != 0) {
+    rule_spec.compare("if_part") != 0 &&
+    rule_spec.compare("new_target") != 0)
+  {
     throw std::runtime_error("ModeHandling::add_rule() can't parse rule spec.");
   }
 
   if (rule_param.get_type() != ParameterType::PARAMETER_STRING &&
-      rule_param.get_type() != ParameterType::PARAMETER_STRING_ARRAY) {
+    rule_param.get_type() != ParameterType::PARAMETER_STRING_ARRAY)
+  {
     throw std::runtime_error("ModeHandling::add_rule() rule is neither string nor string array.");
   }
 

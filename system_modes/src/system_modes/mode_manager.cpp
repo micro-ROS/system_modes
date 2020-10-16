@@ -592,8 +592,9 @@ ModeManager::handle_system_deviation(const std::string &)
               rule.new_system_target.state == State::PRIMARY_STATE_INACTIVE)
             {
               change_state(rule.system, transition_id_("deactivate"), true);
-            } else if (system_actual.state == State::PRIMARY_STATE_INACTIVE &&
-              rule.new_system_target.state == State::PRIMARY_STATE_ACTIVE) {
+            } else if (system_actual.state == State::PRIMARY_STATE_INACTIVE &&  // NOLINT
+              rule.new_system_target.state == State::PRIMARY_STATE_ACTIVE)    // NOLINT
+            {
               change_state(rule.system, transition_id_("activate"), true);
             }
             if (!rule.new_system_target.mode.empty()) {

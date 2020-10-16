@@ -1,8 +1,19 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package system_modes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package system_modes_examples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.2.3 (2020-02-13)
+0.4.0 (2020-09-30)
+-----------
+* publish inferred state and mode transitions
+* https://github.com/micro-ROS/system_modes/issues/42
+
+0.3.0 (2020-07-23)
+-----------
+* removed boost dependencies (was: program options)
+* changed mode service specifications (less redundancy)
+* https://github.com/micro-ROS/system_modes/issues/24
+
+0.2.3 (2020-07-23)
 -----------
 * improved StateAndMode struct
 * testing

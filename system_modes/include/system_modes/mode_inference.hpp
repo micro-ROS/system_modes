@@ -53,27 +53,38 @@ public:
   virtual void update_param(const std::string &, rclcpp::Parameter &);
   virtual void update_target(const std::string &, StateAndMode);
 
-  virtual StateAndMode get(const std::string & part);
+  virtual StateAndMode get(const std::string & part) const;
   virtual StateAndMode get_or_infer(const std::string & part);
 
   virtual StateAndMode infer(const std::string & part);
-  virtual StateAndMode infer_system(const std::string & part);
   virtual StateAndMode infer_node(const std::string & part);
+  virtual StateAndMode infer_system(const std::string & part);
 
-  virtual StateAndMode get_target(const std::string & part);
-  virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode);
-  virtual std::vector<std::string> get_available_modes(const std::string & part);
+  /**
+   * Infers latest transitions of systems
+   *
+   * Returns map of last inferred transitions of systems into new states or
+   * new modes. State transitions of nodes don't have to be inferred, as
+   * nodes publish their state transitions. For nodes, we only need to infer
+   * mode transitions.
+   */
+  virtual Deviation infer_transitions();
+
+  virtual StateAndMode get_target(const std::string & part) const;
+  virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode) const;
+  virtual std::vector<std::string> get_available_modes(const std::string & part) const;
 
   virtual ~ModeInference() = default;
 
 protected:
-  virtual bool matching_parameters(const rclcpp::Parameter &, const rclcpp::Parameter &);
+  virtual bool matching_parameters(const rclcpp::Parameter &, const rclcpp::Parameter &) const;
   virtual void read_modes_from_model(const std::string & model_path);
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
-  StatesMap nodes_, nodes_target_;
-  StatesMap systems_, systems_target_;
+  StatesMap nodes_, nodes_target_, nodes_cache_;
+  StatesMap systems_, systems_target_, systems_cache_;
+
   std::map<std::string, ModeMap> modes_;
   ParametersMap parameters_;
 
@@ -83,6 +94,8 @@ private:
     param_mutex_;
   mutable std::shared_timed_mutex
     nodes_target_mutex_, systems_target_mutex_;
+  mutable std::shared_timed_mutex
+    nodes_cache_mutex_, systems_cache_mutex_;
 };
 
 }  // namespace system_modes

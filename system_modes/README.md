@@ -121,7 +121,7 @@ The mode monitor is a ROS node that accepts an SHM file (see [above](#system-mod
 Running the monitor:
 $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to/modelfile.yaml]`
 
-### Error Handling and Rules
+### Error Handling and Rules (Experimental)
 
 If the _actual_ state/mode of the system or any of its parts diverges from the _target_ state/mode, we define rules that try to bring the system back to a valid _target_ state/mode, e.g., a degraded mode. Rules work in a bottom-up manner, i.e. starting from correcting nodes before sub-systems before systems. Rules are basically defined in the following way:
 

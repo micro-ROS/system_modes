@@ -224,7 +224,6 @@ ModeInference::infer_system(const string & part)
                 "', inference failed.");
       }
     }
-    this->systems_[part] = StateAndMode(state, "");
     return StateAndMode(state, "");
   }
 

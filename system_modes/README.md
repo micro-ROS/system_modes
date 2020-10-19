@@ -135,6 +135,8 @@ then:
 if _actual_ state/mode and _target_ state/mode diverge, but there is no rule for this exact situation, the bottom-up rules will just try to return the system/part to its _target_ state/mode.
 *Potentiall dangereous, to be discussed:* what's happening, if the system is already on its way. E.g., a system or part was just commanded to transition to _ACTIVE.foo_, but is currently _activating_ (so doing everything right). In this case we have to avoid that the bottom-up rules will trigger.
 
+*Note:* This feature is still experimental and might be subject to major changes. However, if no rules are specified in the model file, this feature is not used.
+
 ## How to Apply
 
 When designing the hierarchy of your system, try to group parts semantically, e.g., everything that belongs to *perception* or *navigation*. You want to group those parts of a system that are often jointly managed (initialized, shutdown, configured). Hierarchies don't necessarily need to be designed in one big tree, but can form several parallel trees.

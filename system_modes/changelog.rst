@@ -1,6 +1,17 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Changelog for package system_modes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package system_modes_examples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.4.1 (2020-10-29)
+-----------
+* Include experimental error handling and rules feature
+* https://github.com/micro-ROS/system_modes/issues/13
+* CI for ubuntu 20.04 ROS 2 rolling
+
+0.4.0 (2020-09-30)
+-----------
+* publish inferred state and mode transitions
+* https://github.com/micro-ROS/system_modes/issues/42
 
 0.4.0 (2020-09-30)
 -----------

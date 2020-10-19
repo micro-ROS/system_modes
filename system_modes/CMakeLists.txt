@@ -40,6 +40,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 add_library(mode SHARED
   src/system_modes/mode.cpp
   src/system_modes/mode_impl.cpp
+  src/system_modes/mode_handling.cpp
   src/system_modes/mode_inference.cpp)
 target_include_directories(mode PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

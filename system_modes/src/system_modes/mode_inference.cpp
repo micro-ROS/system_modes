@@ -42,8 +42,9 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: nodes_(), nodes_target_(), nodes_cache_(),
-  systems_(), systems_target_(), systems_cache_(),
+: mode_handling_(new ModeHandling(model_path)),
+  nodes_(), nodes_target_(),
+  systems_(), systems_target_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
   nodes_target_mutex_(), systems_target_mutex_()
@@ -223,7 +224,6 @@ ModeInference::infer_system(const string & part)
                 "', inference failed.");
       }
     }
-    this->systems_[part] = StateAndMode(state, "");
     return StateAndMode(state, "");
   }
 
@@ -717,6 +717,26 @@ ModeInference::infer_transitions()
   }
 
   return transitions;
+}
+
+Deviation
+ModeInference::get_deviation()
+{
+  Deviation deviation;
+
+  for (auto const & part : get_all_parts()) {
+    try {
+      auto actual = get_or_infer(part);
+      auto target = get_target(part);
+      if (actual != target) {
+        deviation[part] = std::make_pair(target, actual);
+      }
+    } catch (...) {
+      // We can't get deviations, if we can't infer the system state
+    }
+  }
+
+  return deviation;
 }
 
 }  // namespace system_modes

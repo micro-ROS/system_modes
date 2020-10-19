@@ -13,8 +13,8 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
     steps:
-      - uses: ros-tooling/setup-ros@0.0.25
-      - uses: ros-tooling/action-ros-ci@0.0.15
+      - uses: ros-tooling/setup-ros@0.0.26
+      - uses: ros-tooling/action-ros-ci@0.0.19
         with:
           package-name: system_modes system_modes_examples
           target-ros2-distro: foxy

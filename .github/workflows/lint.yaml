@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/setup-ros@0.0.26
     - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: xmllint
@@ -23,7 +23,7 @@ jobs:
           linter: [cppcheck, cpplint, uncrustify]
     steps:
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/setup-ros@0.0.26
     - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: ${{ matrix.linter }}
@@ -38,7 +38,7 @@ jobs:
         linter: [flake8, pep257]
     steps:
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@0.0.25
+    - uses: ros-tooling/setup-ros@0.0.26
     - uses: ros-tooling/action-ros2-lint@0.0.6
       with:
         linter: ${{ matrix.linter }}

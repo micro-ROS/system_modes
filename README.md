@@ -17,7 +17,7 @@ standards, e.g., ISO 26262.
 
 ## How to Build, Test, Install, and Use
 
-After you cloned this repository into your ROS 2 workspace folder, you may build and install the [system_modes](./system_modes/) package and the [system_modes_examples](./system_modes_examples/) package using colcon:  
+After you cloned this repository into your ROS 2 workspace folder, you may build and install the [system_modes](./system_modes/) package and the [system_modes_examples](./system_modes_examples/) package using colcon:
 $ `colcon build --packages-select-regex system_modes`
 
 Have a look at the [system_modes_examples](./system_modes_examples/) documentation to try your installation.
@@ -37,6 +37,7 @@ see the file [3rd-party-licenses.txt](3rd-party-licenses.txt).
 Please notice the following issues/limitations:
 
 * Currently, (sub-)systems managed by the mode manager are not recognized by the `ros2 lifecycle` tool (*"Node not found"*). So to trigger lifecycle transitions in (sub-)systems, you have to go with the `ros2 service call` tool. Check the [system_modes_examples](./system_modes_examples/) documentation for example calls.
+* The [Error Handling and Rules](./system_modes/README.md#error-handling-and-rules-experimental) feature is still experimental and might be subject to major changes. However, if no rules are specified in the model file, this feature is not used.
 
 ## Acknowledgments
 

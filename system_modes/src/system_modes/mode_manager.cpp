@@ -59,6 +59,7 @@ namespace system_modes
 ModeManager::ModeManager()
 : Node("__mode_manager"),
   mode_inference_(nullptr),
+  mode_handling_(nullptr),
   state_change_srv_(), get_state_srv_(), states_srv_(),
   mode_change_srv_(), get_mode_srv_(), modes_srv_(),
   state_change_clients_(), mode_change_clients_(),
@@ -71,6 +72,7 @@ ModeManager::ModeManager()
     throw std::invalid_argument("Need path to model file.");
   }
   mode_inference_ = std::make_shared<ModeInference>(model_path);
+  mode_handling_ = std::make_shared<ModeHandling>(model_path);
 
   for (auto system : this->mode_inference_->get_systems()) {
     this->add_system(system);
@@ -557,6 +559,55 @@ ModeManager::change_part_mode(const string & node, const string & mode)
         p.c_str());
     }
     this->param_change_clients_[node]->set_parameters(new_mode->get_parameters());
+  }
+}
+
+void
+ModeManager::handle_system_deviation(const std::string &)
+{
+  auto deviation = this->mode_inference_->get_deviation();
+  if (deviation.empty()) {return;}
+
+  // handle deviation
+  for (auto const & dev : deviation) {
+    RCLCPP_WARN(
+      this->get_logger(),
+      "Deviation detected in system or part '%s': should be %s, but is %s.",
+      dev.first.c_str(),
+      dev.second.first.as_string().c_str(),
+      dev.second.second.as_string().c_str());
+
+    auto rules = this->mode_handling_->get_rules_for(dev.first, dev.second.first);
+    for (auto const & rule : rules) {
+      try {
+        auto part_actual = mode_inference_->get_or_infer(rule.part);
+        if (rule.part_actual == part_actual) {
+          RCLCPP_INFO(this->get_logger(), " applying rule %s...", rule.name.c_str());
+
+          auto system_actual = mode_inference_->get_or_infer(rule.system);
+          if (system_actual.state != rule.new_system_target.state) {
+            // TODO(anordman): this is hacky and needs lifecycle servicing
+            if ((system_actual.state == State::PRIMARY_STATE_ACTIVE ||
+              State::TRANSITION_STATE_ACTIVATING) &&
+              rule.new_system_target.state == State::PRIMARY_STATE_INACTIVE)
+            {
+              change_state(rule.system, transition_id_("deactivate"), true);
+            } else if (system_actual.state == State::PRIMARY_STATE_INACTIVE &&  // NOLINT
+              rule.new_system_target.state == State::PRIMARY_STATE_ACTIVE)    // NOLINT
+            {
+              change_state(rule.system, transition_id_("activate"), true);
+            }
+            if (!rule.new_system_target.mode.empty()) {
+              change_mode(rule.system, rule.new_system_target.mode);
+            }
+          } else {
+            change_mode(rule.system, rule.new_system_target.mode);
+          }
+        }
+      } catch (...) {
+        // If we can't infer anything about the system, it's okay to wait
+      }
+    }
   }
 }
 

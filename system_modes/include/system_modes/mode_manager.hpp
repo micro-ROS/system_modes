@@ -28,6 +28,7 @@
 #include <memory>
 #include <utility>
 
+#include "system_modes/mode_handling.hpp"
 #include "system_modes/mode_inference.hpp"
 #include "system_modes/srv/change_mode.hpp"
 #include "system_modes/srv/get_mode.hpp"
@@ -44,6 +45,7 @@ public:
   ModeManager(const ModeManager &) = delete;
 
   std::shared_ptr<ModeInference> inference();
+  virtual void handle_system_deviation(const std::string & reason);
 
   virtual ~ModeManager() = default;
 
@@ -94,6 +96,9 @@ protected:
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;
+  std::shared_ptr<ModeHandling> mode_handling_;
+  rclcpp::TimerBase::SharedPtr periodic_timer_;
+  std::string model_path_;
 
   // Lifecycle change services
   std::map<std::string, rclcpp::Service<lifecycle_msgs::srv::ChangeState>::SharedPtr>

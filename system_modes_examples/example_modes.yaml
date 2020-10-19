@@ -17,6 +17,24 @@ actuation:
       PERFORMANCE:
         manipulator: active.STRONG
         drive_base: active.FAST
+    rules:
+      degrade_from_MODERATE:
+        if_target: active.MODERATE
+        if_part: [manipulator, inactive]
+        new_target: active.__DEFAULT__
+      degrade_from_PERFORMANCE:
+        if_target: active.PERFORMANCE
+        if_part: [manipulator, inactive]
+        new_target: active.__DEFAULT__
+      inactive_from_MODERATE:
+        if_target: active.MODERATE
+        if_part: [drive_base, inactive]
+        new_target: inactive
+      inactive_from_PERFORMANCE:
+        if_target: active.PERFORMANCE
+        if_part: [drive_base, inactive]
+        new_target: inactive
+      # if system in __DEFAULT__, don't degrade, don't deactivate, but recover
 
 manipulator:
   ros__parameters:

@@ -1,10 +1,10 @@
-General information about this repository, including legal information, project context, build instructions and known issues/limitations, are given in [README.md](../README.md) in the repository root.
-
 # ROS 2 System Modes
 
 The system modes concept assumes that a robotics system is built from components with a lifecycle. It adds a notion of (sub-)systems, hiararchically grouping these nodes, as well as a notion of *modes* that determine the configuration of these nodes and (sub-)systems in terms of their parameter values.
 
 A list of (current and future) requirements for system modes can be found here: [requirements](./doc/requirements.md#system-runtime-configuration).
+
+General information about this repository, including legal information, project context, build instructions and known issues/limitations, are given in [README.md](../README.md) in the repository root.
 
 ## System Modes Package
 
@@ -105,7 +105,7 @@ The mode manager is a ROS node that accepts an SHM file (see [above](#system-mod
   * `/{system_or_node}/transition_request_info` - lifecycle_msgs/TransitionEvent
   * `/{system_or_node}/mode_request_info` - [system_modes/ModeEvent](./msg/ModeEvent.msg)
 
-Running the manager:  
+Running the manager:
 $ `ros2 launch system_modes mode_manager.launch.py modelfile:=[path/to/modelfile.yaml]`
 
 ### Mode Monitor
@@ -118,8 +118,24 @@ The mode monitor is a ROS node that accepts an SHM file (see [above](#system-mod
 
 ![mode_monitor](../system_modes_examples/doc/screenshot-monitor.png "Screenshot of the mode monitor from system_modes_examples")
 
-Running the monitor:  
+Running the monitor:
 $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to/modelfile.yaml]`
+
+### Error Handling and Rules (Experimental)
+
+If the _actual_ state/mode of the system or any of its parts diverges from the _target_ state/mode, we define rules that try to bring the system back to a valid _target_ state/mode, e.g., a degraded mode. Rules work in a bottom-up manner, i.e. starting from correcting nodes before sub-systems before systems. Rules are basically defined in the following way:
+
+```pseudo
+if:
+ system.target == {target state/mode} && system.actual != {target state/mode} && part.actual == {specific state/mode}
+then:
+ system.target := {specific state/mode}
+```
+
+if _actual_ state/mode and _target_ state/mode diverge, but there is no rule for this exact situation, the bottom-up rules will just try to return the system/part to its _target_ state/mode.
+*Potentiall dangereous, to be discussed:* what's happening, if the system is already on its way. E.g., a system or part was just commanded to transition to _ACTIVE.foo_, but is currently _activating_ (so doing everything right). In this case we have to avoid that the bottom-up rules will trigger.
+
+*Note:* This feature is still experimental and might be subject to major changes. However, if no rules are specified in the model file, this feature is not used.
 
 ## How to Apply
 

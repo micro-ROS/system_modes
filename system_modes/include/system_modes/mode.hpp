@@ -16,6 +16,7 @@
 
 #include "system_modes/mode_impl.hpp"
 
+#include <rclcpp/macros.hpp>
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include <rclcpp/parameter_map.hpp>
 

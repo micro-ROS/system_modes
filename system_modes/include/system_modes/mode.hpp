@@ -47,7 +47,7 @@ class ModeBase
 public:
   explicit ModeBase(const std::string & mode_name);
   virtual ~ModeBase() = default;
-  // cppcheck-suppress unknown macro
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeBase)
 
   std::string get_name() const;
@@ -76,7 +76,7 @@ class DefaultMode : public ModeBase
 public:
   DefaultMode();
   explicit DefaultMode(const std::string & mode_name) = delete;
-  // cppcheck-suppress unknown macro
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(DefaultMode)
 
   virtual void set_parameter(const rclcpp::Parameter & parameter);
@@ -92,7 +92,7 @@ class Mode : public ModeBase
 public:
   explicit Mode(const std::string & mode_name) = delete;
   Mode(const std::string & mode_name, const DefaultModePtr default_mode);
-  // cppcheck-suppress unknown macro
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(Mode)
 
   virtual ~Mode() = default;

@@ -204,9 +204,11 @@ ModeMonitor::refresh() const
 
     // state/mode inference
     try {
-      auto stateAndMode = mode_inference_->infer(node);
-      state_infer = stateAndMode.state;
-      mode_infer = stateAndMode.mode;
+      if (state_actual == State::PRIMARY_STATE_ACTIVE) {
+        auto stateAndMode = mode_inference_->infer(node);
+        state_infer = stateAndMode.state;
+        mode_infer = stateAndMode.mode;
+      }
     } catch (std::out_of_range & ex) {
       RCLCPP_DEBUG(
         get_logger(),

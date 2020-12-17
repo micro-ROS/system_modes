@@ -51,6 +51,7 @@ class ModeHandling
 {
 public:
   explicit ModeHandling(const std::string & model_path);
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeHandling)
 
   virtual ~ModeHandling() = default;

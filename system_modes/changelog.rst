@@ -2,6 +2,11 @@
 Changelog for package system_modes_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2020-12-17)
+-----------
+* Error handling and rules feature no longer experimental
+* Fixed bugs in monitor and tests
+
 0.4.1 (2020-10-29)
 -----------
 * Include experimental error handling and rules feature

@@ -40,6 +40,7 @@ class ModeInference
 {
 public:
   explicit ModeInference(const std::string & model_path);
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeInference)
 
   virtual const std::vector<std::string> get_all_parts() const;

@@ -152,7 +152,8 @@ if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)
   set(launch_tests
     "two_lifecycle_nodes"           # Mode Manager with Lifecycle Nodes
-    "two_mixed_nodes")              # Mode Manager with Lifecycle and non-Lifecycle Nodes
+    "two_mixed_nodes"               # Mode Manager with Lifecycle and non-Lifecycle Nodes
+    "two_independent_hierarchies")  # Mode Manager for two independent hierarchies of nodes
 
   # Launch Test: Mode Manager with Lifecycle Nodes
   foreach(test_name ${launch_tests})

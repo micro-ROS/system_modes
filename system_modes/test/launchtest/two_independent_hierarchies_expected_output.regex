@@ -1,0 +1,4 @@
+Transition [AB]:configure
+Parameter D:bar:ONE
+Parameter B:foo:0\.1
+Parameter D:bar:TWO

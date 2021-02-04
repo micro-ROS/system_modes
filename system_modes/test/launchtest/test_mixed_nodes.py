@@ -1,11 +1,10 @@
 import rclpy
 from rclpy.executors import MultiThreadedExecutor
+from rcl_interfaces.msg import SetParametersResult
 from rclpy.node import Node
 
-from rcl_interfaces.msg import SetParametersResult
-from rclpy.parameter import Parameter
-
 from lifecycle_msgs.srv import ChangeState
+from rclpy.parameter import Parameter
 from system_modes.srv import ChangeMode
 
 
@@ -27,13 +26,9 @@ class FakeLifecycleNode(Node):
     def parameter_callback(self, params):
         for param in params:
             if param.name == 'bar' and param.type_ == Parameter.Type.STRING:
-                self.get_logger().info(
-                    'Parameter %s:%s:%s'
-                     % (self.get_name(), param.name, param.value))
+                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), param.name, param.value))
             if param.name == 'foo' and param.type_ == Parameter.Type.DOUBLE:
-                self.get_logger().info(
-                    'Parameter %s:%s:%s'
-                     % (self.get_name(), param.name, param.value))
+                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), param.name, param.value))
         return SetParametersResult(successful=True)
 
     def change_state_callback(self, request, response):
@@ -41,6 +36,7 @@ class FakeLifecycleNode(Node):
         self.get_logger().info('Transition %s:%s' % (self.get_name(), request.transition.label))
 
         return response
+
 
 class NormalNode(Node):
 
@@ -54,14 +50,11 @@ class NormalNode(Node):
     def parameter_callback(self, params):
         for param in params:
             if param.name == 'bar' and param.type_ == Parameter.Type.STRING:
-                self.get_logger().info(
-                    'Parameter %s:%s:%s'
-                     % (self.get_name(), param.name, param.value))
+                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), param.name, param.value))
             if param.name == 'foo' and param.type_ == Parameter.Type.DOUBLE:
-                self.get_logger().info(
-                    'Parameter %s:%s:%f'
-                     % (self.get_name(), param.name, param.value))
+                self.get_logger().info('Parameter %s:%s:%f' % (self.get_name(), param.name, param.value))
         return SetParametersResult(successful=True)
+
 
 class LifecycleClient(Node):
 
@@ -109,12 +102,14 @@ def main(args=None):
             lc.configure_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
 
             lc.activate_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
 
-            lc.change_mode("CC")
+            lc.change_mode('CC')
 
             executor.spin()
         finally:

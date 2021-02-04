@@ -16,6 +16,7 @@ class FakeLifecycleNode(Node):
         
         self.declare_parameter("foo")
         self.declare_parameter("bar")
+        self.add_on_set_parameters_callback(self.parameter_callback)
 
         self.srv = self.create_service(
             ChangeState,
@@ -23,12 +24,15 @@ class FakeLifecycleNode(Node):
             self.change_state_callback)
 
     def parameter_callback(self, params):
-        print(self.get_name() + " got parameters")
         for param in params:
-            if param.name == 'bar' and param.type_ == Parameter.Type.STRING:
-                print(self.name + " set parameter " + param.name + " to " + param.value)
+            if param.name == "bar" and param.type_ == Parameter.Type.STRING:
+                self.get_logger().info(
+                    "Node %s's parameter %s set to %s."
+                     % (self.get_name(), param.name, param.value))
             if param.name == 'foo' and param.type_ == Parameter.Type.DOUBLE:
-                print(self.name + " set parameter " + param.name + " to " + param.value)
+                self.get_logger().info(
+                    "Node %s's parameter %s set to %f."
+                     % (self.get_name(), param.name, param.value))
         return SetParametersResult(successful=True)
 
     def change_state_callback(self, request, response):
@@ -76,11 +80,7 @@ def main(args=None):
 
         try:
             lc.configure_system()
-
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-
             lc.activate_system()
 
             executor.spin()

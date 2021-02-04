@@ -1,4 +1,4 @@
 Incoming change state request for [AB]: configure
 Incoming change state request for [AB]: configure
-Incoming change state request for [A: deactivate|B: activate]
-Incoming change state request for [A: deactivate|B: activate]
+Node.B.*parameter.bar.*ONE
+Node.B.*parameter.foo.*0.1

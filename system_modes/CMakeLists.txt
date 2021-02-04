@@ -113,6 +113,7 @@ if(BUILD_TESTING)
   configure_file(test/modefiles.h.in ${CMAKE_CURRENT_BINARY_DIR}/system_modes/modefiles.h)
   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+  # Unit Tests
   ament_add_gtest(test_state_and_mode_struct test/test_state_and_mode_struct.cpp)
   if(TARGET test_state_and_mode_struct)
     target_include_directories(test_state_and_mode_struct PUBLIC
@@ -145,6 +146,25 @@ if(BUILD_TESTING)
     )
     target_link_libraries(test_mode_inference mode)
   endif()
+
+  # Launch Tests
+  find_package(ament_cmake_pytest REQUIRED)
+  find_package(launch_testing_ament_cmake REQUIRED)
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/example_modes.yaml" MODELFILE)
+
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_lifecycle_nodes.py" TEST_LIFECYCLE_NODES)
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_mode_manager_simple_expected_output" EXPECTED_OUTPUT)
+  configure_file(
+      "test/launchtest/test_mode_manager_simple.launch.py.in"
+      "test/test_mode_manager_simple.launch.py"
+      @ONLY
+    )
+  add_launch_test(
+    "${CMAKE_CURRENT_BINARY_DIR}/test/test_mode_manager_simple.launch.py"
+    TARGET "test_launch_mode_manager_simple"
+    TIMEOUT 30
+    ENV
+  )
 endif()
 
 ament_export_include_directories(include)

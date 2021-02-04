@@ -1,0 +1,68 @@
+# system modes example
+---
+
+sys:
+  ros__parameters:
+    type: system
+    parts:
+      A
+      B
+    modes:
+      __DEFAULT__:
+        A: inactive
+        B: active
+      DD:
+        A: active.AA
+        B: active.EE
+      CC:
+        A: active.BB
+        B: active.FF
+    rules:
+      degrade_from_DD:
+        if_target: active.DD
+        if_part: [A, inactive]
+        new_target: active.__DEFAULT__
+      degrade_from_CC:
+        if_target: active.CC
+        if_part: [A, inactive]
+        new_target: active.__DEFAULT__
+      inactive_from_DD:
+        if_target: active.DD
+        if_part: [B, inactive]
+        new_target: inactive
+      inactive_from_CC:
+        if_target: active.CC
+        if_part: [B, inactive]
+        new_target: inactive
+      # if system in __DEFAULT__, don't degrade, don't deactivate, but recover
+
+A:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+      AA:
+        ros__parameters:
+          foo: 0.1
+      BB:
+        ros__parameters:
+          foo: 0.2
+
+B:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: ONE
+      EE:
+        ros__parameters:
+          foo: 0.2
+          bar: TWO
+      FF:
+        ros__parameters:
+          foo: 0.9
+          bar: THREE

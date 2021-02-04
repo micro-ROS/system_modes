@@ -17,24 +17,6 @@ sys:
       CC:
         A: active.BB
         B: active.FF
-    rules:
-      degrade_from_DD:
-        if_target: active.DD
-        if_part: [A, inactive]
-        new_target: active.__DEFAULT__
-      degrade_from_CC:
-        if_target: active.CC
-        if_part: [A, inactive]
-        new_target: active.__DEFAULT__
-      inactive_from_DD:
-        if_target: active.DD
-        if_part: [B, inactive]
-        new_target: inactive
-      inactive_from_CC:
-        if_target: active.CC
-        if_part: [B, inactive]
-        new_target: inactive
-      # if system in __DEFAULT__, don't degrade, don't deactivate, but recover
 
 A:
   ros__parameters:

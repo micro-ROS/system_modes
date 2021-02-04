@@ -152,6 +152,7 @@ if(BUILD_TESTING)
   find_package(launch_testing_ament_cmake REQUIRED)
   file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/example_modes.yaml" MODELFILE)
 
+  # Launch Test: Mode Manager with Lifecycle Nodes
   file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_lifecycle_nodes.py" TEST_LIFECYCLE_NODES)
   file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_mode_manager_simple_expected_output" EXPECTED_OUTPUT)
   configure_file(
@@ -162,6 +163,21 @@ if(BUILD_TESTING)
   add_launch_test(
     "${CMAKE_CURRENT_BINARY_DIR}/test/test_mode_manager_simple.launch.py"
     TARGET "test_launch_mode_manager_simple"
+    TIMEOUT 30
+    ENV
+  )
+
+  # Launch Test: Mode Manager with Mixed (Lifecycle and non-Lifecycle) Nodes
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_mixed_nodes.py" TEST_LIFECYCLE_NODES)
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/test_mode_manager_mixed_nodes_expected_output" EXPECTED_OUTPUT)
+  configure_file(
+      "test/launchtest/test_mode_manager_mixed_nodes.launch.py.in"
+      "test/test_mode_manager_mixed_nodes.launch.py"
+      @ONLY
+    )
+  add_launch_test(
+    "${CMAKE_CURRENT_BINARY_DIR}/test/test_mode_manager_mixed_nodes.launch.py"
+    TARGET "test_launch_mode_manager_mixed_nodes"
     TIMEOUT 30
     ENV
   )

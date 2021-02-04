@@ -1,4 +1,4 @@
-Incoming change state request for [AB]: configure
-Incoming change state request for [AB]: configure
-Node.B.*parameter.bar.*ONE
-Node.B.*parameter.foo.*0.1
+Transition [AB]:configure
+Parameter B:bar:ONE
+Parameter B:foo:0\.1
+Parameter A:foo:0\.2

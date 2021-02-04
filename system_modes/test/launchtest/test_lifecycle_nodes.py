@@ -1,23 +1,24 @@
 import rclpy
-from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
 
-from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
+from rclpy.parameter import Parameter
 
-from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
+from system_modes.srv import ChangeMode
 
 
 class FakeLifecycleNode(Node):
 
     def __init__(self, name):
         super().__init__(name)
-        
-        self.declare_parameter("foo")
-        self.declare_parameter("bar")
+
+        self.declare_parameter('foo')
+        self.declare_parameter('bar')
         self.add_on_set_parameters_callback(self.parameter_callback)
 
+        # State change service
         self.srv = self.create_service(
             ChangeState,
             self.get_name() + '/change_state',
@@ -25,71 +26,80 @@ class FakeLifecycleNode(Node):
 
     def parameter_callback(self, params):
         for param in params:
-            if param.name == "bar" and param.type_ == Parameter.Type.STRING:
+            if param.name == 'bar' and param.type_ == Parameter.Type.STRING:
                 self.get_logger().info(
-                    "Node %s's parameter %s set to %s."
+                    'Parameter %s:%s:%s'
                      % (self.get_name(), param.name, param.value))
             if param.name == 'foo' and param.type_ == Parameter.Type.DOUBLE:
                 self.get_logger().info(
-                    "Node %s's parameter %s set to %f."
+                    'Parameter %s:%s:%s'
                      % (self.get_name(), param.name, param.value))
         return SetParametersResult(successful=True)
 
     def change_state_callback(self, request, response):
         response.success = True
-        self.get_logger().info(
-            'Incoming change state request for %s: %s' % (self.get_name(), request.transition.label))
+        self.get_logger().info('Transition %s:%s' % (self.get_name(), request.transition.label))
 
         return response
 
 class LifecycleClient(Node):
 
     def __init__(self):
-        super().__init__("lifecycle_client")
-        self.cli = self.create_client(ChangeState, '/sys/change_state')
-        while not self.cli.wait_for_service(timeout_sec=1.0):
+        super().__init__('system_modes_test_client')
+
+        self.clis = self.create_client(ChangeState, '/sys/change_state')
+        while not self.clis.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
-        self.req = ChangeState.Request()
+        self.reqs = ChangeState.Request()
+
+        self.clim = self.create_client(ChangeMode, '/sys/change_mode')
+        while not self.clim.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+        self.reqm = ChangeMode.Request()
 
     def configure_system(self):
-        self.req.transition.id = 1
-        self.req.transition.label = 'configure'
-        self.future = self.cli.call_async(self.req)
+        self.reqs.transition.id = 1
+        self.reqs.transition.label = 'configure'
+        self.future = self.clis.call_async(self.reqs)
 
     def activate_system(self):
-        self.req.transition.id = 3
-        self.req.transition.label = 'activate'
-        self.future = self.cli.call_async(self.req)
+        self.reqs.transition.id = 3
+        self.reqs.transition.label = 'activate'
+        self.future = self.clis.call_async(self.reqs)
+
+    def change_mode(self, mode):
+        self.reqm.mode_name = mode
+        self.future = self.clim.call_async(self.reqm)
+
 
 def main(args=None):
     rclpy.init(args=args)
     try:
         executor = MultiThreadedExecutor()
-
-        node_a = FakeLifecycleNode("A")
-        node_b = FakeLifecycleNode("B")
-        node_c = FakeLifecycleNode("C")
-        node_d = FakeLifecycleNode("D")
+        node_a = FakeLifecycleNode('A')
+        node_b = FakeLifecycleNode('B')
 
         executor.add_node(node_a)
         executor.add_node(node_b)
-        executor.add_node(node_c)
-        executor.add_node(node_d)
 
         lc = LifecycleClient()
 
         try:
             lc.configure_system()
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
+
             lc.activate_system()
+            executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
+
+            lc.change_mode("CC")
 
             executor.spin()
         finally:
             executor.shutdown()
             node_a.destroy_node()
             node_b.destroy_node()
-            node_c.destroy_node()
-            node_d.destroy_node()
     finally:
         rclpy.shutdown()
         return 0

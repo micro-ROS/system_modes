@@ -1,11 +1,12 @@
 import rclpy
-from rclpy.executors import MultiThreadedExecutor
-from rcl_interfaces.msg import SetParametersResult
-from rclpy.node import Node
-
-from lifecycle_msgs.srv import ChangeState
-from system_modes.srv import ChangeMode
 from rclpy.parameter import Parameter
+
+from system_modes.srv import ChangeMode
+from rcl_interfaces.msg import SetParametersResult
+from lifecycle_msgs.srv import ChangeState
+
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
 
 
 class FakeLifecycleNode(Node):
@@ -24,11 +25,11 @@ class FakeLifecycleNode(Node):
             self.change_state_callback)
 
     def parameter_callback(self, params):
-        for param in params:
-            if param.name == 'bar' and param.type_ == Parameter.Type.STRING:
-                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), param.name, param.value))
-            if param.name == 'foo' and param.type_ == Parameter.Type.DOUBLE:
-                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), param.name, param.value))
+        for p in params:
+            if p.name == 'bar' and p.type_ == Parameter.Type.STRING:
+                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), p.name, p.value))
+            if p.name == 'foo' and p.type_ == Parameter.Type.DOUBLE:
+                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), p.name, p.value))
         return SetParametersResult(successful=True)
 
     def change_state_callback(self, request, response):
@@ -85,8 +86,10 @@ def main(args=None):
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
 
             lc.activate_system()
+            executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)

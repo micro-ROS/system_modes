@@ -83,8 +83,8 @@ def main(args=None):
         executor.add_node(node_c)
         executor.add_node(node_d)
 
-        lc = LifecycleClient("sys")
-        lc2 = LifecycleClient("sys2")
+        lc = LifecycleClient('sys')
+        lc2 = LifecycleClient('sys2')
 
         try:
             lc.configure_system()

@@ -1,12 +1,12 @@
+from lifecycle_msgs.srv import ChangeState
+from rcl_interfaces.msg import SetParametersResult
+
 import rclpy
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
 from rclpy.parameter import Parameter
 
 from system_modes.srv import ChangeMode
-from rcl_interfaces.msg import SetParametersResult
-from lifecycle_msgs.srv import ChangeState
-
-from rclpy.executors import MultiThreadedExecutor
-from rclpy.node import Node
 
 
 class FakeLifecycleNode(Node):

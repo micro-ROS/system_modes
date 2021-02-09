@@ -19,15 +19,15 @@ jobs:
         ros_distribution: [ foxy, rolling ]
     steps:
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@0.0.26
+    - uses: ros-tooling/setup-ros@0.1.2
       with:
         required-ros-distributions: ${{ matrix.ros_distribution }}
-    - uses : ros-tooling/action-ros-ci@0.1.0
+    - uses : ros-tooling/action-ros-ci@0.1.1
       with:
         package-name: "system_modes system_modes_examples"
         target-ros2-distro: ${{ matrix.ros_distribution }}
         colcon-mixin-name: coverage-gcc
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v1.2.1
       with:
         file: ros_ws/lcov/total_coverage.info

@@ -1,0 +1,98 @@
+# system modes example
+---
+
+sys:
+  ros__parameters:
+    type: system
+    parts:
+      A
+      B
+    modes:
+      __DEFAULT__:
+        A: inactive
+        B: active
+      DD:
+        A: active.AA
+        B: active.EE
+      CC:
+        A: active.BB
+        B: active.FF
+
+A:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+      AA:
+        ros__parameters:
+          foo: 0.1
+      BB:
+        ros__parameters:
+          foo: 0.2
+
+B:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: ONE
+      EE:
+        ros__parameters:
+          foo: 0.2
+          bar: TWO
+      FF:
+        ros__parameters:
+          foo: 0.9
+          bar: THREE
+
+sys2:
+  ros__parameters:
+    type: system
+    parts:
+      C
+      D
+    modes:
+      __DEFAULT__:
+        C: inactive
+        D: active
+      DD:
+        C: active.AA
+        D: active.EE
+      CC:
+        C: active.BB
+        D: active.FF
+
+C:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+      AA:
+        ros__parameters:
+          foo: 0.1
+      BB:
+        ros__parameters:
+          foo: 0.2
+
+D:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: ONE
+      EE:
+        ros__parameters:
+          foo: 0.2
+          bar: TWO
+      FF:
+        ros__parameters:
+          foo: 0.9
+          bar: THREE

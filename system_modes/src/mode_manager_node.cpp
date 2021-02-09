@@ -55,6 +55,7 @@ void transition_callback(
   const string & node_name)
 {
   manager->inference()->update_state(node_name, msg->goal_state.id);
+  manager->handle_system_deviation("transition");
 }
 
 void mode_change_callback(
@@ -63,6 +64,7 @@ void mode_change_callback(
 {
   manager->inference()->update_state(node_name, State::PRIMARY_STATE_ACTIVE);
   manager->inference()->update_mode(node_name, msg->goal_mode.label.c_str());
+  manager->handle_system_deviation("mode change");
 }
 
 void transition_request_callback(
@@ -104,6 +106,7 @@ parameter_event_callback(const ParameterEvent::SharedPtr event)
     auto param = rclcpp::Parameter::from_parameter_msg(p);
     manager->inference()->update_param(event->node, param);
   }
+  manager->handle_system_deviation("parameter event");
 }
 
 int main(int argc, char * argv[])

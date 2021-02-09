@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "system_modes/mode.hpp"
+#include "system_modes/mode_handling.hpp"
 
 namespace system_modes
 {
@@ -39,6 +40,7 @@ class ModeInference
 {
 public:
   explicit ModeInference(const std::string & model_path);
+  // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeInference)
 
   virtual const std::vector<std::string> get_all_parts() const;
@@ -69,6 +71,7 @@ public:
    * mode transitions.
    */
   virtual Deviation infer_transitions();
+  virtual Deviation get_deviation();
 
   virtual StateAndMode get_target(const std::string & part) const;
   virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode) const;
@@ -82,9 +85,10 @@ protected:
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
+  ModeHandling * mode_handling_;
+
   StatesMap nodes_, nodes_target_, nodes_cache_;
   StatesMap systems_, systems_target_, systems_cache_;
-
   std::map<std::string, ModeMap> modes_;
   ParametersMap parameters_;
 

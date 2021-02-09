@@ -42,8 +42,9 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: nodes_(), nodes_target_(), nodes_cache_(),
-  systems_(), systems_target_(), systems_cache_(),
+: mode_handling_(new ModeHandling(model_path)),
+  nodes_(), nodes_target_(),
+  systems_(), systems_target_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
   nodes_target_mutex_(), systems_target_mutex_()
@@ -55,7 +56,11 @@ void
 ModeInference::update(const string & node, const StateAndMode & sm)
 {
   this->update_state(node, sm.state);
-  this->update_mode(node, sm.mode);
+  if (sm.state == State::PRIMARY_STATE_ACTIVE) {
+    this->update_mode(node, sm.mode);
+  } else {
+    this->update_mode(node, "");
+  }
 }
 
 void
@@ -161,7 +166,14 @@ ModeInference::get(const string & part) const
     throw std::runtime_error("No solid information about state and mode of '" + part + "'.");
   }
 
-  return this->nodes_.at(part);
+  auto sam = this->nodes_.at(part);
+  if (sam.state != State::PRIMARY_STATE_ACTIVE &&
+    sam.state != State::TRANSITION_STATE_ACTIVATING)
+  {
+    sam.mode = "";
+  }
+
+  return sam;
 }
 
 StateAndMode
@@ -223,7 +235,6 @@ ModeInference::infer_system(const string & part)
                 "', inference failed.");
       }
     }
-    this->systems_[part] = StateAndMode(state, "");
     return StateAndMode(state, "");
   }
 
@@ -422,7 +433,7 @@ ModeInference::get_or_infer(const string & part)
       return stateAndMode;
     }
   } catch (...) {
-    // not a node, so try inference
+    // so try inference
   }
 
   try {
@@ -440,6 +451,9 @@ ModeInference::get_or_infer(const string & part)
 
   if (stateAndMode.state == 0 && stateAndMode.mode.empty()) {
     throw std::runtime_error("Not able to infer anything for part " + part);
+  }
+  if (stateAndMode.state != State::PRIMARY_STATE_ACTIVE) {
+    stateAndMode.mode = "";
   }
 
   return stateAndMode;
@@ -555,9 +569,13 @@ ModeInference::read_modes_from_model(const string & model_path)
 
       } else {
         if (param.value_to_string().compare("node") != 0) {
-          this->systems_.emplace(part_name, StateAndMode(0, ""));
+          this->systems_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
         } else {
-          this->nodes_.emplace(part_name, StateAndMode(0, ""));
+          this->nodes_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
         }
       }
     }
@@ -717,6 +735,26 @@ ModeInference::infer_transitions()
   }
 
   return transitions;
+}
+
+Deviation
+ModeInference::get_deviation()
+{
+  Deviation deviation;
+
+  for (auto const & part : get_all_parts()) {
+    try {
+      auto actual = get_or_infer(part);
+      auto target = get_target(part);
+      if (actual != target) {
+        deviation[part] = std::make_pair(target, actual);
+      }
+    } catch (...) {
+      // We can't get deviations, if we can't infer the system state
+    }
+  }
+
+  return deviation;
 }
 
 }  // namespace system_modes

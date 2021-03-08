@@ -1,0 +1,3 @@
+ignore:
+  - "system_modes_examples"
+  - "system_modes/test"

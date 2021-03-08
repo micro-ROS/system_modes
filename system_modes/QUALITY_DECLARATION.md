@@ -49,8 +49,8 @@ This package uses DCO as its confirmation of contributor origin policy. More inf
 
 ### Continuous Integration [2.iv]
 
-All pull requests must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers) except tier 1 platform Windows.
-**TODO: build status**
+All pull requests must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers) (currently not true for tier 1 platform _Windows_).
+Latest build results can be seen [here](https://github.com/micro-ROS/system_modes/actions).
 
 ###  Documentation Policy [2.v]
 
@@ -78,9 +78,9 @@ There is an automated test which runs a linter that ensures each file has at lea
 
 ### Feature Testing [4.i]
 
-Each feature in `system_modes` has corresponding tests which simulate typical usage, and they are located in the [`test`](https://github.com/micro-ROS/system_modes/tree/master/system_modes/test) directory.
+Each feature in `system_modes` has corresponding tests which simulate typical usage, located in the [`test`](https://github.com/micro-ROS/system_modes/tree/master/system_modes/test) directory.
 New features are required to have tests before being added.
-**TODO: test status**
+Latest test results can be seen [here](https://github.com/micro-ROS/system_modes/actions).
 
 ### Coverage [4.iii]
 
@@ -94,16 +94,15 @@ This includes:
 
 Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
 
-Current coverage statistics can be viewed [here](https://ci.ros2.org/job/nightly_linux_coverage/lastCompletedBuild/cobertura/src_ros2_system_modes_system_modes_src_system_modes/). A description of how coverage statistics are calculated is summarized in this page ["ROS 2 Onboarding Guide"](https://index.ros.org/doc/ros2/Contributing/ROS-2-On-boarding-Guide/#note-on-coverage-runs).**TODO**
+Current coverage statistics can be viewed [here](https://codecov.io/gh/micro-ROS/system_modes).
 
-`system_modes` has a line coverage `>= 95%`**TODO**, which is calculated over all directories within `system_modes`.
+`system_modes` has a line coverage `>= 20%`, which is calculated over all directories within `system_modes`.
 
 ### Linters and Static Analysis [4.v]
 
 `system_modes` uses and passes all the ROS2 standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.
 
-Currently nightly test results can be seen here:
-**TODO**
+Latest linting results can be seen [here](https://github.com/micro-ROS/system_modes/actions).
 
 ## Dependencies [5]
 
@@ -119,7 +118,11 @@ It also has several test dependencies, which do not affect the resulting quality
 
 #### `rclcpp_lifecycle`
 
-The `rclcpp_lifecycle` package provides the ROS 2 standard lifecycle in c**. It is **Quality Level 1**, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp/QUALITY_DECLARATION.md). The same is true for its transient dependencies, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp/QUALITY_DECLARATION.md).
+The `rclcpp` package provides theROS client library in C++. It is **Quality Level 1**, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp/QUALITY_DECLARATION.md). The same is true for its transient dependencies, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp/QUALITY_DECLARATION.md).
+
+#### `rclcpp_lifecycle`
+
+The `rclcpp_lifecycle` package provides the ROS 2 standard lifecycle in C++. It is **Quality Level 1**, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp_lifecycle/QUALITY_DECLARATION.md). The same is true for its transient dependencies, see its [Quality Declaration document](https://github.com/ros2/rclcpp/blob/master/rclcpp_lifecycle/QUALITY_DECLARATION.md).
 
 ### Direct Runtime non-ROS Dependency [5.iii]
 
@@ -127,8 +130,7 @@ The `rclcpp_lifecycle` package provides the ROS 2 standard lifecycle in c**. It 
 
 ## Platform Support [6]
 
-`system_modes` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers), and tests each change against all of them.
-**TODO: windows**
+`system_modes` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers) (currently not true for tier 1 platform _Windows_), and tests each change against all of them.
 
 ## Security
 

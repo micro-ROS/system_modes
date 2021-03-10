@@ -1,3 +1,5 @@
 ignore:
   - "system_modes_examples"
+  - "system_modes_examples/src"
   - "system_modes/test"
+  - "system_modes/src/*_node.cpp"

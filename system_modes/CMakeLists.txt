@@ -174,7 +174,8 @@ if(BUILD_TESTING)
   set(launch_tests
     "two_lifecycle_nodes"           # Mode Manager with Lifecycle Nodes
     "two_mixed_nodes"               # Mode Manager with Lifecycle and non-Lifecycle Nodes
-    "two_independent_hierarchies")  # Mode Manager for two independent hierarchies of nodes
+    "two_independent_hierarchies"   # Mode Manager for two independent hierarchies of nodes
+    "manager_and_monitor")          # Mode Manager and Mode Monitor
 
   # Launch Test: Mode Manager with Lifecycle Nodes
   foreach(test_name ${launch_tests})

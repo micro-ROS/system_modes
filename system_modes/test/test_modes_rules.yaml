@@ -1,0 +1,71 @@
+# config/test
+---
+
+system:
+  ros__parameters:
+    type: system
+    parts:
+      part0
+      part1
+    modes:
+      __DEFAULT__:
+        part0: inactive
+        part1: active
+      AA:
+        part0: active.FOO
+        part1: active.AAA
+      BB:
+        part0: active.BAR
+        part1: active.BBB
+    rules:
+      degrade_from_AA:
+        if_target: active.AA
+        if_part: [part0, inactive]
+        new_target: active.__DEFAULT__
+      degrade_from_BB:
+        if_target: active.BB
+        if_part: [part0, inactive]
+        new_target: active.__DEFAULT__
+      inactive_from_AA:
+        if_target: active.AA
+        if_part: [part1, inactive]
+        new_target: inactive
+      inactive_from_BB:
+        if_target: active.BB
+        if_part: [part1, inactive]
+        new_target: inactive
+
+part0:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: WARN
+      FOO:
+        ros__parameters:
+          foo: 0.1
+          bar: DBG
+      BAR:
+        ros__parameters:
+          foo: 0.2
+          bar: ERR
+
+part1:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          foo: 0.1
+          bar: WARN
+      AAA:
+        ros__parameters:
+          foo: 0.2
+          bar: DBG
+      BBB:
+        ros__parameters:
+          foo: 0.9
+          bar: ERR
+

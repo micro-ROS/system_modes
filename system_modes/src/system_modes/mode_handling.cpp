@@ -135,8 +135,7 @@ ModeHandling::get_rules_for(const std::string & system, const StateAndMode & tar
 {
   std::vector<ModeRule> rules;
   try {
-    auto rulesmap = this->rules_[system];
-    for (auto rule : rulesmap) {
+    for (auto rule : this->rules_[system]) {
       if (target == rule.second.system_target) {
         rules.push_back(rule.second);
       }

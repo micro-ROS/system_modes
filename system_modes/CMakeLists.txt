@@ -109,6 +109,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   set(MODE_FILE_CORRECT ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes.yaml)
+  set(MODE_FILE_RULES ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_rules.yaml)
   set(MODE_FILE_WRONG ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_wrong.yaml)
   configure_file(test/modefiles.h.in ${CMAKE_CURRENT_BINARY_DIR}/system_modes/modefiles.h)
   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
@@ -145,6 +146,15 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
     )
     target_link_libraries(test_mode_inference mode)
+  endif()
+
+  ament_add_gtest(test_mode_handling test/test_mode_handling.cpp)
+  if(TARGET test_mode_handling)
+    target_include_directories(test_mode_handling PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_handling mode)
   endif()
 
   ament_add_gtest(test_mode_manager

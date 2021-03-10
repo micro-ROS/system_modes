@@ -147,6 +147,28 @@ if(BUILD_TESTING)
     target_link_libraries(test_mode_inference mode)
   endif()
 
+  ament_add_gtest(test_mode_manager
+    test/test_mode_manager.cpp
+    src/system_modes/mode_manager.cpp)
+  if(TARGET test_mode_manager)
+    target_include_directories(test_mode_manager PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_manager mode)
+  endif()
+
+  ament_add_gtest(test_mode_monitor
+    test/test_mode_monitor.cpp
+    src/system_modes/mode_monitor.cpp)
+  if(TARGET test_mode_monitor)
+    target_include_directories(test_mode_monitor PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_monitor mode)
+  endif()
+
   # Launch Tests
   find_package(launch_testing_ament_cmake REQUIRED)
   set(launch_tests

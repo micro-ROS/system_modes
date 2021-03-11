@@ -102,10 +102,13 @@ def main(args=None):
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
 
             lc.change_mode('CC')
             executor.spin_once(timeout_sec=1)
             lc2.change_mode('DD')
+            executor.spin_once(timeout_sec=1)
 
             executor.spin()
         finally:

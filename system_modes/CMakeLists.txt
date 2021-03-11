@@ -109,10 +109,12 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   set(MODE_FILE_CORRECT ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes.yaml)
+  set(MODE_FILE_RULES ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_rules.yaml)
   set(MODE_FILE_WRONG ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_wrong.yaml)
   configure_file(test/modefiles.h.in ${CMAKE_CURRENT_BINARY_DIR}/system_modes/modefiles.h)
   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+  # Unit Tests
   ament_add_gtest(test_state_and_mode_struct test/test_state_and_mode_struct.cpp)
   if(TARGET test_state_and_mode_struct)
     target_include_directories(test_state_and_mode_struct PUBLIC
@@ -145,6 +147,63 @@ if(BUILD_TESTING)
     )
     target_link_libraries(test_mode_inference mode)
   endif()
+
+  ament_add_gtest(test_mode_handling test/test_mode_handling.cpp)
+  if(TARGET test_mode_handling)
+    target_include_directories(test_mode_handling PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_handling mode)
+  endif()
+
+  ament_add_gtest(test_mode_manager
+    test/test_mode_manager.cpp
+    src/system_modes/mode_manager.cpp)
+  if(TARGET test_mode_manager)
+    target_include_directories(test_mode_manager PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_manager mode)
+  endif()
+
+  ament_add_gtest(test_mode_monitor
+    test/test_mode_monitor.cpp
+    src/system_modes/mode_monitor.cpp)
+  if(TARGET test_mode_monitor)
+    target_include_directories(test_mode_monitor PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_monitor mode)
+  endif()
+
+  # Launch Tests
+  find_package(launch_testing_ament_cmake REQUIRED)
+  set(launch_tests
+    "two_lifecycle_nodes"           # Mode Manager with Lifecycle Nodes
+    "two_mixed_nodes"               # Mode Manager with Lifecycle and non-Lifecycle Nodes
+    "two_independent_hierarchies"   # Mode Manager for two independent hierarchies of nodes
+    "manager_and_monitor")          # Mode Manager and Mode Monitor
+
+  # Launch Test: Mode Manager with Lifecycle Nodes
+  foreach(test_name ${launch_tests})
+    file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/${test_name}.py" TEST_NODES)
+    file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/${test_name}_modes.yaml" MODELFILE)
+    file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/launchtest/${test_name}_expected_output" EXPECTED_OUTPUT)
+    configure_file(
+        "test/launchtest/${test_name}.launch.py.in"
+        "test/${test_name}.launch.py"
+        @ONLY
+      )
+    add_launch_test(
+      "${CMAKE_CURRENT_BINARY_DIR}/test/${test_name}.launch.py"
+      TARGET "${test_name}"
+      TIMEOUT 30
+      ENV
+    )
+  endforeach()
 endif()
 
 ament_export_include_directories(include)

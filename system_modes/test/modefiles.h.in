@@ -3,4 +3,5 @@
 #include <string>
 
 const static std::string MODE_FILE_CORRECT = "@MODE_FILE_CORRECT@";
+const static std::string MODE_FILE_RULES = "@MODE_FILE_RULES@";
 const static std::string MODE_FILE_WRONG = "@MODE_FILE_WRONG@";

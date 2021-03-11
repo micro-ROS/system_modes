@@ -52,6 +52,7 @@ Please notice the following issues/limitations:
 
 * Currently, (sub-)systems managed by the mode manager are not recognized by the `ros2 lifecycle` tool (*"Node not found"*). So to trigger lifecycle transitions in (sub-)systems, you have to go with the `ros2 service call` tool. Check the [system_modes_examples](./system_modes_examples/) documentation for example calls.
 * The [Error Handling and Rules](./system_modes/README.md#error-handling-and-rules-experimental) feature is still experimental and might be subject to major changes. However, if no rules are specified in the model file, this feature is not used.
+* The mode inference and the error handling and rules feature do not work as intended if some of the involved nodes are non-lifecycle nodes.
 
 ## Acknowledgments
 

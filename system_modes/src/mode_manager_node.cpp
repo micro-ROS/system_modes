@@ -47,7 +47,6 @@ using lifecycle_msgs::msg::TransitionEvent;
 using rcl_interfaces::msg::ParameterType;
 using rcl_interfaces::msg::ParameterEvent;
 
-string modelfile, loglevel;
 shared_ptr<ModeManager> manager;
 
 void transition_callback(

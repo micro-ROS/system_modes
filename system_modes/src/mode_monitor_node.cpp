@@ -50,11 +50,6 @@ using lifecycle_msgs::msg::TransitionEvent;
 using rcl_interfaces::msg::ParameterType;
 using rcl_interfaces::msg::ParameterEvent;
 
-string modelfile, loglevel;
-bool debug = false;
-unsigned int rate = 1000;
-bool verbose = false;
-
 shared_ptr<system_modes::ModeMonitor> monitor;
 
 void transition_callback(

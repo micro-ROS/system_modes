@@ -14,18 +14,19 @@
 // limitations under the License.
 #include "system_modes/mode_handling.hpp"
 
+#include <shared_mutex>
+
+#include <lifecycle_msgs/msg/state.hpp>
 #include <rclcpp/parameter.hpp>
 #include <rclcpp/parameter_map.hpp>
-#include <lifecycle_msgs/msg/state.hpp>
 #include <rcl_yaml_param_parser/parser.h>
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
-#include <memory>
 #include <utility>
-#include <shared_mutex>
+#include <vector>
 
 using std::endl;
 using std::pair;
@@ -135,8 +136,7 @@ ModeHandling::get_rules_for(const std::string & system, const StateAndMode & tar
 {
   std::vector<ModeRule> rules;
   try {
-    auto rulesmap = this->rules_[system];
-    for (auto rule : rulesmap) {
+    for (auto rule : this->rules_[system]) {
       if (target == rule.second.system_target) {
         rules.push_back(rule.second);
       }

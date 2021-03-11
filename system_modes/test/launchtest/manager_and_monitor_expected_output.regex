@@ -1,0 +1,5 @@
+System.Modes.Monitor
+active
+CC\(\*\)
+BB\(\*\).*BB<foo:0.200000>
+FF\(\*\).*<bar:THREE, foo:0.900000>

@@ -14,18 +14,19 @@
 // limitations under the License.
 #include "system_modes/mode_inference.hpp"
 
+#include <shared_mutex>
+
+#include <lifecycle_msgs/msg/state.hpp>
 #include <rclcpp/parameter.hpp>
 #include <rclcpp/parameter_map.hpp>
-#include <lifecycle_msgs/msg/state.hpp>
 #include <rcl_yaml_param_parser/parser.h>
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
-#include <memory>
 #include <utility>
-#include <shared_mutex>
+#include <vector>
 
 using std::endl;
 using std::mutex;

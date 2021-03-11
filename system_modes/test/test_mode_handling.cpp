@@ -56,15 +56,14 @@ TEST(TestModeFilesParse, constructor) {
 TEST(TestModeFilesParse, parse_rules) {
   ModeHandling * handling = new ModeHandling(MODE_FILE_RULES);
 
-  EXPECT_EQ(
-    0u,
-    handling->get_rules_for("system", StateAndMode(State::PRIMARY_STATE_ACTIVE, "")).size());
-  EXPECT_EQ(
-    2u,
-    handling->get_rules_for("system", StateAndMode(State::PRIMARY_STATE_ACTIVE, "AA")).size());
-  EXPECT_EQ(
-    2u,
-    handling->get_rules_for("system", StateAndMode(State::PRIMARY_STATE_ACTIVE, "BB")).size());
+  auto target = StateAndMode(State::PRIMARY_STATE_ACTIVE, "");
+  EXPECT_EQ(0u, handling->get_rules_for("system", target).size());
+
+  target = StateAndMode(State::PRIMARY_STATE_ACTIVE, "AA");
+  EXPECT_EQ(2u, handling->get_rules_for("system", target).size());
+
+  target = StateAndMode(State::PRIMARY_STATE_ACTIVE, "BB");
+  EXPECT_EQ(2u, handling->get_rules_for("system", target).size());
 }
 
 /*

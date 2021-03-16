@@ -633,7 +633,6 @@ ModeManager::publish_transitions()
       info->start_state.label = state_label_(from.state);
       info->goal_state.id = to.state;
       info->goal_state.label = state_label_(to.state);
-      this->transition_pub_[part]->publish(TransitionEvent());
       this->transition_pub_[part]->publish(*info);
     }
     if (from.mode.compare(to.mode) != 0) {

@@ -2,6 +2,12 @@
 Changelog for package system_modes_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.0 (2020-03-16)
+-----------
+* Atomic parameter setting https://github.com/micro-ROS/system_modes/issues/59
+* Bug fixing
+* More tests
+
 0.4.2 (2020-12-17)
 -----------
 * Error handling and rules feature no longer experimental

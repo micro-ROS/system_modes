@@ -73,7 +73,7 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_configure(const rclcpp_lifecycle::State &)
   {
-    RCLCPP_INFO(get_logger(), "on_configure()", this->get_name());
+    RCLCPP_INFO(get_logger(), "%s on_configure()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -81,7 +81,7 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_activate(const rclcpp_lifecycle::State &)
   {
-    RCLCPP_INFO(get_logger(), "on_activate()", this->get_name());
+    RCLCPP_INFO(get_logger(), "%s on_activate()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -89,7 +89,7 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_deactivate(const rclcpp_lifecycle::State &)
   {
-    RCLCPP_INFO(get_logger(), "on_deactivate()", this->get_name());
+    RCLCPP_INFO(get_logger(), "%s on_deactivate()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -97,7 +97,7 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_cleanup(const rclcpp_lifecycle::State &)
   {
-    RCLCPP_INFO(get_logger(), "on_cleanup()", this->get_name());
+    RCLCPP_INFO(get_logger(), "%s on_cleanup()", this->get_name());
 
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }

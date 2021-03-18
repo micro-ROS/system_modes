@@ -109,10 +109,12 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   set(MODE_FILE_CORRECT ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes.yaml)
+  set(MODE_FILE_RULES ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_rules.yaml)
   set(MODE_FILE_WRONG ${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes_wrong.yaml)
   configure_file(test/modefiles.h.in ${CMAKE_CURRENT_BINARY_DIR}/system_modes/modefiles.h)
   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+  # Unit Tests
   ament_add_gtest(test_state_and_mode_struct test/test_state_and_mode_struct.cpp)
   if(TARGET test_state_and_mode_struct)
     target_include_directories(test_state_and_mode_struct PUBLIC
@@ -144,6 +146,37 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
     )
     target_link_libraries(test_mode_inference mode)
+  endif()
+
+  ament_add_gtest(test_mode_handling test/test_mode_handling.cpp)
+  if(TARGET test_mode_handling)
+    target_include_directories(test_mode_handling PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_handling mode)
+  endif()
+
+  ament_add_gtest(test_mode_manager
+    test/test_mode_manager.cpp
+    src/system_modes/mode_manager.cpp)
+  if(TARGET test_mode_manager)
+    target_include_directories(test_mode_manager PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_manager mode)
+  endif()
+
+  ament_add_gtest(test_mode_monitor
+    test/test_mode_monitor.cpp
+    src/system_modes/mode_monitor.cpp)
+  if(TARGET test_mode_monitor)
+    target_include_directories(test_mode_monitor PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_monitor mode)
   endif()
 endif()
 

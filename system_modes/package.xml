@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes</name>
-  <version>0.4.2</version>
+  <version>0.5.0</version>
   <description>
     The system modes concept assumes that a robotics system is built
     from components with a lifecycle. It adds a notion of (sub-)systems,
@@ -15,11 +15,11 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>builtin_interfaces</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
-  <depend>std_msgs</depend>
-  <depend>builtin_interfaces</depend>
   <depend>rosidl_default_generators</depend>
+  <depend>std_msgs</depend>
 
   <exec_depend>launch_ros</exec_depend>
 
@@ -30,6 +30,7 @@
   <test_depend>ament_cmake_cpplint</test_depend>
   <test_depend>ament_cmake_cppcheck</test_depend>
   <test_depend>ament_cmake_uncrustify</test_depend>
+  <test_depend>ament_index_python</test_depend>
   <test_depend>ament_lint_auto</test_depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>

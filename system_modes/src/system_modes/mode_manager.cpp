@@ -229,7 +229,6 @@ ModeManager::add_node(const std::string & node)
   this->state_change_clients_[node] = this->create_client<ChangeState>(topic_name);
 
   // Parameter change clients
-  topic_name = node + "/set_parameters_atomically";
   this->param_change_clients_[node] = std::make_shared<rclcpp::AsyncParametersClient>(
     this->get_node_base_interface(),
     this->get_node_topics_interface(),
@@ -558,7 +557,7 @@ ModeManager::change_part_mode(const string & node, const string & mode)
         node.c_str(),
         p.c_str());
     }
-    this->param_change_clients_[node]->set_parameters(new_mode->get_parameters());
+    this->param_change_clients_[node]->set_parameters_atomically(new_mode->get_parameters());
   }
 }
 
@@ -634,7 +633,6 @@ ModeManager::publish_transitions()
       info->start_state.label = state_label_(from.state);
       info->goal_state.id = to.state;
       info->goal_state.label = state_label_(to.state);
-      this->transition_pub_[part]->publish(TransitionEvent());
       this->transition_pub_[part]->publish(*info);
     }
     if (from.mode.compare(to.mode) != 0) {

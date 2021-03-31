@@ -21,6 +21,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 
@@ -32,6 +33,7 @@ namespace system_modes
 {
 
 using std::map;
+using std::mutex;
 using std::string;
 
 using lifecycle_msgs::msg::TransitionEvent;
@@ -88,6 +90,7 @@ protected:
 private:
   std::weak_ptr<rclcpp::Node> node_handle_;
   map<string, StateAndMode> cache_;
+  mutable std::shared_timed_mutex mutex_;
 
   map<string, std::shared_ptr<rclcpp::Subscription<TransitionEvent>>> state_subs_;
   map<string, std::shared_ptr<rclcpp::Subscription<ModeEvent>>> mode_subs_;

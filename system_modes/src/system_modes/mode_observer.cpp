@@ -27,6 +27,7 @@
 
 using std::function;
 using std::map;
+using std::mutex;
 using std::placeholders::_1;
 using std::string;
 using std::vector;
@@ -40,6 +41,7 @@ using system_modes::msg::ModeEvent;
 using system_modes::srv::GetMode;
 
 using namespace std::chrono_literals;
+using shared_mutex = std::shared_timed_mutex;
 
 namespace system_modes
 {
@@ -52,6 +54,7 @@ ModeObserver::ModeObserver(std::weak_ptr<rclcpp::Node> handle)
 StateAndMode
 ModeObserver::get(const std::string & part_name)
 {
+  std::shared_lock<shared_mutex> lock(this->mutex_);
   try {
     return cache_.at(part_name);
   } catch(const std::exception& e) {
@@ -63,6 +66,8 @@ ModeObserver::get(const std::string & part_name)
 void
 ModeObserver::observe(const std::string & part_name)
 {
+  std::unique_lock<shared_mutex> lock(mutex_);
+
   cache_[part_name] = StateAndMode();
 
   // Initial try to get current state via service request
@@ -109,9 +114,10 @@ ModeObserver::observe(const std::string & part_name)
 void
 ModeObserver::stop_observing(const std::string & part_name)
 {
-  cache_.erase(part_name);
+  std::unique_lock<shared_mutex> lock(mutex_);
   state_subs_.erase(part_name);
   mode_subs_.erase(part_name);
+  cache_.erase(part_name);
 }
 
 void
@@ -119,6 +125,7 @@ ModeObserver::transition_callback(
   const TransitionEvent::SharedPtr msg,
   const string & part_name)
 {
+  std::unique_lock<shared_mutex> lock(mutex_);
   cache_[part_name].state = msg->goal_state.id;
 }
 
@@ -127,6 +134,7 @@ ModeObserver::mode_event_callback(
   const ModeEvent::SharedPtr msg,
   const string & part_name)
 {
+  std::unique_lock<shared_mutex> lock(mutex_);
   cache_[part_name].mode = msg->goal_mode.label;
 }
 

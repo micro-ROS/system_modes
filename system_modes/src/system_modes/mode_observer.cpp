@@ -57,7 +57,7 @@ ModeObserver::get(const std::string & part_name)
   std::shared_lock<shared_mutex> lock(this->mutex_);
   try {
     return cache_.at(part_name);
-  } catch(const std::exception& e) {
+  } catch (const std::exception & e) {
     std::cerr << e.what() << '\n';
     return StateAndMode();
   }
@@ -76,7 +76,8 @@ ModeObserver::observe(const std::string & part_name)
   auto stateclient = node_handle_.lock()->create_client<GetState>(topic);
   auto state = stateclient->async_send_request(gsrequest);
   if (rclcpp::spin_until_future_complete(node_handle_.lock(), state) ==
-    rclcpp::FutureReturnCode::SUCCESS) {
+    rclcpp::FutureReturnCode::SUCCESS)
+  {
     auto result = state.get();
     cache_[part_name].state = result->current_state.id;
   }
@@ -87,7 +88,8 @@ ModeObserver::observe(const std::string & part_name)
   auto modeclient = node_handle_.lock()->create_client<GetMode>(topic);
   auto mode = modeclient->async_send_request(gmrequest);
   if (rclcpp::spin_until_future_complete(node_handle_.lock(), mode) ==
-    rclcpp::FutureReturnCode::SUCCESS) {
+    rclcpp::FutureReturnCode::SUCCESS)
+  {
     auto result = mode.get();
     cache_[part_name].mode = result->current_mode;
   }

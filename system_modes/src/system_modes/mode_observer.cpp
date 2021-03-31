@@ -74,24 +74,28 @@ ModeObserver::observe(const std::string & part_name)
   std::string topic = part_name + "/get_state";
   auto gsrequest = std::make_shared<GetState::Request>();
   auto stateclient = node_handle_.lock()->create_client<GetState>(topic);
-  auto state = stateclient->async_send_request(gsrequest);
-  if (rclcpp::spin_until_future_complete(node_handle_.lock(), state) ==
-    rclcpp::FutureReturnCode::SUCCESS)
-  {
-    auto result = state.get();
-    cache_[part_name].state = result->current_state.id;
+  if (stateclient->wait_for_service(std::chrono::microseconds(500))) {
+    auto state = stateclient->async_send_request(gsrequest);
+    if (rclcpp::spin_until_future_complete(node_handle_.lock(), state) ==
+      rclcpp::FutureReturnCode::SUCCESS)
+    {
+      auto result = state.get();
+      cache_[part_name].state = result->current_state.id;
+    }
   }
 
   // Initial try to get current mode via service request
   topic = part_name + "/get_mode";
   auto gmrequest = std::make_shared<GetMode::Request>();
   auto modeclient = node_handle_.lock()->create_client<GetMode>(topic);
-  auto mode = modeclient->async_send_request(gmrequest);
-  if (rclcpp::spin_until_future_complete(node_handle_.lock(), mode) ==
-    rclcpp::FutureReturnCode::SUCCESS)
-  {
-    auto result = mode.get();
-    cache_[part_name].mode = result->current_mode;
+  if (modeclient->wait_for_service(std::chrono::microseconds(500))) {
+    auto mode = modeclient->async_send_request(gmrequest);
+    if (rclcpp::spin_until_future_complete(node_handle_.lock(), mode) ==
+      rclcpp::FutureReturnCode::SUCCESS)
+    {
+      auto result = mode.get();
+      cache_[part_name].mode = result->current_mode;
+    }
   }
 
   // Set up transition subscriber and mode event subscriber for continuous observation

@@ -180,6 +180,15 @@ if(BUILD_TESTING)
     target_link_libraries(test_mode_monitor mode)
   endif()
 
+  ament_add_gtest(test_mode_observer test/test_mode_observer.cpp)
+  if(TARGET test_mode_observer)
+    target_include_directories(test_mode_observer PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_observer mode)
+  endif()
+
   # Launch Tests
   find_package(launch_testing_ament_cmake REQUIRED)
   set(launch_tests

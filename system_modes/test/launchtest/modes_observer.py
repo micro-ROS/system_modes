@@ -36,12 +36,12 @@ class FakeLifecycleNode(Node):
 
         msg = TransitionEvent()
         if request.transition.id == 1 or request.transition.id == 4:
-            print("node ", self.get_name(), " pretending to go to 'inactive'")
+            print('node ', self.get_name(), ' pretending to go to "inactive"')
             msg.transition = request.transition
             msg.goal_state.id = 2
             msg.goal_state.label = 'inactive'
         elif request.transition.id == 3:
-            print("node ", self.get_name(), " pretending to go to 'active'")
+            print('node ', self.get_name(), ' pretending to go to "active"')
             msg.transition = request.transition
             msg.goal_state.id = 3
             msg.goal_state.label = 'active'

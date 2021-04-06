@@ -189,6 +189,14 @@ if(BUILD_TESTING)
     target_link_libraries(test_mode_observer mode)
   endif()
 
+  # mode observer test node
+  add_executable(modes_observer_test_node test/launchtest/modes_observer_test_node.cpp)
+  target_include_directories(modes_observer_test_node PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  target_link_libraries(modes_observer_test_node mode)
+  install(TARGETS modes_observer_test_node DESTINATION lib/${PROJECT_NAME})
+
   # Launch Tests
   find_package(launch_testing_ament_cmake REQUIRED)
   set(launch_tests
@@ -196,7 +204,8 @@ if(BUILD_TESTING)
     "two_mixed_nodes"               # Mode Manager with Lifecycle and non-Lifecycle Nodes
     "two_independent_hierarchies"   # Mode Manager for two independent hierarchies of nodes
     "manager_and_monitor"           # Mode Manager and Mode Monitor
-    "redundant_mode_changes")       # Ignore redundant mode changes
+    "redundant_mode_changes"        # Ignore redundant mode changes
+    "modes_observer")               # Mode Observer
 
   # Launch Test: Mode Manager with Lifecycle Nodes
   foreach(test_name ${launch_tests})

@@ -53,7 +53,6 @@ class ModeObserver
 {
 public:
   explicit ModeObserver(std::weak_ptr<rclcpp::Node>);
-  ModeObserver(const ModeObserver &) = delete;
   virtual ~ModeObserver() = default;
 
   /**

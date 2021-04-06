@@ -28,7 +28,6 @@
 #include <utility>
 #include <vector>
 
-using std::endl;
 using std::pair;
 using std::mutex;
 using std::string;

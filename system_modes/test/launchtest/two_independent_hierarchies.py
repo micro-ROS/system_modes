@@ -2,7 +2,7 @@ from lifecycle_msgs.srv import ChangeState
 from rcl_interfaces.msg import SetParametersResult
 
 import rclpy
-from rclpy.executors import MultiThreadedExecutor
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 
@@ -72,7 +72,7 @@ class LifecycleClient(Node):
 def main(args=None):
     rclpy.init(args=args)
     try:
-        executor = MultiThreadedExecutor()
+        executor = SingleThreadedExecutor()
         node_a = FakeLifecycleNode('A')
         node_b = FakeLifecycleNode('B')
         node_c = FakeLifecycleNode('C')

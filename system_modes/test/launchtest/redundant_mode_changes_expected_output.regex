@@ -1,0 +1,4 @@
+Transition [AB]:configure
+Transition [AB]:activate
+Parameter callback #0 A:foo:0.2
+Parameter callback #1 A:foo:0.3

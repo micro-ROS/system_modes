@@ -1,7 +1,10 @@
+from time import sleep
+
 from lifecycle_msgs.srv import ChangeState
 from rcl_interfaces.msg import SetParametersResult
 
 import rclpy
+
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from rclpy.parameter import Parameter
@@ -102,33 +105,28 @@ def main(args=None):
             lc.configure_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)
 
             lc.activate_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
 
             lc.change_A_mode('AA')
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            lc.change_A_mode('AA')  # redundant, should be ignored
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            lc.change_A_mode('BB')
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(3)  # give the system some time to converge
 
+            lc.change_A_mode('AA')  # this is the tested aspect: call redundant, should be ignored
+            executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
+
+            lc.change_A_mode('BB')
             executor.spin()
         finally:
             executor.shutdown()

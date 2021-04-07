@@ -18,6 +18,7 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition_event.hpp>
 
+#include <cassert>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -70,6 +71,10 @@ public:
         std::cout << "cached:A:" << observer->get("A").as_string() << std::endl;
         std::cout << "cached:B:" << observer->get("B").as_string() << std::endl;
       });
+
+    auto sm = observer->get("foo");
+    assert(sm.state == 0);
+    assert(sm.mode.compare("") == 0);
   }
 
 private:

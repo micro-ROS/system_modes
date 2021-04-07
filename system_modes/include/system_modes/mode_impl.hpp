@@ -90,6 +90,11 @@ struct StateAndMode
     }
     return state_label_(state) + "." + mode;
   }
+
+  bool unknown()
+  {
+    return state == State::PRIMARY_STATE_UNKNOWN;
+  }
 };
 
 class ModeImpl

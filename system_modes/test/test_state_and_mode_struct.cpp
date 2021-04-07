@@ -112,3 +112,13 @@ TEST_F(TestStateAndMode, string_setter) {
     EXPECT_EQ(inactive, copy);
   }
 }
+
+TEST_F(TestStateAndMode, string_unknown) {
+  {
+    EXPECT_FALSE(inactive.unknown());
+    EXPECT_FALSE(active.unknown());
+    EXPECT_FALSE(active_default.unknown());
+    EXPECT_FALSE(active_foo.unknown());
+    EXPECT_TRUE(unknown.unknown());
+  }
+}

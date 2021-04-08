@@ -89,6 +89,12 @@ Since the introduced (sub-)systems are not concrete software entities, their sta
   Before attempting a state or mode change for a system or node, the [mode manager](#mode_manager) publishes information about the request.
   The according topics might need to be *latched* in order to allow nodes to do the inference after joining a running system.
 
+#### Mode Observer
+
+Additionally, the library comprises a *Mode Observer* that serves as a local cache of states and modes of all observed system parts. The mode observer will try to obtain the current state and mode initially via sevrice calls (GetState, GetMode) and subsequently monitors according transitions events and mode events.
+
+The mode observer is supposed to be instantiated within a ROS 2 node to have states and modes available locally for fast access, see this exemplary [ModeObserverNode](https://github.com/micro-ROS/system_modes/blob/master/system_modes/test/launchtest/modes_observer_test_node.cpp) used for testing.
+
 ### Mode Manager
 
 The mode manager is a ROS node that accepts an SHM file (see [above](#system-modes)) as command line parameter. It parses the SHM file and creates the according services, publishers, and subscribers to manage the system and its modes.

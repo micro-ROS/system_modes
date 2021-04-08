@@ -41,7 +41,8 @@ add_library(mode SHARED
   src/system_modes/mode.cpp
   src/system_modes/mode_impl.cpp
   src/system_modes/mode_handling.cpp
-  src/system_modes/mode_inference.cpp)
+  src/system_modes/mode_inference.cpp
+  src/system_modes/mode_observer.cpp)
 target_include_directories(mode PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -179,13 +180,32 @@ if(BUILD_TESTING)
     target_link_libraries(test_mode_monitor mode)
   endif()
 
+  ament_add_gtest(test_mode_observer test/test_mode_observer.cpp)
+  if(TARGET test_mode_observer)
+    target_include_directories(test_mode_observer PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_observer mode)
+  endif()
+
+  # mode observer test node
+  add_executable(modes_observer_test_node test/launchtest/modes_observer_test_node.cpp)
+  target_include_directories(modes_observer_test_node PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  target_link_libraries(modes_observer_test_node mode)
+  install(TARGETS modes_observer_test_node DESTINATION lib/${PROJECT_NAME})
+
   # Launch Tests
   find_package(launch_testing_ament_cmake REQUIRED)
   set(launch_tests
     "two_lifecycle_nodes"           # Mode Manager with Lifecycle Nodes
     "two_mixed_nodes"               # Mode Manager with Lifecycle and non-Lifecycle Nodes
     "two_independent_hierarchies"   # Mode Manager for two independent hierarchies of nodes
-    "manager_and_monitor")          # Mode Manager and Mode Monitor
+    "manager_and_monitor"           # Mode Manager and Mode Monitor
+    "redundant_mode_changes"        # Ignore redundant mode changes
+    "modes_observer")               # Mode Observer
 
   # Launch Test: Mode Manager with Lifecycle Nodes
   foreach(test_name ${launch_tests})

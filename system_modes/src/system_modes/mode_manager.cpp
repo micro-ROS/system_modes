@@ -432,6 +432,21 @@ ModeManager::change_mode(
     return false;
   }
 
+  // Mode change redundant?
+  try {
+    auto current = mode_inference_->get_or_infer(node_name);
+    if (current.mode.compare(mode_name) == 0) {
+      RCLCPP_ERROR(
+        this->get_logger(),
+        "Redundant mode change of %s to %s - ignored.",
+        node_name.c_str(),
+        mode_name.c_str());
+      return true;
+    }
+  } catch (...) {
+    // Okay, if we don't know anything about this part, yet
+  }
+
   // Publish info about this request
   auto info = std::make_shared<ModeEvent>();
   info->goal_mode.label = mode_name;
@@ -633,7 +648,6 @@ ModeManager::publish_transitions()
       info->start_state.label = state_label_(from.state);
       info->goal_state.id = to.state;
       info->goal_state.label = state_label_(to.state);
-      this->transition_pub_[part]->publish(TransitionEvent());
       this->transition_pub_[part]->publish(*info);
     }
     if (from.mode.compare(to.mode) != 0) {

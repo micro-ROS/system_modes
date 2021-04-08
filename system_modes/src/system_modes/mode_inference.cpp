@@ -28,7 +28,6 @@
 #include <utility>
 #include <vector>
 
-using std::endl;
 using std::mutex;
 using std::string;
 using std::make_pair;
@@ -223,6 +222,7 @@ ModeInference::infer_system(const string & part)
       // error-processing?
       if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
+
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -236,6 +236,7 @@ ModeInference::infer_system(const string & part)
                 "', inference failed.");
       }
     }
+
     return StateAndMode(state, "");
   }
 
@@ -245,8 +246,8 @@ ModeInference::infer_system(const string & part)
   string targetMode = stateAndModeTarget->second.mode;
   if (targetState == State::PRIMARY_STATE_INACTIVE) {
     // target: inactive
-    for (auto part : default_mode->get_parts()) {
-      auto stateAndMode = this->get_or_infer(part);
+    for (auto partpart : default_mode->get_parts()) {
+      auto stateAndMode = this->get_or_infer(partpart);
 
       if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
         // Note: If current entity was in an active mode that allowed a part to
@@ -254,6 +255,7 @@ ModeInference::infer_system(const string & part)
         // to switch to inactive, then the actual state of the current entity will
         // go to error-processing until the mentioned part recovers.
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
+
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -262,9 +264,11 @@ ModeInference::infer_system(const string & part)
         stateAndMode.state != State::PRIMARY_STATE_UNCONFIGURED)
       {
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
+
         return StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
       }
     }
+
     return StateAndMode(State::PRIMARY_STATE_INACTIVE, "");
   } else if (targetState == State::PRIMARY_STATE_ACTIVE) {
     ModeConstPtr mode;
@@ -281,6 +285,7 @@ ModeInference::infer_system(const string & part)
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
           this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
+
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -302,6 +307,7 @@ ModeInference::infer_system(const string & part)
       if (inTargetMode) {
         // Target state and target mode reached, all good!
         this->systems_[part] = StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
+
         return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
       }
     }
@@ -316,6 +322,7 @@ ModeInference::infer_system(const string & part)
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
           this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
+
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
@@ -331,11 +338,13 @@ ModeInference::infer_system(const string & part)
       if (foundMode) {
         // We are in a non-target mode, this means we are still activating
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
+
         return StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
       }
     }
 
     this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
+
     return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
   }
 
@@ -616,8 +625,8 @@ const std::vector<string>
 ModeInference::get_nodes() const
 {
   std::vector<string> result;
-  for (auto node : this->nodes_) {
-    result.push_back(node.first);
+  for (auto part : this->nodes_) {
+    result.push_back(part.first);
   }
   return result;
 }
@@ -626,8 +635,8 @@ const std::vector<string>
 ModeInference::get_systems() const
 {
   std::vector<string> result;
-  for (auto node : this->systems_) {
-    result.push_back(node.first);
+  for (auto part : this->systems_) {
+    result.push_back(part.first);
   }
   return result;
 }

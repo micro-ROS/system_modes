@@ -1,8 +1,10 @@
+from time import sleep
+
 from lifecycle_msgs.srv import ChangeState
 from rcl_interfaces.msg import SetParametersResult
 
 import rclpy
-from rclpy.executors import MultiThreadedExecutor
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 
@@ -72,7 +74,7 @@ class LifecycleClient(Node):
 def main(args=None):
     rclpy.init(args=args)
     try:
-        executor = MultiThreadedExecutor()
+        executor = SingleThreadedExecutor()
         node_a = FakeLifecycleNode('A')
         node_b = FakeLifecycleNode('B')
         node_c = FakeLifecycleNode('C')
@@ -89,27 +91,26 @@ def main(args=None):
         try:
             lc.configure_system()
             executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
             lc2.configure_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
 
             lc.activate_system()
+            executor.spin_once(timeout_sec=1)
+            executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             lc2.activate_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
 
             lc.change_mode('CC')
             executor.spin_once(timeout_sec=1)
-            lc2.change_mode('DD')
             executor.spin_once(timeout_sec=1)
-
+            lc2.change_mode('DD')
             executor.spin()
         finally:
             executor.shutdown()

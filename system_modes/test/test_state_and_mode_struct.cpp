@@ -32,6 +32,8 @@ class TestStateAndMode : public ::testing::Test
 protected:
   void SetUp()
   {
+    unknown.state = State::PRIMARY_STATE_UNKNOWN;
+
     inactive.state = State::PRIMARY_STATE_INACTIVE;
 
     active.state = State::PRIMARY_STATE_ACTIVE;
@@ -47,8 +49,15 @@ protected:
   {
   }
 
-  StateAndMode inactive, active, active_default, active_foo;
+  StateAndMode unknown, inactive, active, active_default, active_foo;
 };
+
+TEST_F(TestStateAndMode, initialization_as_unknown) {
+  {
+    StateAndMode initial;
+    EXPECT_EQ(unknown, initial);
+  }
+}
 
 TEST_F(TestStateAndMode, comparison) {
   {
@@ -101,5 +110,15 @@ TEST_F(TestStateAndMode, string_setter) {
 
     copy.from_string(inactive.as_string());
     EXPECT_EQ(inactive, copy);
+  }
+}
+
+TEST_F(TestStateAndMode, string_unknown) {
+  {
+    EXPECT_FALSE(inactive.unknown());
+    EXPECT_FALSE(active.unknown());
+    EXPECT_FALSE(active_default.unknown());
+    EXPECT_FALSE(active_foo.unknown());
+    EXPECT_TRUE(unknown.unknown());
   }
 }

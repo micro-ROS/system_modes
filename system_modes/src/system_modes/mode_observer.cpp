@@ -77,7 +77,7 @@ ModeObserver::observe(const std::string & part_name)
   if (stateclient->wait_for_service(std::chrono::microseconds(500))) {
     auto state = stateclient->async_send_request(gsrequest);
     if (rclcpp::spin_until_future_complete(node_handle_.lock(), state) ==
-      rclcpp::FutureReturnCode::SUCCESS)
+      rclcpp::executor::FutureReturnCode::SUCCESS)
     {
       auto result = state.get();
       cache_[part_name].state = result->current_state.id;
@@ -91,7 +91,7 @@ ModeObserver::observe(const std::string & part_name)
   if (modeclient->wait_for_service(std::chrono::microseconds(500))) {
     auto mode = modeclient->async_send_request(gmrequest);
     if (rclcpp::spin_until_future_complete(node_handle_.lock(), mode) ==
-      rclcpp::FutureReturnCode::SUCCESS)
+      rclcpp::executor::FutureReturnCode::SUCCESS)
     {
       auto result = mode.get();
       cache_[part_name].mode = result->current_mode;

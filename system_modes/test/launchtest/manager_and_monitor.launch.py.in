@@ -18,11 +18,14 @@ def generate_test_description():
 
     modelfile = '@MODELFILE@'
 
-    mode_manager = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.PythonLaunchDescriptionSource(
-            ament_index_python.packages.get_package_share_directory(
-                'system_modes') + '/launch/mode_manager.launch.py'),
-        launch_arguments={'modelfile': modelfile}.items())
+    mode_manager = launch_ros.actions.Node(
+            package='system_modes',
+            executable='mode_manager',
+            emulate_tty=True,
+            output='screen',
+            parameters=[
+                {"modelfile": modelfile}
+            ])
 
     test_nodes = ExecuteProcess(
         cmd=[
@@ -32,24 +35,17 @@ def generate_test_description():
         name='test_nodes',
         emulate_tty=True)
 
-    mode_monitor = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "run",
-            "system_modes",
-            "mode_monitor",
-            "--ros-args",
-            "-p",
-            "modelfile:=" + modelfile,
-            "-p",
-            "debug:=True",
-            "-p",
-            "verbose:=True",
-            "-p",
-            "rate:=200"],
-        name='mode_monitor',
-        emulate_tty=True,
-        output='screen')
+    mode_monitor = launch_ros.actions.Node(
+            package='system_modes',
+            executable='mode_monitor',
+            emulate_tty=True,
+            output='screen',
+            parameters=[
+                {"modelfile": modelfile},
+                {"debug": True},
+                {"verbose": True},
+                {"rate": 300},
+            ])
 
     launch_description = LaunchDescription()
     launch_description.add_action(mode_manager)

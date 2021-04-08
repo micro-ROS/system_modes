@@ -432,6 +432,21 @@ ModeManager::change_mode(
     return false;
   }
 
+  // Mode change redundant?
+  try {
+    auto current = mode_inference_->get_or_infer(node_name);
+    if (current.mode.compare(mode_name) == 0) {
+      RCLCPP_ERROR(
+        this->get_logger(),
+        "Redundant mode change of %s to %s - ignored.",
+        node_name.c_str(),
+        mode_name.c_str());
+      return true;
+    }
+  } catch (...) {
+    // Okay, if we don't know anything about this part, yet
+  }
+
   // Publish info about this request
   auto info = std::make_shared<ModeEvent>();
   info->goal_mode.label = mode_name;

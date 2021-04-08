@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202-blue.svg)](https://github.com/micro-ROS/system_modes/blob/master/LICENSE)
 [![Build status](https://build.ros2.org/job/Ddev__system_modes__ubuntu_bionic_amd64/badge/icon?subject=Build%20farm%3A%20Dashing)](https://build.ros2.org/job/Ddev__system_modes__ubuntu_bionic_amd64/)
 [![Build status](https://github.com/micro-ROS/system_modes/workflows/Build%20action%3A%20Dashing/badge.svg)](https://github.com/micro-ROS/system_modes/actions)
-[![Code coverage](https://codecov.io/gh/micro-ROS/system_modes/branch/master/graph/badge.svg)](https://codecov.io/gh/micro-ROS/system_modes)
+[![Code coverage](https://codecov.io/gh/micro-ROS/system_modes/branch/dashing/graph/badge.svg)](https://codecov.io/gh/micro-ROS/system_modes)
 
 This repository explores a system modes concept that is implemented for ROS 2 in two packages:
 * [system_modes](./system_modes/) provides a library for system mode inference, a mode manager, and a mode monitor

@@ -41,7 +41,8 @@ add_library(mode SHARED
   src/system_modes/mode.cpp
   src/system_modes/mode_impl.cpp
   src/system_modes/mode_handling.cpp
-  src/system_modes/mode_inference.cpp)
+  src/system_modes/mode_inference.cpp
+  src/system_modes/mode_observer.cpp)
 target_include_directories(mode PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -177,6 +178,15 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
     )
     target_link_libraries(test_mode_monitor mode)
+  endif()
+
+  ament_add_gtest(test_mode_observer test/test_mode_observer.cpp)
+  if(TARGET test_mode_observer)
+    target_include_directories(test_mode_observer PUBLIC
+      ${rclcpp_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_BINARY_DIR}/system_modes/
+    )
+    target_link_libraries(test_mode_observer mode)
   endif()
 endif()
 

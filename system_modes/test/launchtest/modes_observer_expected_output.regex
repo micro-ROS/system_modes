@@ -1,0 +1,7 @@
+cached:.*:inactive
+cached:sys:active.__DEFAULT__
+cached:A:inactive
+cached:B:active.__DEFAULT__
+cached:sys:active.CC
+cached:A:active.BB
+cached:B:active.FF

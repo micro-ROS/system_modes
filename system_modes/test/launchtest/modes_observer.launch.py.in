@@ -18,15 +18,11 @@ def generate_test_description():
 
     modelfile = '@MODELFILE@'
 
-    modes_observer = ExecuteProcess(
-        cmd=[
-            "ros2",
-            "run",
-            "system_modes",
-            "modes_observer_test_node"],
-        name='modes_observer_test_node',
-        emulate_tty=True,
-        output='screen')
+    modes_observer = launch_ros.actions.Node(
+            package='system_modes',
+            executable='modes_observer_test_node',
+            emulate_tty=True,
+            output='screen')
 
     mode_manager = launch.actions.IncludeLaunchDescription(
         launch.launch_description_sources.PythonLaunchDescriptionSource(
@@ -39,9 +35,7 @@ def generate_test_description():
             "@PYTHON_EXECUTABLE@",
             "@TEST_NODES@"
             ],
-        name='test_nodes',
-        emulate_tty=True,
-        output='screen')
+        name='test_nodes',)
 
     launch_description = LaunchDescription()
     launch_description.add_action(modes_observer)

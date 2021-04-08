@@ -117,23 +117,15 @@ def main(args=None):
             lc.configure_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
 
             lc.activate_system()
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
             executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
-            executor.spin_once(timeout_sec=1)
+            sleep(2)  # give the system some time to converge
 
             lc.change_mode('CC')
-
             executor.spin()
         finally:
             executor.shutdown()

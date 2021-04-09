@@ -1,6 +1,12 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package system_modes_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+0.6.0 (2020-03-16)
+-----------
+
+* Introduced mode observer https://github.com/micro-ROS/system_modes/issues/59
+* Mode manager prevents redundant mode changes https://github.com/micro-ROS/system_modes/pull/67
+* Minor bugfix in inference
 
 0.5.0 (2020-03-16)
 -----------

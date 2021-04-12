@@ -30,10 +30,10 @@
 
 #include "system_modes/mode_handling.hpp"
 #include "system_modes/mode_inference.hpp"
-#include "system_modes/srv/change_mode.hpp"
-#include "system_modes/srv/get_mode.hpp"
-#include "system_modes/srv/get_available_modes.hpp"
-#include "system_modes/msg/mode_event.hpp"
+#include "system_modes_msgs/srv/change_mode.hpp"
+#include "system_modes_msgs/srv/get_mode.hpp"
+#include "system_modes_msgs/srv/get_available_modes.hpp"
+#include "system_modes_msgs/msg/mode_event.hpp"
 
 namespace system_modes
 {
@@ -68,14 +68,14 @@ protected:
   // Mode service callbacks
   virtual void on_change_mode(
     const std::string &,
-    const std::shared_ptr<system_modes::srv::ChangeMode::Request>,
-    std::shared_ptr<system_modes::srv::ChangeMode::Response>);
+    const std::shared_ptr<system_modes_msgs::srv::ChangeMode::Request>,
+    std::shared_ptr<system_modes_msgs::srv::ChangeMode::Response>);
   virtual void on_get_mode(
     const std::string &,
-    std::shared_ptr<system_modes::srv::GetMode::Response>);
+    std::shared_ptr<system_modes_msgs::srv::GetMode::Response>);
   virtual void on_get_available_modes(
     const std::string &,
-    std::shared_ptr<system_modes::srv::GetAvailableModes::Response>);
+    std::shared_ptr<system_modes_msgs::srv::GetAvailableModes::Response>);
 
   virtual bool change_state(
     const std::string &,
@@ -109,17 +109,17 @@ private:
   states_srv_;
 
   // Mode change services
-  std::map<std::string, rclcpp::Service<system_modes::srv::ChangeMode>::SharedPtr>
+  std::map<std::string, rclcpp::Service<system_modes_msgs::srv::ChangeMode>::SharedPtr>
   mode_change_srv_;
-  std::map<std::string, rclcpp::Service<system_modes::srv::GetMode>::SharedPtr>
+  std::map<std::string, rclcpp::Service<system_modes_msgs::srv::GetMode>::SharedPtr>
   get_mode_srv_;
-  std::map<std::string, rclcpp::Service<system_modes::srv::GetAvailableModes>::SharedPtr>
+  std::map<std::string, rclcpp::Service<system_modes_msgs::srv::GetAvailableModes>::SharedPtr>
   modes_srv_;
 
   // Lifecycle / Mode / Parameter service clients
   std::map<std::string, rclcpp::Client<lifecycle_msgs::srv::ChangeState>::SharedPtr>
   state_change_clients_;
-  std::map<std::string, rclcpp::Client<system_modes::srv::ChangeMode>::SharedPtr>
+  std::map<std::string, rclcpp::Client<system_modes_msgs::srv::ChangeMode>::SharedPtr>
   mode_change_clients_;
   std::map<std::string, rclcpp::AsyncParametersClient::SharedPtr>
   param_change_clients_;
@@ -131,9 +131,9 @@ private:
   state_request_pub_;
 
   // Mode transition publisher
-  std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
+  std::map<std::string, rclcpp::Publisher<system_modes_msgs::msg::ModeEvent>::SharedPtr>
   mode_transition_pub_;
-  std::map<std::string, rclcpp::Publisher<system_modes::msg::ModeEvent>::SharedPtr>
+  std::map<std::string, rclcpp::Publisher<system_modes_msgs::msg::ModeEvent>::SharedPtr>
   mode_request_pub_;
 
   // Remember states and modes of the systems

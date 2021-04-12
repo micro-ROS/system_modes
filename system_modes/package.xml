@@ -18,8 +18,8 @@
   <depend>builtin_interfaces</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
-  <depend>rosidl_default_generators</depend>
   <depend>std_msgs</depend>
+  <depend>system_modes_msgs</depend>
 
   <exec_depend>launch_ros</exec_depend>
 
@@ -35,8 +35,6 @@
   <test_depend>launch_testing_ament_cmake</test_depend>
   <test_depend>launch_testing_ros</test_depend>
   <test_depend>ros2run</test_depend>
-
-  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>

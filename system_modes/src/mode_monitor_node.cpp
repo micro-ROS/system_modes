@@ -43,7 +43,7 @@ using std::invalid_argument;
 using system_modes::ModeMonitor;
 using system_modes::DEFAULT_MODE;
 using system_modes::StateAndMode;
-using system_modes::msg::ModeEvent;
+using system_modes_msgs::msg::ModeEvent;
 using lifecycle_msgs::msg::State;
 using lifecycle_msgs::msg::TransitionEvent;
 

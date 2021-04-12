@@ -25,6 +25,7 @@ find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(system_modes REQUIRED)
+find_package(system_modes_msgs REQUIRED)
 
 # drive_base
 add_executable(drive_base src/drive_base.cpp)
@@ -39,6 +40,7 @@ ament_target_dependencies(drive_base
   "rosidl_typesupport_cpp"
   "std_msgs"
   "system_modes"
+  "system_modes_msgs"
 )
 install(TARGETS drive_base
   EXPORT export_${PROJECT_NAME}
@@ -57,6 +59,7 @@ ament_target_dependencies(manipulator
   "rosidl_typesupport_cpp"
   "std_msgs"
   "system_modes"
+  "system_modes_msgs"
 )
 install(TARGETS manipulator
   EXPORT export_${PROJECT_NAME}

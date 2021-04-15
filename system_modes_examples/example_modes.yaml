@@ -41,28 +41,22 @@ manipulator:
     type: node
     modes:
       __DEFAULT__:
-        ros__parameters:
-          max_torque: 0.1
+        max_torque: 0.1
       WEAK:
-        ros__parameters:
-          max_torque: 0.1
+        max_torque: 0.1
       STRONG:
-        ros__parameters:
-          max_torque: 0.2
+        max_torque: 0.2
 
 drive_base:
   ros__parameters:
     type: node
     modes:
       __DEFAULT__:
-        ros__parameters:
-          max_speed: 0.1
-          controller: PID
+        max_speed: 0.1
+        controller: PID
       SLOW:
-        ros__parameters:
-          max_speed: 0.2
-          controller: PID
+        max_speed: 0.2
+        controller: PID
       FAST:
-        ros__parameters:
-          max_speed: 0.9
-          controller: MPC
+        max_speed: 0.9
+        controller: MPC

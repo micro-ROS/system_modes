@@ -23,32 +23,25 @@ testPart:
     type: node
     modes:
       __DEFAULT__:
-        ros__parameters:
-          foo: 0.1
-          bar: WARN
+        foo: 0.1
+        bar: WARN
       FOO:
-        ros__parameters:
-          wrong: 0.1
-          bar: DBG
+        wrong: 0.1
+        bar: DBG
       BAR:
-        ros__parameters:
-          foo: 0.2
-          wrong: ERR
+        foo: 0.2
+        wrong: ERR
 
 testPart2:
   ros__parameters:
     type: node
     modes:
       __DEFAULT__:
-        ros__parameters:
-          foo: 0.1
-          bar: WARN
+        foo: 0.1
+        bar: WARN
       AAA:
-        ros__parameters:
-          foo: 0.2
-          bar: DBG
+        foo: 0.2
+        bar: DBG
       BBB:
-        ros__parameters:
-          foo: 0.9
-          bar: ERR
-
+        foo: 0.9
+        bar: ERR

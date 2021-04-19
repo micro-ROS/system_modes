@@ -559,10 +559,10 @@ ModeInference::read_modes_from_model(const string & model_path)
           this->add_param_to_mode(mode, param);
         } else {
           // part mode
-          string part_name = param.get_name();
+          string part_part = param.get_name();
           std::size_t foundr = param.get_name().rfind(".");
           if (foundr != string::npos) {
-            part_name = param.get_name().substr(foundr + 1);
+            part_part = param.get_name().substr(foundr + 1);
           }
 
           string state(param.value_to_string());
@@ -573,7 +573,7 @@ ModeInference::read_modes_from_model(const string & model_path)
             smode = param.value_to_string().substr(foundr + 1);
           }
 
-          mode->set_part_mode(part_name, StateAndMode(state_id_(state), smode));
+          mode->set_part_mode(part_part, StateAndMode(state_id_(state), smode));
         }
         this->modes_[part_name].emplace(mode->get_name(), mode);
 

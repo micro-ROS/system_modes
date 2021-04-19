@@ -42,10 +42,7 @@ public:
     RCLCPP_INFO(get_logger(), "Constructed lifecycle node '%s'", this->get_name());
 
     // Parameter declaration
-    this->declare_parameter(
-      "max_torque",
-      rclcpp::ParameterValue(rclcpp::PARAMETER_NOT_SET),
-      rcl_interfaces::msg::ParameterDescriptor());
+    this->declare_parameter("max_torque", 0.0);
 
     auto param_change_callback =
       [this](std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult

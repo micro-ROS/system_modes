@@ -17,7 +17,7 @@ class FakeLifecycleNode(Node):
         super().__init__(name)
 
         self.declare_parameter('foo', 0.0)
-        self.declare_parameter('bar', "ZERO")
+        self.declare_parameter('bar', 'ZERO')
         self.add_on_set_parameters_callback(self.parameter_callback)
 
         # State change service

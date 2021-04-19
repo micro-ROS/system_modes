@@ -18,24 +18,12 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_lifecycle REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
-
-# generate service
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Mode.msg"
-  "msg/ModeEvent.msg"
-  "srv/ChangeMode.srv"
-  "srv/GetMode.srv"
-  "srv/GetAvailableModes.srv"
-  ADD_LINTER_TESTS
-  DEPENDENCIES builtin_interfaces
-)
+find_package(system_modes_msgs REQUIRED)
 
 add_library(mode SHARED
   src/system_modes/mode.cpp
@@ -50,17 +38,10 @@ ament_target_dependencies(mode
   "rclcpp"
   "rcl_lifecycle"
   "rclcpp_lifecycle"
-  "lifecycle_msgs"
   "rosidl_typesupport_cpp"
-  "std_msgs"
-  "builtin_interfaces"
+  "lifecycle_msgs"
+  "system_modes_msgs"
 )
-#rosidl_target_interfaces(mode
-# ${PROJECT_NAME} "rosidl_typesupport_cpp")
-# TODO Should work with the two lines above, but doesn't
-include_directories(../../build/system_modes/rosidl_generator_cpp/)
-link_directories(../../build/system_modes/)
-target_link_libraries(mode system_modes__rosidl_typesupport_cpp)
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
@@ -227,11 +208,9 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
-#ament_export_interfaces(export_${PROJECT_NAME})
 ament_export_libraries(mode)
-ament_export_libraries(${PROJECT_NAME}__rosidl_typesupport_introspection_cpp)
 ament_export_dependencies(rclcpp)
 ament_export_dependencies(rclcpp_lifecycle)
 ament_export_dependencies(lifecycle_msgs)
-ament_export_dependencies(std_msgs)
+ament_export_dependencies(system_modes_msgs)
 ament_package()

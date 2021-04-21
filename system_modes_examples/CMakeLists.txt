@@ -20,7 +20,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_lifecycle REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
@@ -38,7 +37,6 @@ ament_target_dependencies(drive_base
   "rclcpp_lifecycle"
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
-  "std_msgs"
   "system_modes"
   "system_modes_msgs"
 )
@@ -57,7 +55,6 @@ ament_target_dependencies(manipulator
   "rclcpp_lifecycle"
   "lifecycle_msgs"
   "rosidl_typesupport_cpp"
-  "std_msgs"
   "system_modes"
   "system_modes_msgs"
 )

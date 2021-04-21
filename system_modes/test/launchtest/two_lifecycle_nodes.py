@@ -87,7 +87,7 @@ def main(args=None):
     try:
         executor = SingleThreadedExecutor()
         node_a = FakeLifecycleNode('A')
-        node_b = FakeLifecycleNode('B', ns="foo")
+        node_b = FakeLifecycleNode('B', ns='foo')
 
         executor.add_node(node_a)
         executor.add_node(node_b)

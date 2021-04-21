@@ -5,7 +5,8 @@
 [![Build status](https://github.com/micro-ROS/system_modes/workflows/Build%20action%3A%20Dashing/badge.svg)](https://github.com/micro-ROS/system_modes/actions)
 [![Code coverage](https://codecov.io/gh/micro-ROS/system_modes/branch/dashing/graph/badge.svg)](https://codecov.io/gh/micro-ROS/system_modes)
 
-This repository explores a system modes concept that is implemented for ROS 2 in two packages:
+This repository explores a system modes concept that is implemented for ROS 2 in three packages:
+* [system_modes_msgs](./system_modes_msgs/) provides the message types and services for system modes
 * [system_modes](./system_modes/) provides a library for system mode inference, a mode manager, and a mode monitor
 * [system_modes_examples](./system_modes_examples/) implements a simple example
 

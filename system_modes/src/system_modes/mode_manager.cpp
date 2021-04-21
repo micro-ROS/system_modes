@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "system_modes/msg/mode_event.hpp"
+#include "system_modes_msgs/msg/mode_event.hpp"
 
 using std::string;
 using std::out_of_range;
@@ -46,10 +46,10 @@ using lifecycle_msgs::srv::GetState;
 using lifecycle_msgs::srv::ChangeState;
 using lifecycle_msgs::srv::GetAvailableStates;
 
-using system_modes::msg::ModeEvent;
-using system_modes::srv::GetMode;
-using system_modes::srv::ChangeMode;
-using system_modes::srv::GetAvailableModes;
+using system_modes_msgs::msg::ModeEvent;
+using system_modes_msgs::srv::GetMode;
+using system_modes_msgs::srv::ChangeMode;
+using system_modes_msgs::srv::GetAvailableModes;
 
 using namespace std::chrono_literals;
 
@@ -156,7 +156,7 @@ ModeManager::add_system(const std::string & system)
     std::shared_ptr<GetMode::Response>)> mode_get_callback =
     std::bind(&ModeManager::on_get_mode, this, system, _3);
   this->get_mode_srv_[system] =
-    this->create_service<system_modes::srv::GetMode>(
+    this->create_service<system_modes_msgs::srv::GetMode>(
     topic_name,
     mode_get_callback);
 
@@ -211,7 +211,7 @@ ModeManager::add_node(const std::string & node)
     std::shared_ptr<GetMode::Response>)> mode_get_callback =
     std::bind(&ModeManager::on_get_mode, this, node, _3);
   this->get_mode_srv_[node] =
-    this->create_service<system_modes::srv::GetMode>(
+    this->create_service<system_modes_msgs::srv::GetMode>(
     topic_name,
     mode_get_callback);
 
@@ -333,7 +333,7 @@ ModeManager::on_change_mode(
 void
 ModeManager::on_get_mode(
   const std::string & node_name,
-  std::shared_ptr<system_modes::srv::GetMode::Response> response)
+  std::shared_ptr<system_modes_msgs::srv::GetMode::Response> response)
 {
   // TODO(anordman): to be on the safe side, don't use the node name from
   //       the request, but bind it to the callback instead
@@ -532,9 +532,9 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
 void
 ModeManager::change_part_mode(const string & node, const string & mode)
 {
-  RCLCPP_INFO(
+  RCLCPP_DEBUG(
     this->get_logger(),
-    " changing mode of %s to %s",
+    " changing mode of part %s to %s",
     node.c_str(),
     mode.c_str());
 

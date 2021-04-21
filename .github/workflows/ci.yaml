@@ -24,7 +24,7 @@ jobs:
         required-ros-distributions: ${{ matrix.ros_distribution }}
     - uses : ros-tooling/action-ros-ci@0.1.0
       with:
-        package-name: "system_modes system_modes_examples"
+        package-name: "system_modes_msgs system_modes system_modes_examples"
         target-ros2-distro: ${{ matrix.ros_distribution }}
         vcs-repo-file-url: ""
         colcon-mixin-name: coverage-gcc

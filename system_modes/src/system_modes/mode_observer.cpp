@@ -23,7 +23,7 @@
 #include <vector>
 #include <memory>
 
-#include "system_modes/msg/mode_event.hpp"
+#include "system_modes_msgs/msg/mode_event.hpp"
 
 using std::function;
 using std::map;
@@ -37,8 +37,8 @@ using lifecycle_msgs::msg::Transition;
 using lifecycle_msgs::msg::TransitionEvent;
 using lifecycle_msgs::srv::GetState;
 
-using system_modes::msg::ModeEvent;
-using system_modes::srv::GetMode;
+using system_modes_msgs::msg::ModeEvent;
+using system_modes_msgs::srv::GetMode;
 
 using namespace std::chrono_literals;
 using shared_mutex = std::shared_timed_mutex;

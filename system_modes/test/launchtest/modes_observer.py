@@ -7,8 +7,8 @@ from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 
-from system_modes.msg import ModeEvent
-from system_modes.srv import ChangeMode
+from system_modes_msgs.msg import ModeEvent
+from system_modes_msgs.srv import ChangeMode
 
 
 class FakeLifecycleNode(Node):

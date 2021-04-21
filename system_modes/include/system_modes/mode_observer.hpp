@@ -26,8 +26,8 @@
 #include <utility>
 
 #include "system_modes/mode.hpp"
-#include "system_modes/msg/mode_event.hpp"
-#include "system_modes/srv/get_mode.hpp"
+#include "system_modes_msgs/msg/mode_event.hpp"
+#include "system_modes_msgs/srv/get_mode.hpp"
 
 namespace system_modes
 {
@@ -39,8 +39,8 @@ using std::string;
 using lifecycle_msgs::msg::TransitionEvent;
 using lifecycle_msgs::srv::GetState;
 using rclcpp::node_interfaces::NodeBaseInterface;
-using system_modes::msg::ModeEvent;
-using system_modes::srv::GetMode;
+using system_modes_msgs::msg::ModeEvent;
+using system_modes_msgs::srv::GetMode;
 
 /**
  * Mode observer provides a local system modes cache.

@@ -43,7 +43,7 @@ using rclcpp::ParameterMap;
 using lifecycle_msgs::msg::State;
 using lifecycle_msgs::msg::Transition;
 using lifecycle_msgs::msg::TransitionEvent;
-using system_modes::msg::ModeEvent;
+using system_modes_msgs::msg::ModeEvent;
 
 using namespace std::chrono_literals;
 using namespace std::literals::string_literals;

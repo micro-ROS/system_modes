@@ -26,10 +26,10 @@
 #include "system_modes/mode.hpp"
 #include "system_modes/mode_inference.hpp"
 
-#include "system_modes/srv/change_mode.hpp"
-#include "system_modes/srv/get_mode.hpp"
-#include "system_modes/srv/get_available_modes.hpp"
-#include "system_modes/msg/mode_event.hpp"
+#include "system_modes_msgs/srv/change_mode.hpp"
+#include "system_modes_msgs/srv/get_mode.hpp"
+#include "system_modes_msgs/srv/get_available_modes.hpp"
+#include "system_modes_msgs/msg/mode_event.hpp"
 
 namespace system_modes
 {

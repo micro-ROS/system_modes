@@ -2,6 +2,11 @@
 Changelog for package system_modes_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.1 (2020-04-22)
+-----------
+
+* Improved metadata for ROS 2 package releases
+
 0.7.0 (2020-04-22)
 -----------
 

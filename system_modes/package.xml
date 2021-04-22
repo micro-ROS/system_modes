@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>system_modes</name>
-  <version>0.7.0</version>
+  <version>0.7.1</version>
   <description>
     The system modes concept assumes that a robotics system is built
     from components with a lifecycle. It adds a notion of (sub-)systems,
@@ -12,6 +12,10 @@
   </description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
   <license>Apache License 2.0</license>
+
+  <url type="website">https://micro.ros.org/docs/concepts/client_library/lifecycle_and_system_modes/</url>
+  <url type="repository">https://github.com/micro-ROS/system_modes</url>
+  <url type="bugtracker">https://github.com/micro-ROS/system_modes/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

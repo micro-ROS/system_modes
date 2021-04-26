@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main entry point for the `launch_system_modes` package."""
+"""Package for launch_system_modes.events."""
 
-from . import actions
-from . import events
+from .system_part import SystemPart
 
 __all__ = [
-    'actions',
-    'events',
+    'SystemPart',
 ]

@@ -24,8 +24,6 @@ import launch
 from launch import SomeSubstitutionsType
 from launch.action import Action
 import launch.logging
-
-from launch_ros.actions.lifecycle_node import LifecycleNode
 from launch_ros.ros_adapters import get_ros_node
 
 import system_modes_msgs.msg
@@ -35,8 +33,8 @@ from ..events import ChangeMode
 from ..events import ModeChanged
 
 
-class SystemPart(LifecycleNode):
-    """Action that handles system modes."""
+class System(Action):
+    """Action that handles system modes of systems."""
 
     def __init__(
         self,
@@ -46,12 +44,14 @@ class SystemPart(LifecycleNode):
         **kwargs
     ) -> None:
         """
-        Construct a SystemPart action.
+        Construct a System action.
 
-        :param name: The name of the system or node.
+        :param name: The name of the system.
         :param namespace: The namespace of the system or node.
         """
-        super().__init__(name=name, namespace=namespace, **kwargs)
+        super().__init__(**kwargs)
+        self.__name = name
+        self.__namespace = namespace
         self.__logger = launch.logging.get_logger(__name__)
         self.__rclpy_subscription = None
         print('ModeChanged event initialized')

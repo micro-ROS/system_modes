@@ -22,7 +22,7 @@ from launch_ros.actions import LifecycleNode  # noqa: F401
 
 
 class ChangeMode(Event):
-    """Event emitted when a system mode transition is requested for a system or node."""
+    """Event emitted when a system mode change is requested for a system or node."""
 
     name = 'launch_system_modes.events.ChangeMode'
 
@@ -42,7 +42,7 @@ class ChangeMode(Event):
         super().__init__()
         self.__lifecycle_node_matcher = lifecycle_node_matcher
         self.__mode_name = mode_name
-        print('ChangeMode event initialized')
+        print('ChangeMode event initialized for: '+mode_name)
 
     @property
     def lifecycle_node_matcher(self) -> Callable[['LifecycleNode'], bool]:

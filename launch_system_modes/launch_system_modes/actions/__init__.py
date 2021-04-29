@@ -14,8 +14,10 @@
 
 """Package for launch_system_modes.events."""
 
+from .system import System
 from .system_part import SystemPart
 
 __all__ = [
+    'System',
     'SystemPart',
 ]

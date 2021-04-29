@@ -54,7 +54,8 @@ class SystemPart(LifecycleNode):
         super().__init__(name=name, namespace=namespace, **kwargs)
         self.__logger = launch.logging.get_logger(__name__)
         self.__rclpy_subscription = None
-        print('ModeChanged event initialized')
+        self.__part_name = name
+        self.__logger.debug('SystemPart "'+self.__part_name+'" initialized')
 
     def _on_mode_event(self, context, msg):
         try:
@@ -145,3 +146,6 @@ class SystemPart(LifecycleNode):
 
         # Delegate execution to ExecuteProcess.
         return super().execute(context)
+
+    def get_name(self):
+        return self.__part_name

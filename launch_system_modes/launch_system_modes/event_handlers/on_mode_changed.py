@@ -35,7 +35,6 @@ class OnModeChanged(EventHandler):
         *,
         entities: SomeActionsType,
         target_system_part: SystemPart = None,
-        start_mode: Optional[SomeSubstitutionsType] = None,
         goal_mode: Optional[SomeSubstitutionsType] = None,
         matcher: Optional[Callable[[Event], bool]] = None,
         **kwargs
@@ -59,13 +58,7 @@ class OnModeChanged(EventHandler):
                     isinstance(event, ModeChanged) and (
                         target_system_part is None or
                         event.action == target_system_part
-                    ) and (
-                        start_mode is None or
-                        event.start_mode == start_mode
-                    ) and (
-                        goal_mode is None or
-                        event.goal_mode == goal_mode
-                    )
+                    ) and (event.goal_mode == goal_mode)
                 )
             )
         # Call parent init.
@@ -74,8 +67,11 @@ class OnModeChanged(EventHandler):
             entities=entities,
             **kwargs
         )
+        self.__goal_mode = goal_mode
         self.__target_system_part = target_system_part
-        print('OnModeChanged event handler initialized')
+        print('OnModeChanged event handler initialized for part "'
+              + self.__target_system_part.get_name()
+              + '" and mode: ' + self.__goal_mode)
 
     @property
     def handler_description(self) -> Text:
@@ -86,9 +82,7 @@ class OnModeChanged(EventHandler):
     def matcher_description(self):
         """Return the string description of the matcher."""
         if self.__target_system_part is None:
-            print('OUIUDI')
             return 'event == ModeChanged'
-        print('OUIUsdfDI')
         return 'event == ModeChanged and event.action == SystemPart({})'.format(
             hex(id(self.__target_system_part))
         )

@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 import ament_index_python.packages
 
 import launch
@@ -52,7 +50,6 @@ def generate_launch_description():
                 executable='drive_base',
                 name='drive_base',
                 namespace='',
-                parameters=[{'modelfile': modelfile}],
                 output='screen')
 
         manipulator = launch.actions.IncludeLaunchDescription(
@@ -72,10 +69,17 @@ def generate_launch_description():
                 lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
                 transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
             ))
+
         drive_base_change_mode_to_DEFAULT = launch.actions.EmitEvent(
             event=launch_system_modes.events.ChangeMode(
                 lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
                 mode_name='__DEFAULT__',
+            ))
+
+        drive_base_change_mode_to_FAST = launch.actions.EmitEvent(
+            event=launch_system_modes.events.ChangeMode(
+                lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
+                mode_name='FAST',
             ))
 
         # Handlers
@@ -91,22 +95,26 @@ def generate_launch_description():
                 goal_state='active',
                 entities=[drive_base_change_mode_to_DEFAULT]))
 
+        on_DEFAULT_mode = launch.actions.RegisterEventHandler(
+            launch_system_modes.event_handlers.OnModeChanged(
+                target_system_part=drive_base,
+                goal_mode='__DEFAULT__',
+                entities=[drive_base_change_mode_to_FAST]))
+
         description = launch.LaunchDescription()
         description.add_action(on_inactive_handler)
         description.add_action(on_active_handler)
+        description.add_action(on_DEFAULT_mode)
         description.add_action(mode_manager)
         description.add_action(drive_base)
         description.add_action(manipulator)
         description.add_action(drive_base_configure)
     except TypeError as err:
-        print(err)
-        print(sys.exc_type)
+        print('TypeError: '+err)
     except NameError as err:
-        print(err)
-        print(sys.exc_type)
+        print('NameError: '+err)
     except AttributeError as err:
-        print(err)
-        print(sys.exc_type)
+        print('AttributeError: '+err)
     except Exception as err:
         exception_type = type(err).__name__
         print('--Exception of type: ' + exception_type)

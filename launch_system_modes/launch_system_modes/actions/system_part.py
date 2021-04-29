@@ -25,11 +25,11 @@ from launch import SomeSubstitutionsType
 from launch.action import Action
 import launch.logging
 
-import system_modes_msgs.msg
-import system_modes_msgs.srv
-
 from launch_ros.actions.lifecycle_node import LifecycleNode
 from launch_ros.ros_adapters import get_ros_node
+
+import system_modes_msgs.msg
+import system_modes_msgs.srv
 
 from ..events import ChangeMode
 from ..events import ModeChanged

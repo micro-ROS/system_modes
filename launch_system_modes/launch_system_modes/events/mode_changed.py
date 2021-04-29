@@ -20,6 +20,10 @@ from launch.event import Event
 
 import system_modes_msgs.msg
 
+if False:
+    from ..actions import SystemPart  # noqa: F401
+
+
 class ModeChanged(Event):
     """Event emitted when a system mode changed."""
 
@@ -28,13 +32,13 @@ class ModeChanged(Event):
     def __init__(
         self,
         *,
-        action: 'SystemMode',
+        action: 'SystemPart',
         msg: system_modes_msgs.msg.ModeEvent
     ) -> None:
         """
         Create a ModeChanged event.
 
-        :param: action the instance of class::`SystemMode` that generated this event
+        :param: action the instance of class::`SystemPart` that generated this event
         :param: msg the instance of the ROS message ModeEvent that generated this event
         """
         super().__init__()
@@ -46,7 +50,7 @@ class ModeChanged(Event):
         print('ModeChanged event initialized')
 
     @property
-    def action(self) -> 'SystemMode':
+    def action(self) -> 'SystemPart':
         """Getter for action."""
         return self.__action
 

@@ -47,7 +47,7 @@ class ModeChanged(Event):
         self.__timestamp = msg.timestamp
         self.__start_mode = msg.start_mode.label
         self.__goal_mode = msg.goal_mode.label
-        print('ModeChanged event initialized for: '+self.__goal_mode)
+        print('ModeChanged event created: ' + self.__action.get_name() + " changed to " + self.__goal_mode)
 
     @property
     def action(self) -> 'SystemPart':

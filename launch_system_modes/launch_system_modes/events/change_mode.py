@@ -18,7 +18,8 @@ from typing import Callable
 
 from launch.event import Event
 
-from launch_ros.actions import LifecycleNode  # noqa: F401
+if False:
+    from launch_system_modes.actions import SystemPart  # noqa: F401
 
 
 class ChangeMode(Event):
@@ -29,25 +30,25 @@ class ChangeMode(Event):
     def __init__(
         self,
         *,
-        lifecycle_node_matcher: Callable[['LifecycleNode'], bool],
+        system_part_matcher: Callable[['SystemPart'], bool],
         mode_name: str
     ) -> None:
         """
         Create a ChangeMode event.
 
-        :param: lifecycle_node_matcher is a callable which returns True if the
-            given lifecycle node should be affected by this event.
+        :param: system_part_matcher is a callable which returns True if the
+            given system part should be affected by this event.
         :param: mode_name is the name of the requested mode
         """
         super().__init__()
-        self.__lifecycle_node_matcher = lifecycle_node_matcher
+        self.__system_part_matcher = system_part_matcher
         self.__mode_name = mode_name
-        print('ChangeMode event initialized for: '+mode_name)
+        print('ChangeMode event initialized for mode: '+mode_name)
 
     @property
-    def lifecycle_node_matcher(self) -> Callable[['LifecycleNode'], bool]:
-        """Getter for lifecycle_node_matcher."""
-        return self.__lifecycle_node_matcher
+    def system_part_matcher(self) -> Callable[['SystemPart'], bool]:
+        """Getter for system_part_matcher."""
+        return self.__system_part_matcher
 
     @property
     def mode_name(self) -> int:

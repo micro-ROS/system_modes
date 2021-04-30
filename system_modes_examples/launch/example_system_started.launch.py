@@ -45,18 +45,20 @@ def generate_launch_description():
                     'system_modes') + '/launch/mode_manager.launch.py'),
             launch_arguments={'modelfile': modelfile}.items())
 
-        drive_base = launch_system_modes.actions.SystemPart(
+        drive_base = launch_system_modes.actions.Node(
                 package='system_modes_examples',
                 executable='drive_base',
                 name='drive_base',
                 namespace='',
                 output='screen')
 
-        manipulator = launch.actions.IncludeLaunchDescription(
-            launch.launch_description_sources.PythonLaunchDescriptionSource(
-                ament_index_python.packages.get_package_share_directory(
-                    'system_modes_examples') + '/launch/manipulator.launch.py'),
-            launch_arguments={'modelfile': modelfile}.items())
+        manipulator = launch_system_modes.actions.Node(
+                package='system_modes_examples',
+                executable='manipulator',
+                name='manipulator',
+                namespace='',
+                output='screen')
+
 
         # Startup
         drive_base_configure = launch.actions.EmitEvent(
@@ -72,13 +74,13 @@ def generate_launch_description():
 
         drive_base_change_mode_to_DEFAULT = launch.actions.EmitEvent(
             event=launch_system_modes.events.ChangeMode(
-                lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
+                system_part_matcher=launch.events.matchers.matches_action(drive_base),
                 mode_name='__DEFAULT__',
             ))
 
         drive_base_change_mode_to_FAST = launch.actions.EmitEvent(
             event=launch_system_modes.events.ChangeMode(
-                lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
+                system_part_matcher=launch.events.matchers.matches_action(drive_base),
                 mode_name='FAST',
             ))
 
@@ -110,11 +112,11 @@ def generate_launch_description():
         description.add_action(manipulator)
         description.add_action(drive_base_configure)
     except TypeError as err:
-        print('TypeError: '+err)
+        print('TypeError: ' + str(err))
     except NameError as err:
-        print('NameError: '+err)
+        print('NameError: ' + str(err))
     except AttributeError as err:
-        print('AttributeError: '+err)
+        print('AttributeError: ' + str(err))
     except Exception as err:
         exception_type = type(err).__name__
         print('--Exception of type: ' + exception_type)

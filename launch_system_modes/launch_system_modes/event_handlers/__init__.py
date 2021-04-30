@@ -15,7 +15,9 @@
 """Package for launch_system_modes.event_handlers."""
 
 from .on_mode_changed import OnModeChanged
+from .on_state_transition import OnStateTransition
 
 __all__ = [
     'OnModeChanged',
+    'OnStateTransition',
 ]

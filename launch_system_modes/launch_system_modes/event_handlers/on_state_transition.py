@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for OnModeChanged class."""
+"""Module for OnStateTransition class."""
 
 from typing import Callable
 from typing import Optional
@@ -23,24 +23,26 @@ from launch.event_handler import EventHandler
 from launch.some_actions_type import SomeActionsType
 from launch.some_substitutions_type import SomeSubstitutionsType
 
-from ..actions import SystemPart
-from ..events import ModeChanged
+from ..actions import System
+from ..events import StateTransition
 
 
-class OnModeChanged(EventHandler):
+class OnStateTransition(EventHandler):
     """Convenience class for handling a mode change of a system part."""
 
     def __init__(
         self,
         *,
         entities: SomeActionsType,
-        target_system_part: SystemPart = None,
-        goal_mode: Optional[SomeSubstitutionsType] = None,
+        target_system_part: System = None,
+        transition: Optional[SomeSubstitutionsType] = None,
+        start_state: Optional[SomeSubstitutionsType] = None,
+        goal_state: Optional[SomeSubstitutionsType] = None,
         matcher: Optional[Callable[[Event], bool]] = None,
         **kwargs
     ) -> None:
         """
-        Create an OnModeChanged event handler.
+        Create an OnStateTransition event handler.
 
         There are several matching options, each of which is compared with the
         event and must match it to have the handler handle the event.
@@ -48,17 +50,28 @@ class OnModeChanged(EventHandler):
         being considered (and therefore not required) when matching the event.
         If matcher is given, the other conditions are not considered.
         """
-        if not isinstance(target_system_part, (SystemPart, type(None))):
-            raise RuntimeError("OnModeChanged requires a 'SystemPart' action as the target")
+        if not isinstance(target_system_part, (System, type(None))):
+            raise RuntimeError("OnStateTransition requires a 'System' action as the target")
+
+        self.__target_system_part = target_system_part
         # Handle optional matcher argument.
         self.__custom_matcher = matcher
         if self.__custom_matcher is None:
             self.__custom_matcher = (
                 lambda event: (
-                    isinstance(event, ModeChanged) and (
+                    isinstance(event, StateTransition) and (
                         target_system_part is None or
                         event.action == target_system_part
-                    ) and (event.goal_mode == goal_mode)
+                    ) and (
+                        transition is None or
+                        event.transition == transition
+                    ) and (
+                        start_state is None or
+                        event.start_state == start_state
+                    ) and (
+                        goal_state is None or
+                        event.goal_state == goal_state
+                    )
                 )
             )
         # Call parent init.
@@ -67,11 +80,9 @@ class OnModeChanged(EventHandler):
             entities=entities,
             **kwargs
         )
-        self.__goal_mode = goal_mode
-        self.__target_system_part = target_system_part
-        print('OnModeChanged event handler initialized for part "'
-              + self.__target_system_part.get_name()
-              + '" and mode: ' + self.__goal_mode)
+        print('OnStateTransition event handler initialized for part "'
+              + target_system_part.get_name()
+              + '" and target state: ' + goal_state)
 
     @property
     def handler_description(self) -> Text:
@@ -82,7 +93,7 @@ class OnModeChanged(EventHandler):
     def matcher_description(self):
         """Return the string description of the matcher."""
         if self.__target_system_part is None:
-            return 'event == ModeChanged'
-        return 'event == ModeChanged and event.action == LifecycleNode({})'.format(
+            return 'event == StateTransition'
+        return 'event == StateTransition and event.action == System({})'.format(
             hex(id(self.__target_system_part))
         )

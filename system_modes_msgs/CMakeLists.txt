@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+
 project(system_modes_msgs)
 
 # Default to C++14
@@ -10,7 +11,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_cppcheck REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # generate service

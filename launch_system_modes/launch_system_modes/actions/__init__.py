@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Package for launch_system_modes.events."""
+"""Package for launch_system_modes.actions."""
 
+from .node import Node
 from .system import System
 from .system_part import SystemPart
 
 __all__ = [
+    'Node',
     'System',
     'SystemPart',
 ]

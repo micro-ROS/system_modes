@@ -25,7 +25,7 @@ if False:
 
 
 class StateTransition(Event):
-    """Event emitted when a system mode changed."""
+    """Event emitted when a state changed."""
 
     name = 'launch_system_modes.events.StateTransition'
 

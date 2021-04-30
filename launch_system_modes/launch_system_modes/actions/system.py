@@ -28,13 +28,13 @@ from launch_ros.ros_adapters import get_ros_node
 
 import system_modes_msgs.msg
 import system_modes_msgs.srv
+import lifecycle_msgs.msg
 
 from .system_part import SystemPart
 from ..events import ChangeMode
 from ..events import ChangeState
 from ..events import ModeChanged
 from ..events import StateTransition
-
 
 class System(Action, SystemPart):
     """Action that handles system modes of systems."""
@@ -58,7 +58,8 @@ class System(Action, SystemPart):
         self.node_name = self.get_name()  # todo: get rid of node_name
 
         self.__logger = launch.logging.get_logger(__name__)
-        self.__rclpy_subscription = None
+        self.__rclpy_mode_subscription = None
+        self.__rclpy_state_subscription = None
         print('System action "' + self.get_name() + '" initialized')
 
     def _on_mode_event(self, context, msg):
@@ -66,22 +67,25 @@ class System(Action, SystemPart):
         try:
             event = ModeChanged(action=self, msg=msg)
             self.__current_mode = msg.goal_mode.label
+            print(' -> emitting ModeChanged event for ' + self.get_name() + '\'s change to ' + msg.goal_mode.label)
             context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
         except Exception as exc:
             self.__logger.error(
                 "Exception in handling of 'system_modes.msg.ModeEvent': {}".format(exc))
 
     def _on_state_event(self, context, msg):
-        print('System action "' + self.get_name() + '" caught transition event ' + msg.transition.id)
+        print('System action "' + self.get_name() + '" caught transition event ' + str(msg.transition.id))
         try:
             event = StateTransition(action=self, msg=msg)
             self.__current_state = msg.goal_state.label
+            print(' -> emitting StateTransition event for ' + self.get_name() + '\'s change to ' + msg.goal_state.label)
             context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
         except Exception as exc:
             self.__logger.error(
                 "Exception in handling of 'lifecycle_msgs.msg.TransitionEvent': {}".format(exc))
 
     def _call_change_mode(self, request, context: launch.LaunchContext):
+        print('System action "' + self.get_name() + '" _call_change_mode')
         while not self.__rclpy_change_mode_client.wait_for_service(timeout_sec=1.0):
             if context.is_shutdown:
                 self.__logger.warning(
@@ -122,7 +126,8 @@ class System(Action, SystemPart):
             )
 
     def _call_change_state(self, request, context: launch.LaunchContext):
-        while not self.__rclpy_change_dtate_client.wait_for_service(timeout_sec=1.0):
+        print('System action "' + self.get_name() + '" _call_change_state')
+        while not self.__rclpy_change_state_client.wait_for_service(timeout_sec=1.0):
             if context.is_shutdown:
                 self.__logger.warning(
                     "Abandoning wait for the '{}' service, due to shutdown.".format(
@@ -162,20 +167,24 @@ class System(Action, SystemPart):
             )
 
     def _on_change_mode_event(self, context: launch.LaunchContext) -> None:
+        print('System action "' + self.get_name() + '" caught mode change request')
         typed_event = cast(ChangeMode, context.locals.event)
-        if not typed_event.lifecycle_node_matcher(self):
+        if not typed_event.system_part_matcher(self):
             return None
         request = system_modes_msgs.srv.ChangeMode.Request()
         request.mode_name = typed_event.mode_name
+        print(' -> attempting mode change of ' + self.get_name() + ' to ' + typed_event.mode_name)
         context.add_completion_future(
             context.asyncio_loop.run_in_executor(None, self._call_change_mode, request, context))
 
     def _on_change_state_event(self, context: launch.LaunchContext) -> None:
+        print('System action "' + self.get_name() + '" caught state change request')
         typed_event = cast(ChangeState, context.locals.event)
         if not typed_event.system_part_matcher(self):
             return None
         request = lifecycle_msgs.srv.ChangeState.Request()
         request.transition.id = typed_event.transition_id
+        print(' -> attempting state change of ' + self.get_name() + ' to ' + str(typed_event.transition_id))
         context.add_completion_future(
             context.asyncio_loop.run_in_executor(None, self._call_change_state, request, context))
 
@@ -185,16 +194,23 @@ class System(Action, SystemPart):
 
         Delegated to :meth:`launch.actions.ExecuteProcess.execute`.
         """
-        self._perform_substitutions(context)  # ensure self.node_name is expanded
+        #self._perform_substitutions(context)  # ensure self.node_name is expanded
         if '<node_name_unspecified>' in self.node_name:
             raise RuntimeError('node_name unexpectedly incomplete for system_modes node')
         node = get_ros_node(context)
 
         # Create a subscription to monitor the mode changes of the subprocess.
-        self.__rclpy_subscription = node.create_subscription(
+        self.__rclpy_mode_subscription = node.create_subscription(
             system_modes_msgs.msg.ModeEvent,
             '{}/mode_event'.format(self.node_name),
             functools.partial(self._on_mode_event, context),
+            10)
+
+        # Create a subscription to monitor the state changes of the subprocess.
+        self.__rclpy_state_subscription = node.create_subscription(
+            lifecycle_msgs.msg.TransitionEvent,
+            '{}/transition_event'.format(self.node_name),
+            functools.partial(self._on_state_event, context),
             10)
 
         # Create a service client to change mode on demand.

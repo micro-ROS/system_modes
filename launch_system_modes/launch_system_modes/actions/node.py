@@ -60,9 +60,11 @@ class Node(LifecycleNode, SystemPart):
         print('SystemPart action "' + self.get_name() + '" initialized')
 
     def _on_mode_event(self, context, msg):
+        print('Node action "' + self.get_name() + '" caught mode event ' + msg.goal_mode.label)
         try:
             event = ModeChanged(action=self, msg=msg)
             self.__current_mode = msg.goal_mode.label
+            print(' -> emitting ModeChanged event for ' + self.get_name() + '\'s change to ' + msg.goal_mode.label)
             context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
         except Exception as exc:
             self.__logger.error(
@@ -109,11 +111,13 @@ class Node(LifecycleNode, SystemPart):
             )
 
     def _on_change_mode_event(self, context: launch.LaunchContext) -> None:
+        print('Node action "' + self.get_name() + '" caught mode change request')
         typed_event = cast(ChangeMode, context.locals.event)
         if not typed_event.system_part_matcher(self):
             return None
         request = system_modes_msgs.srv.ChangeMode.Request()
         request.mode_name = typed_event.mode_name
+        print(' -> attempting mode change of ' + self.get_name() + ' to ' + typed_event.mode_name)
         context.add_completion_future(
             context.asyncio_loop.run_in_executor(None, self._call_change_mode, request, context))
 

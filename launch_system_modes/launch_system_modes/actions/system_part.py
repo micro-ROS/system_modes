@@ -16,15 +16,17 @@
 class SystemPart:
 
     def __init__(self, name, namespace):
-      """
-      Construct a SystemPart action. This is a marker class to be able to match
-      systems and lifecycle nodes within the event handlers.
+        """
+        Construct a SystemPart action.
 
-      :param name: The name of the lifecycle node or system.
-      :param namespace: The namespace of the lifecycle node or system.
-      """
-      self.__part_name = name
-      self.__namespace = namespace
+        This is a marker class to be able to match systems and lifecycle nodes within the event
+        handlers.
+
+        :param name: The name of the lifecycle node or system.
+        :param namespace: The namespace of the lifecycle node or system.
+        """
+        self.__part_name = name
+        self.__namespace = namespace
 
     def get_name(self):
         return self.__part_name

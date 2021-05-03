@@ -26,15 +26,16 @@ from launch.action import Action
 import launch.logging
 from launch_ros.ros_adapters import get_ros_node
 
+import lifecycle_msgs.msg
 import system_modes_msgs.msg
 import system_modes_msgs.srv
-import lifecycle_msgs.msg
 
 from .system_part import SystemPart
 from ..events import ChangeMode
 from ..events import ChangeState
 from ..events import ModeChanged
 from ..events import StateTransition
+
 
 class System(Action, SystemPart):
     """Action that handles system modes of systems."""
@@ -67,18 +68,21 @@ class System(Action, SystemPart):
         try:
             event = ModeChanged(action=self, msg=msg)
             self.__current_mode = msg.goal_mode.label
-            print(' -> emitting ModeChanged event for ' + self.get_name() + '\'s change to ' + msg.goal_mode.label)
+            print(' -> emitting ModeChanged event for ' + self.get_name() + '\'s change to '
+                  + msg.goal_mode.label)
             context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
         except Exception as exc:
             self.__logger.error(
                 "Exception in handling of 'system_modes.msg.ModeEvent': {}".format(exc))
 
     def _on_state_event(self, context, msg):
-        print('System action "' + self.get_name() + '" caught transition event ' + str(msg.transition.id))
+        print('System action "' + self.get_name() + '" caught transition event '
+              + str(msg.transition.id))
         try:
             event = StateTransition(action=self, msg=msg)
             self.__current_state = msg.goal_state.label
-            print(' -> emitting StateTransition event for ' + self.get_name() + '\'s change to ' + msg.goal_state.label)
+            print(' -> emitting StateTransition event for ' + self.get_name() + '\'s change to '
+                  + msg.goal_state.label)
             context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
         except Exception as exc:
             self.__logger.error(
@@ -184,7 +188,8 @@ class System(Action, SystemPart):
             return None
         request = lifecycle_msgs.srv.ChangeState.Request()
         request.transition.id = typed_event.transition_id
-        print(' -> attempting state change of ' + self.get_name() + ' to ' + str(typed_event.transition_id))
+        print(' -> attempting state change of ' + self.get_name() + ' to '
+              + str(typed_event.transition_id))
         context.add_completion_future(
             context.asyncio_loop.run_in_executor(None, self._call_change_state, request, context))
 
@@ -194,7 +199,7 @@ class System(Action, SystemPart):
 
         Delegated to :meth:`launch.actions.ExecuteProcess.execute`.
         """
-        #self._perform_substitutions(context)  # ensure self.node_name is expanded
+        # self._perform_substitutions(context)  # ensure self.node_name is expanded
         if '<node_name_unspecified>' in self.node_name:
             raise RuntimeError('node_name unexpectedly incomplete for system_modes node')
         node = get_ros_node(context)

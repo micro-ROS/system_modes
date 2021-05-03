@@ -59,7 +59,6 @@ def generate_launch_description():
                 namespace='',
                 output='screen')
 
-
         # Startup
         drive_base_configure = launch.actions.EmitEvent(
             event=launch_ros.events.lifecycle.ChangeState(

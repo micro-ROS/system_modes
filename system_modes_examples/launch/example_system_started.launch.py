@@ -12,8 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
-
 import ament_index_python.packages
 
 import launch
@@ -22,10 +20,6 @@ import launch.events
 
 import launch.launch_description_sources
 import launch.substitutions
-
-import launch_ros.actions
-import launch_ros.events
-import launch_ros.events.lifecycle
 
 import launch_system_modes.actions
 import launch_system_modes.event_handlers
@@ -103,4 +97,3 @@ def generate_launch_description():
     description.add_action(manipulator)
     description.add_action(actuation_configure)
     return description
-

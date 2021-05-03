@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+
 project(system_modes_msgs)
 
 # Default to C++14

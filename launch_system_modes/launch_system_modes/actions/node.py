@@ -65,7 +65,7 @@ class Node(LifecycleNode, SystemPart):
         event = ModeChanged(action=self, msg=msg)
         self.__current_mode = msg.goal_mode.label
         print(' -> emitting ModeChanged event for '
-              + self.get_name() + '\'s change to ' + msg.goal_mode.label)
+              + self.get_name() + ' change to ' + msg.goal_mode.label)
         context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
 
     def _call_change_mode(self, request, context: launch.LaunchContext):

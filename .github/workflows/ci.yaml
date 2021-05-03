@@ -2,9 +2,9 @@ name: "Build action: Foxy + Rolling"
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, dev ]
+    branches: [ master ]
   schedule:
     # Run once per day to detect broken dependencies.
     - cron: '17 6 * * *'
@@ -22,12 +22,19 @@ jobs:
     - uses: ros-tooling/setup-ros@0.1.4
       with:
         required-ros-distributions: ${{ matrix.ros_distribution }}
-    - uses : ros-tooling/action-ros-ci@0.2.0
+    - uses : ros-tooling/action-ros-ci@v0.2
       with:
         package-name: "launch_system_modes system_modes system_modes_examples system_modes_msgs"
         target-ros2-distro: ${{ matrix.ros_distribution }}
-        vcs-repo-file-url: ""
-        colcon-mixin-name: coverage-gcc
+        colcon-defaults: |
+          {
+            "build": {
+              "mixin": ["coverage-gcc", "coverage-pytest"]
+            },
+            "test": {
+              "mixin": ["coverage-pytest"]
+            }
+          }
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
     - uses: codecov/codecov-action@v1
       with:

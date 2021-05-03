@@ -68,7 +68,7 @@ class System(Action, SystemPart):
 
         event = ModeChanged(action=self, msg=msg)
         self.__current_mode = msg.goal_mode.label
-        print(' -> emitting ModeChanged event for ' + self.get_name() + '\'s change to '
+        print(' -> emitting ModeChanged event for ' + self.get_name() + 's change to '
               + msg.goal_mode.label)
         context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
 
@@ -78,7 +78,7 @@ class System(Action, SystemPart):
 
         event = StateTransition(action=self, msg=msg)
         self.__current_state = msg.goal_state.label
-        print(' -> emitting StateTransition event for ' + self.get_name() + '\'s change to '
+        print(' -> emitting StateTransition event for ' + self.get_name() + 's change to '
               + msg.goal_state.label)
         context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
 

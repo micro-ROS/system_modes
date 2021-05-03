@@ -61,15 +61,12 @@ class Node(LifecycleNode, SystemPart):
 
     def _on_mode_event(self, context, msg):
         print('Node action "' + self.get_name() + '" caught mode event ' + msg.goal_mode.label)
-        try:
-            event = ModeChanged(action=self, msg=msg)
-            self.__current_mode = msg.goal_mode.label
-            print(' -> emitting ModeChanged event for '
-                  + self.get_name() + '\'s change to ' + msg.goal_mode.label)
-            context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
-        except Exception as exc:
-            self.__logger.error(
-                "Exception in handling of 'system_modes.msg.ModeEvent': {}".format(exc))
+
+        event = ModeChanged(action=self, msg=msg)
+        self.__current_mode = msg.goal_mode.label
+        print(' -> emitting ModeChanged event for '
+              + self.get_name() + '\'s change to ' + msg.goal_mode.label)
+        context.asyncio_loop.call_soon_threadsafe(lambda: context.emit_event_sync(event))
 
     def _call_change_mode(self, request, context: launch.LaunchContext):
         while not self.__rclpy_change_mode_client.wait_for_service(timeout_sec=1.0):

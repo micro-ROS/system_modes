@@ -15,18 +15,18 @@ The actions, events, and event handlers implemented for system modes are:
 Two launch actions are implemented for system modes:
 
 * `System`: Declares a *system*, consisting of further system parts. and allows further system mode specific events and event handlers.
-* `SystemPart`: Declares a *system part*, i.e. a lifecycle node with system modes. It inherits from the [launch_ros/lifecycle_node](https://github.com/ros2/launch_ros/blob/master/launch_ros/launch_ros/actions/lifecycle_node.py) action and allows further system mode specific events and event handlers.
+* `Node`: Declares a *system part*, i.e. a lifecycle node with system modes. It inherits from the [launch_ros/lifecycle_node](https://github.com/ros2/launch_ros/blob/master/launch_ros/launch_ros/actions/lifecycle_node.py) action and allows further system mode specific events and event handlers.
 
 ### Events
 
-* `ChangeMode`: Trigger a mode change in a `System` or `SystemPart`
+* `ChangeMode`: Trigger a mode change in a `System` or `Node`
 * `ChangeState`: Trigger a state transition in a `System`, since [launch_ros/ChangeState](https://github.com/ros2/launch_ros/blob/master/launch_ros/launch_ros/events/lifecycle/change_state.py) only works for lifecycle nodes, not systems.
-* `ModeChanged`: Emitted when a `System` or `SystemPart` changed its mode.
+* `ModeChanged`: Emitted when a `System` or `Node` changed its mode.
 * `StateTransition`: Emitted when a `System` changed its state, since [launch_ros/StateTransition](https://github.com/ros2/launch_ros/blob/master/launch_ros/launch_ros/events/lifecycle/state_transition.py) only works for lifecycle nodes, not systems.
 
 ### Event Handlers
 
-* `OnModeChanged`: Event handler for mode changes of a `System` or `SystemPart`
+* `OnModeChanged`: Event handler for mode changes of a `System` or `Node`
 * `OnModeChanged`: Event handler for state transitions of a `System`
 
 ## Examples

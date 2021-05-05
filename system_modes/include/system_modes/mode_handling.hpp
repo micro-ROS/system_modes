@@ -16,8 +16,10 @@
 
 #include <stdint.h>
 #include <shared_mutex>
+
 #include <rclcpp/parameter.hpp>
 #include <rclcpp/parameter_map.hpp>
+
 
 #include <map>
 #include <mutex>
@@ -28,6 +30,7 @@
 
 #include "system_modes/mode.hpp"
 #include "system_modes/mode_impl.hpp"
+#include "system_modes/visibility_control.hpp"
 
 namespace system_modes
 {
@@ -50,11 +53,15 @@ using RulesMap = std::map<std::string, ModeRule>;
 class ModeHandling
 {
 public:
+  SYSTEM_MODES_PUBLIC
   explicit ModeHandling(const std::string & model_path);
   // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeHandling)
 
+  SYSTEM_MODES_PUBLIC
   virtual ~ModeHandling() = default;
+  
+  SYSTEM_MODES_PUBLIC
   virtual const std::vector<ModeRule> get_rules_for(
     const std::string & system,
     const StateAndMode & target);

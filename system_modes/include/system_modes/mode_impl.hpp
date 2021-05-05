@@ -19,6 +19,8 @@
 
 #include <lifecycle_msgs/msg/state.hpp>
 
+#include "system_modes/visibility_control.hpp"
+
 #include <map>
 #include <mutex>
 #include <vector>
@@ -34,26 +36,42 @@ namespace system_modes
 static const char DEFAULT_MODE[] = "__DEFAULT__";
 
 
-unsigned int state_id_(const std::string & state_label);
-const std::string state_label_(unsigned int state_id);
+SYSTEM_MODES_PUBLIC
+unsigned int
+state_id_(const std::string & state_label);
 
-unsigned int transition_id_(const std::string & transition_label);
-const std::string transition_label_(unsigned int transition_id);
+SYSTEM_MODES_PUBLIC
+const std::string
+state_label_(unsigned int state_id);
 
-unsigned int goal_state_(unsigned int transition_id);
+SYSTEM_MODES_PUBLIC
+unsigned int
+transition_id_(const std::string & transition_label);
+
+SYSTEM_MODES_PUBLIC
+const std::string
+transition_label_(unsigned int transition_id);
+
+SYSTEM_MODES_PUBLIC
+unsigned int
+goal_state_(unsigned int transition_id);
 
 struct StateAndMode
 {
   unsigned int state;
   std::string mode;
 
-  explicit StateAndMode(unsigned int newstate = 0, const std::string & newmode = "")
+  SYSTEM_MODES_PUBLIC
+  explicit
+  StateAndMode(unsigned int newstate = 0, const std::string & newmode = "")
   {
     state = newstate;
     mode = newmode;
   }
 
-  bool operator==(const StateAndMode & cmp) const
+  SYSTEM_MODES_PUBLIC
+  bool
+  operator==(const StateAndMode & cmp) const
   {
     if (cmp.state != state) {
       return false;
@@ -66,12 +84,16 @@ struct StateAndMode
            (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty());    // DEFAULT_MODE the same
   }
 
-  bool operator!=(const StateAndMode & cmp) const
+  SYSTEM_MODES_PUBLIC
+  bool
+  operator!=(const StateAndMode & cmp) const
   {
     return !(*this == cmp);
   }
 
-  void from_string(const std::string & sam)
+  SYSTEM_MODES_PUBLIC
+  void
+  from_string(const std::string & sam)
   {
     auto dot = sam.find(".");
     if (dot != std::string::npos) {
@@ -83,7 +105,9 @@ struct StateAndMode
     }
   }
 
-  std::string as_string() const
+  SYSTEM_MODES_PUBLIC
+  std::string
+  as_string() const
   {
     if (state != State::PRIMARY_STATE_ACTIVE || mode.empty()) {
       return state_label_(state);
@@ -100,31 +124,72 @@ struct StateAndMode
 class ModeImpl
 {
 public:
-  explicit ModeImpl(const std::string & mode_name);
-  virtual ~ModeImpl() = default;
+  SYSTEM_MODES_PUBLIC
+  explicit
+  ModeImpl(const std::string & mode_name);
+  
+  SYSTEM_MODES_PUBLIC
+  virtual
+  ~ModeImpl() = default;
+  
+  SYSTEM_MODES_PUBLIC
   ModeImpl(const ModeImpl & copy) = delete;
 
-  virtual std::string get_name() const;
+  SYSTEM_MODES_PUBLIC
+  virtual std::string
+  get_name() const;
 
-  virtual void add_parameter(const rclcpp::Parameter & parameter);
-  virtual void add_parameters(const std::vector<rclcpp::Parameter> & parameters);
-  virtual void add_part_mode(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  add_parameter(const rclcpp::Parameter & parameter);
+  
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  add_parameters(const std::vector<rclcpp::Parameter> & parameters);
+  
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  add_part_mode(
     const std::string & part,
     const StateAndMode stateAndMode);
 
-  virtual void set_parameter(const rclcpp::Parameter & parameter);
-  virtual void set_parameters(const std::vector<rclcpp::Parameter> & parameters);
-  virtual void set_part_mode(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  set_parameter(const rclcpp::Parameter & parameter);
+  
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  set_parameters(const std::vector<rclcpp::Parameter> & parameters);
+  
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  set_part_mode(
     const std::string & part,
     const StateAndMode stateAndMode);
 
-  virtual std::vector<std::string> get_parameter_names() const;
-  virtual rclcpp::Parameter get_parameter(const std::string & param_name) const;
-  virtual bool get_parameter(const std::string & param_name, rclcpp::Parameter & parameter) const;
-  virtual const std::vector<rclcpp::Parameter> get_parameters() const;
+  SYSTEM_MODES_PUBLIC
+  virtual std::vector<std::string>
+  get_parameter_names() const;
+  
+  SYSTEM_MODES_PUBLIC
+  virtual rclcpp::Parameter
+  get_parameter(const std::string & param_name) const;
+  
+  SYSTEM_MODES_PUBLIC
+  virtual bool
+  get_parameter(const std::string & param_name, rclcpp::Parameter & parameter) const;
+  
+  SYSTEM_MODES_PUBLIC
+  virtual const std::vector<rclcpp::Parameter>
+  get_parameters() const;
 
-  virtual const std::vector<std::string> get_parts() const;
-  virtual const StateAndMode get_part_mode(const std::string & part) const;
+  SYSTEM_MODES_PUBLIC
+  virtual const std::vector<std::string>
+  get_parts() const;
+  
+  SYSTEM_MODES_PUBLIC
+  virtual const StateAndMode
+  get_part_mode(const std::string & part) const;
 
 protected:
   std::string name_;

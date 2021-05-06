@@ -15,6 +15,7 @@
 """Main entry point for the `launch_system_modes` package."""
 
 from . import actions
+from . import event_handlers
 from . import events
 
 __all__ = [

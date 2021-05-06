@@ -1,0 +1,50 @@
+# system modes example
+---
+
+actuation:
+  ros__parameters:
+    type: system
+    parts:
+      manipulator
+      drive_base
+    modes:
+      __DEFAULT__:
+        manipulator: inactive
+        drive_base: active
+      MODERATE:
+        manipulator: active.WEAK
+        drive_base: active.SLOW
+      PERFORMANCE:
+        manipulator: active.STRONG
+        drive_base: active.FAST
+
+manipulator:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          max_torque: 0.1
+      WEAK:
+        ros__parameters:
+          max_torque: 0.1
+      STRONG:
+        ros__parameters:
+          max_torque: 0.2
+
+drive_base:
+  ros__parameters:
+    type: node
+    modes:
+      __DEFAULT__:
+        ros__parameters:
+          max_speed: 0.1
+          controller: PID
+      SLOW:
+        ros__parameters:
+          max_speed: 0.2
+          controller: PID
+      FAST:
+        ros__parameters:
+          max_speed: 0.9
+          controller: MPC

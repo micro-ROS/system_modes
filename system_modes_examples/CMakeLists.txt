@@ -17,14 +17,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rcl_lifecycle REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
-find_package(rosidl_typesupport_cpp REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-find_package(lifecycle_msgs REQUIRED)
 find_package(system_modes REQUIRED)
-find_package(system_modes_msgs REQUIRED)
 
 # drive_base
 add_executable(drive_base src/drive_base.cpp)
@@ -32,13 +25,7 @@ target_include_directories(drive_base PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(drive_base
-  "rclcpp"
-  "rcl_lifecycle"
-  "rclcpp_lifecycle"
-  "lifecycle_msgs"
-  "rosidl_typesupport_cpp"
   "system_modes"
-  "system_modes_msgs"
 )
 install(TARGETS drive_base
   EXPORT export_${PROJECT_NAME}
@@ -50,13 +37,7 @@ target_include_directories(manipulator PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(manipulator
-  "rclcpp"
-  "rcl_lifecycle"
-  "rclcpp_lifecycle"
-  "lifecycle_msgs"
-  "rosidl_typesupport_cpp"
   "system_modes"
-  "system_modes_msgs"
 )
 install(TARGETS manipulator
   EXPORT export_${PROJECT_NAME}

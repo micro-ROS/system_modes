@@ -42,14 +42,8 @@ public:
     RCLCPP_INFO(get_logger(), "Constructed lifecycle node '%s'", this->get_name());
 
     // Parameter declaration
-    this->declare_parameter(
-      "max_speed",
-      rclcpp::ParameterValue(rclcpp::PARAMETER_NOT_SET),
-      rcl_interfaces::msg::ParameterDescriptor());
-    this->declare_parameter(
-      "controller",
-      rclcpp::ParameterValue(rclcpp::PARAMETER_NOT_SET),
-      rcl_interfaces::msg::ParameterDescriptor());
+    this->declare_parameter("max_speed", 0.0);
+    this->declare_parameter("controller", "none");
 
     auto param_change_callback =
       [this](std::vector<rclcpp::Parameter> parameters) -> rcl_interfaces::msg::SetParametersResult

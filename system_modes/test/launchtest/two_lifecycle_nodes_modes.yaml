@@ -6,17 +6,17 @@ sys:
     type: system
     parts:
       A
-      B
+      foo/B
     modes:
       __DEFAULT__:
         A: inactive
-        B: active
+        foo/B: active
       DD:
         A: active.AA
-        B: active.EE
+        foo/B: active.EE
       CC:
         A: active.BB
-        B: active.FF
+        foo/B: active.FF
 
 A:
   ros__parameters:
@@ -32,7 +32,7 @@ A:
         ros__parameters:
           foo: 0.2
 
-B:
+foo/B:
   ros__parameters:
     type: node
     modes:

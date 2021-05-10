@@ -13,11 +13,11 @@ from system_modes_msgs.srv import ChangeMode
 
 class FakeLifecycleNode(Node):
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, ns=''):
+        super().__init__(name, namespace=ns)
 
-        self.declare_parameter('foo')
-        self.declare_parameter('bar')
+        self.declare_parameter('foo', 0.0)
+        self.declare_parameter('bar', 'ZERO')
         self.add_on_set_parameters_callback(self.parameter_callback)
 
         # State change service
@@ -29,14 +29,25 @@ class FakeLifecycleNode(Node):
     def parameter_callback(self, params):
         for p in params:
             if p.name == 'bar' and p.type_ == Parameter.Type.STRING:
-                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), p.name, p.value))
+                self.get_logger().info('Parameter %s/%s:%s:%s' % (
+                    ('' if self.get_namespace() == '/' else self.get_namespace()),
+                    self.get_name(),
+                    p.name,
+                    p.value))
             if p.name == 'foo' and p.type_ == Parameter.Type.DOUBLE:
-                self.get_logger().info('Parameter %s:%s:%s' % (self.get_name(), p.name, p.value))
+                self.get_logger().info('Parameter %s/%s:%s:%s' % (
+                    ('' if self.get_namespace() == '/' else self.get_namespace()),
+                    self.get_name(),
+                    p.name,
+                    p.value))
         return SetParametersResult(successful=True)
 
     def change_state_callback(self, request, response):
         response.success = True
-        self.get_logger().info('Transition %s:%s' % (self.get_name(), request.transition.label))
+        self.get_logger().info('Transition %s/%s:%s' % (
+            ('' if self.get_namespace() == '/' else self.get_namespace()),
+            self.get_name(),
+            request.transition.label))
 
         return response
 
@@ -76,7 +87,7 @@ def main(args=None):
     try:
         executor = SingleThreadedExecutor()
         node_a = FakeLifecycleNode('A')
-        node_b = FakeLifecycleNode('B')
+        node_b = FakeLifecycleNode('B', ns='foo')
 
         executor.add_node(node_a)
         executor.add_node(node_b)

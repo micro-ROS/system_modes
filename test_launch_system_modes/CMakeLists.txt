@@ -29,9 +29,9 @@ if(BUILD_TESTING)
 
   find_package(launch_testing_ament_cmake REQUIRED)
   file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/test_modes.yaml" MODELFILE)
+  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/expected_output" EXPECTED_OUTPUT)
 
   # Test launch actions, events, and event handlers with a node
-  file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/node_test_expected_output" EXPECTED_OUTPUT)
   configure_file(
       "test/node_test.launch.py.in"
       "test/node_test.launch.py"
@@ -43,18 +43,17 @@ if(BUILD_TESTING)
     TIMEOUT 30
     ENV)
 
-    # Test launch actions, events, and event handlers with a system
-    file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/system_test_expected_output" EXPECTED_OUTPUT)
-    configure_file(
-        "test/system_test.launch.py.in"
-        "test/system_test.launch.py"
-        @ONLY
-      )
-    add_launch_test(
-      "${CMAKE_CURRENT_BINARY_DIR}/test/system_test.launch.py"
-      TARGET "system_test"
-      TIMEOUT 30
-      ENV)
+  # Test launch actions, events, and event handlers with a system
+  configure_file(
+      "test/system_test.launch.py.in"
+      "test/system_test.launch.py"
+      @ONLY
+    )
+  add_launch_test(
+    "${CMAKE_CURRENT_BINARY_DIR}/test/system_test.launch.py"
+    TARGET "system_test"
+    TIMEOUT 30
+    ENV)
 endif()
 
 ament_export_include_directories(include)

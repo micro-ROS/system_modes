@@ -1,4 +1,0 @@
-drive_base on_configure
-drive_base on_activate
-parameter.*controller.*now.*PID
-parameter.*controller.*now.*MPC

@@ -8,11 +8,12 @@
 [![Build status](https://github.com/micro-ROS/system_modes/workflows/Build%20action%3A%20Foxy%20%2B%20Rolling/badge.svg)](https://github.com/micro-ROS/system_modes/actions)
 [![Code coverage](https://codecov.io/gh/micro-ROS/system_modes/branch/master/graph/badge.svg)](https://codecov.io/gh/micro-ROS/system_modes)
 
-This repository explores a system modes concept that is implemented for ROS 2 in three packages:
+This repository explores a system modes concept that is implemented for ROS 2 in these packages:
 * [system_modes_msgs](./system_modes_msgs/) provides the message types and services for system modes
 * [system_modes](./system_modes/) provides a library for system mode inference, a mode manager, and a mode monitor
 * [system_modes_examples](./system_modes_examples/) implements a simple example
 * [launch_system_modes](./launch_system_modes/) launch actions, events, and event handlers for system modes
+* [test_launch_system_modes](./test_launch_system_modes/) launch test for the launch_system_modes` package
 
 For further information, please contact [Arne Nordmann](https://github.com/norro) or [Ralph Lange](https://github.com/ralph-lange).
 

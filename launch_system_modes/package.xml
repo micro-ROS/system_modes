@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>launch_system_modes</name>
+  <version>0.7.1</version>
+  <description>System modes specific extensions to the launch tool.</description>
+  <maintainer email="arne.nordmann@de.bosch.com">Arne Nordmann</maintainer>
+  <license>Apache License 2.0</license>
+
+  <depend>ament_index_python</depend>
+  <depend>launch</depend>
+  <depend>system_modes_msgs</depend>
+  <depend>osrf_pycommon</depend>
+  <depend>rclpy</depend>
+  <depend>python3-importlib-metadata</depend>
+  <depend>python3-yaml</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -12,6 +12,8 @@ The SMH file [example_modes.yaml](./example_modes.yaml) specifies an *actuation*
 * The *drive\_base* node has a default mode, a *FAST* mode, and a *SLOW* mode, configuring different values for its *max_speed* and its controller (*PID* or *MPC*).
 * The *actuation* system comprises of these two nodes. It has a default mode, a *PERFORMANCE* mode, and a *MODERATE* mode, changing the modes of its two nodes accordingly.
 
+An additional SMH file [example_modes_with_namespaces.yaml](./example_modes.yaml) demonstates how system modes work with namespaces. The node setup and service calls of the example have to be adapted accordingly, e.g., starting two *manipulator* nodes with namespaces `left` resp. `right`.
+
 ## Running the Example
 
 ### Setup
@@ -19,17 +21,23 @@ The SMH file [example_modes.yaml](./example_modes.yaml) specifies an *actuation*
 Until this package provies a proper launch configruation, open 3 terminals to set up your example system:
 
 1. terminal 1: start the *drive\_base* node:  
-  $ `ros2 launch system_modes_examples drive_base.launch.py`  
+  $ `ros2 launch system_modes_examples drive_base.launch.py`
 1. terminal 2: start the *manipulator* node:  
-  $ `ros2 launch system_modes_examples manipulator.launch.py`  
+  $ `ros2 launch system_modes_examples manipulator.launch.py`
 1. terminal 3: start the [mode_manager](../system_modes/README.md#mode_manager) with the provided example model file:  
   $ `ros2 launch system_modes mode_manager.launch.py modelfile:=[path/to]/example_modes.yaml` (If you installed the binary package directly, the example model file is located in `/opt/ros/[distribution]/share/system_modes_examples/`. If you built the package from source, the file is typically located in `install/system_modes_examples/share/system_modes_examples/`.)
   The mode manager parses the provided SHM model file and creates the necessary services and topics to manage the system modes of the two nodes as well as services and topics to manage the system modes *and* the lifecycle of the *actuation* system.
   ![mode_manager](./doc/screenshot-manager.png "Screenshot of the mode manager")
 
-In an additional fourth terminal, start the [mode_monitor](../system_modes/README.md#mode_monitor) to see the system modes inference in action:  
+Example launch files launch provided with the the system_modes_examples package automatically launch these three nodes for you:  
 
-* $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to]/example_modes.yaml`  
+* `ros2 launch system_modes_examples example_system.launch.py` launches the three nodes drive_base, manipulator, and mode manager.
+* `ros2 launch system_modes_examples example_system_start_drive_base.launch.py` launches the three nodes drive_base, manipulator, and mode manager, but additionally transitions drive_base into its *FAST* mode with according system modes launch events, see [launch/example_system_start_drive_base.launch.py#L75-L104](https://github.com/micro-ROS/system_modes/blob/master/system_modes_examples/launch/example_system_start_drive_base.launch.py#L75-L104).
+* `ros2 launch system_modes_examples example_system_started.launch.py` launches the three nodes drive_base, manipulator, and mode manager, but additionally transitions the system into its *PERFORMANCE* mode with according system modes launch events, see [launch/example_system_started.launch.py#L67-L95](https://github.com/micro-ROS/system_modes/blob/master/system_modes_examples/launch/example_system_started.launch.py#L67-L95).
+
+In an additional terminal, you may start the [mode_monitor](../system_modes/README.md#mode_monitor) to see the system modes inference in action:  
+
+* $ `ros2 launch system_modes mode_monitor.launch.py modelfile:=[path/to]/example_modes.yaml`
 
 The monitor updates every second and displays the current lifecycle states and modes of the example system.
 ![mode_monitor](./doc/screenshot-monitor.png "Screenshot of the mode monitor")
@@ -41,11 +49,11 @@ Now that you set up the system and you are able to monitor it, play around with 
 In an additional fifth terminal, you may mimic a planning/executive component to change the state and mode of your system or its components.
 
 1. Start by initializing your system to inactive. The ROS 2 command:  
-  $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 1, label: configure}}"`  
-  will call the according service on the mode manager, which will change the state of the two nodes to *inactive* accordingly. Observe the console output of the mode manager and the two nodes as well as the mode monitor. The mode monitor should display the following system state:  
+  $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 1, label: configure}}"`
+  will call the according service on the mode manager, which will change the state of the two nodes to *inactive* accordingly. Observe the console output of the mode manager and the two nodes as well as the mode monitor. The mode monitor should display the following system state:
   ![mode_monitor](./doc/screenshot-monitor-inactive.png "Screenshot of the mode monitor")
 1. Activate your system with the following ROS 2 command:  
-  $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 3, label: activate}}"`  
+  $ `ros2 service call /actuation/change_state lifecycle_msgs/ChangeState "{transition: {id: 3, label: activate}}"`
   To change the *actuation* system into active and its default mode (since no explicit mode was requested), the mode manager will set the *drive\_base* to active and leave the *manipulator* inactive, as specified in the model file.
   The mode monitor should display the following system state:  
   ![mode_monitor](./doc/screenshot-monitor-active.png "Screenshot of the mode monitor")

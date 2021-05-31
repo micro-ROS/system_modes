@@ -127,11 +127,11 @@ public:
   SYSTEM_MODES_PUBLIC
   explicit
   ModeImpl(const std::string & mode_name);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual
   ~ModeImpl() = default;
-  
+
   SYSTEM_MODES_PUBLIC
   ModeImpl(const ModeImpl & copy) = delete;
 
@@ -142,11 +142,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   add_parameter(const rclcpp::Parameter & parameter);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   add_parameters(const std::vector<rclcpp::Parameter> & parameters);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   add_part_mode(
@@ -156,11 +156,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameter(const rclcpp::Parameter & parameter);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameters(const std::vector<rclcpp::Parameter> & parameters);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_part_mode(
@@ -170,15 +170,15 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual std::vector<std::string>
   get_parameter_names() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual rclcpp::Parameter
   get_parameter(const std::string & param_name) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual bool
   get_parameter(const std::string & param_name, rclcpp::Parameter & parameter) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<rclcpp::Parameter>
   get_parameters() const;
@@ -186,7 +186,7 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_parts() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const StateAndMode
   get_part_mode(const std::string & part) const;

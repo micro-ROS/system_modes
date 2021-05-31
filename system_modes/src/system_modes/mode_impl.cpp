@@ -222,7 +222,7 @@ static const map<unsigned int, unsigned int> GOAL_STATES_ = {
   {Transition::TRANSITION_ACTIVE_SHUTDOWN, State::PRIMARY_STATE_FINALIZED}
 };
 
-SYSTEM_MODES_LOCAL
+SYSTEM_MODES_PUBLIC
 const string
 state_label_(unsigned int state_id)
 {
@@ -233,7 +233,7 @@ state_label_(unsigned int state_id)
   }
 }
 
-SYSTEM_MODES_LOCAL
+SYSTEM_MODES_PUBLIC
 unsigned int
 state_id_(const string & state_label)
 {
@@ -245,7 +245,7 @@ state_id_(const string & state_label)
   return 0;
 }
 
-SYSTEM_MODES_LOCAL
+SYSTEM_MODES_PUBLIC
 const string
 transition_label_(unsigned int transition_id)
 {
@@ -256,7 +256,7 @@ transition_label_(unsigned int transition_id)
   }
 }
 
-SYSTEM_MODES_LOCAL
+SYSTEM_MODES_PUBLIC
 unsigned int
 transition_id_(const string & transition_label)
 {
@@ -268,7 +268,7 @@ transition_id_(const string & transition_label)
   throw out_of_range("Unknown transition " + transition_label);
 }
 
-SYSTEM_MODES_LOCAL
+SYSTEM_MODES_PUBLIC
 unsigned int
 goal_state_(unsigned int transition_id)
 {

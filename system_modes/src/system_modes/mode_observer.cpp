@@ -53,7 +53,7 @@ ModeObserver::ModeObserver(std::weak_ptr<rclcpp::Node> handle)
 
 ModeObserver::~ModeObserver()
 {
-};
+}
 
 StateAndMode
 ModeObserver::get(const std::string & part_name)

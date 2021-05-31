@@ -103,7 +103,7 @@ ModeManager::ModeManager()
 
 ModeManager::~ModeManager()
 {
-};
+}
 
 std::shared_ptr<ModeInference>
 ModeManager::inference()

@@ -25,8 +25,10 @@ def generate_launch_description():
         ament_index_python.packages.get_package_share_directory('system_modes_examples') +
         '/example_modes.yaml')
     return launch.LaunchDescription([
-        launch_ros.actions.Node(
+        launch_ros.actions.LifecycleNode(
             package='system_modes_examples',
             executable='drive_base',
+            name='drive_base',
+            namespace='',
             parameters=[{'modelfile': default_modelfile}],
             output='screen')])

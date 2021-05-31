@@ -16,8 +16,8 @@ class FakeLifecycleNode(Node):
     def __init__(self, name):
         super().__init__(name)
 
-        self.declare_parameter('foo')
-        self.declare_parameter('bar')
+        self.declare_parameter('foo', 0.0)
+        self.declare_parameter('bar', 'ZERO')
 
         self.pubs = self.create_publisher(
             TransitionEvent, self.get_name() + '/transition_event',

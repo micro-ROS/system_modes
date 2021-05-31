@@ -18,8 +18,8 @@ jobs:
         os: [ ubuntu-20.04 ]
         ros_distribution: [ foxy, rolling ]
     steps:
-    - uses: actions/checkout@v2.3.1
-    - uses: ros-tooling/setup-ros@0.1.4
+    - uses: actions/checkout@v2.3.4
+    - uses: ros-tooling/setup-ros@v0.2
       with:
         required-ros-distributions: ${{ matrix.ros_distribution }}
     - uses : ros-tooling/action-ros-ci@v0.2
@@ -36,6 +36,6 @@ jobs:
             }
           }
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v1.5.0
       with:
         file: ros_ws/lcov/total_coverage.info

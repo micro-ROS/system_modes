@@ -64,6 +64,3 @@ class TestModeManagement(unittest.TestCase):
             output_filter=output_filter,
             timeout=15,
             stream='stdout')
-
-        import time
-        time.sleep(1)

@@ -38,17 +38,22 @@ def generate_test_description():
         ])
 
     drive_base = launch_system_modes.actions.Node(
-            package='system_modes_examples',
-            executable='drive_base',
-            name='drive_base',
-            namespace='',
-            output='screen')
+        package='system_modes_examples',
+        executable='drive_base',
+        name='drive_base',
+        namespace='',
+        output='screen')
 
     # Startup
-    drive_base_configure = launch.actions.EmitEvent(
-        event=launch_ros.events.lifecycle.ChangeState(
-            lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
-            transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE))
+    drive_base_configure = launch.actions.TimerAction(
+        period=2.,
+        actions=[
+            launch.actions.EmitEvent(
+                event=launch_ros.events.lifecycle.ChangeState(
+                    lifecycle_node_matcher=launch.events.matchers.matches_action(drive_base),
+                    transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE))
+        ]
+    )
 
     drive_base_activate = launch.actions.EmitEvent(
         event=launch_ros.events.lifecycle.ChangeState(
@@ -88,13 +93,13 @@ def generate_test_description():
             entities=[drive_base_change_mode_to_FAST]))
 
     launch_description = LaunchDescription()
+    launch_description.add_action(mode_manager)
+    launch_description.add_action(drive_base)
     launch_description.add_action(on_inactive_handler)
     launch_description.add_action(on_active_handler)
     launch_description.add_action(on_DEFAULT_mode)
-    launch_description.add_action(mode_manager)
     launch_description.add_action(launch_testing.util.KeepAliveProc())
     launch_description.add_action(launch_testing.actions.ReadyToTest())
-    launch_description.add_action(drive_base)
     launch_description.add_action(drive_base_configure)
 
     return launch_description, locals()
@@ -115,9 +120,6 @@ class TestModeManagement(unittest.TestCase):
             output_filter=output_filter,
             timeout=15
         )
-
-        import time
-        time.sleep(1)
 
 @launch_testing.post_shutdown_test()
 class TestModeManagementShutdown(unittest.TestCase):

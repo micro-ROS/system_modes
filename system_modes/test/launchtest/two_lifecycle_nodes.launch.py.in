@@ -67,12 +67,3 @@ class TestModeManagement(unittest.TestCase):
             output_filter=output_filter,
             timeout=15
         )
-
-        import time
-        time.sleep(1)
-
-@launch_testing.post_shutdown_test()
-class TestModeManagementShutdown(unittest.TestCase):
-
-    def test_last_process_exit_code(self, proc_info, test_nodes):
-        launch_testing.asserts.assertExitCodes(proc_info, process=test_nodes)

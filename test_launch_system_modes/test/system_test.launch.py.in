@@ -99,7 +99,6 @@ def generate_test_description():
             entities=[actuation_change_mode_to_FAST]))
 
     launch_description = LaunchDescription()
-    launch_description.add_action(launch_testing.util.KeepAliveProc())
     launch_description.add_action(mode_manager)
     launch_description.add_action(actuation)
     launch_description.add_action(drive_base)
@@ -107,6 +106,7 @@ def generate_test_description():
     launch_description.add_action(on_inactive_handler)
     launch_description.add_action(on_active_handler)
     launch_description.add_action(on_DEFAULT_mode)
+    launch_description.add_action(launch_testing.util.KeepAliveProc())
     launch_description.add_action(launch_testing.actions.ReadyToTest())
     launch_description.add_action(actuation_configure)
 

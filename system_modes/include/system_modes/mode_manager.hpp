@@ -44,7 +44,7 @@ class ModeManager : public rclcpp::Node
 public:
   SYSTEM_MODES_PUBLIC
   ModeManager();
-  
+
   SYSTEM_MODES_PUBLIC
   ModeManager(const ModeManager &) = delete;
 
@@ -55,7 +55,7 @@ public:
   SYSTEM_MODES_PUBLIC
   std::shared_ptr<ModeInference>
   inference();
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   handle_system_deviation(const std::string & reason);
@@ -64,7 +64,7 @@ protected:
   SYSTEM_MODES_PUBLIC
   virtual void
   add_system(const std::string &);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   add_node(const std::string &);
@@ -96,13 +96,13 @@ protected:
     const std::string &,
     const std::shared_ptr<system_modes_msgs::srv::ChangeMode::Request>,
     std::shared_ptr<system_modes_msgs::srv::ChangeMode::Response>);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   on_get_mode(
     const std::string &,
     std::shared_ptr<system_modes_msgs::srv::GetMode::Response>);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   on_get_available_modes(
@@ -115,7 +115,7 @@ protected:
     const std::string &,
     unsigned int,
     bool transitive = true);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual bool
   change_mode(
@@ -127,7 +127,7 @@ protected:
   change_part_state(
     const std::string &,
     unsigned int);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   change_part_mode(

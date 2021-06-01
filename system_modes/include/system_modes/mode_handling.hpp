@@ -60,7 +60,7 @@ public:
 
   SYSTEM_MODES_PUBLIC
   virtual ~ModeHandling() = default;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<ModeRule> get_rules_for(
     const std::string & system,

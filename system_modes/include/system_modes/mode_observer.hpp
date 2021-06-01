@@ -54,7 +54,7 @@ class ModeObserver
 public:
   SYSTEM_MODES_PUBLIC
   explicit ModeObserver(std::weak_ptr<rclcpp::Node>);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual
   ~ModeObserver();

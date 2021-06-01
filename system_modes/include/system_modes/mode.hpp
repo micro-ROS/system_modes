@@ -20,8 +20,6 @@
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include <rclcpp/parameter_map.hpp>
 
-#include "system_modes/visibility_control.hpp"
-
 #include <map>
 #include <mutex>
 #include <string>
@@ -29,6 +27,8 @@
 #include <memory>
 #include <utility>
 #include <iostream>
+
+#include "system_modes/visibility_control.hpp"
 
 namespace system_modes
 {
@@ -49,13 +49,13 @@ class ModeBase
 public:
   SYSTEM_MODES_PUBLIC
   explicit ModeBase(const std::string & mode_name);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual ~ModeBase() = default;
+
   // cppcheck-suppress unknownMacro
-  
   SYSTEM_MODES_PUBLIC
-  RCLCPP_DISABLE_COPY(ModeBase)
+    RCLCPP_DISABLE_COPY(ModeBase)
 
   SYSTEM_MODES_PUBLIC
   std::string
@@ -64,11 +64,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameter(const rclcpp::Parameter & parameter) = 0;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameters(const std::vector<rclcpp::Parameter> & parameters) = 0;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_part_mode(
@@ -78,11 +78,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual rclcpp::Parameter
   get_parameter(const std::string & param_name) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual std::vector<std::string>
   get_parameter_names() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<rclcpp::Parameter>
   get_parameters() const;
@@ -90,7 +90,7 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_parts() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const StateAndMode
   get_part_mode(const std::string & part) const;
@@ -108,7 +108,7 @@ class DefaultMode : public ModeBase
 public:
   SYSTEM_MODES_PUBLIC
   DefaultMode();
-  
+
   SYSTEM_MODES_PUBLIC
   explicit DefaultMode(const std::string & mode_name) = delete;
   // cppcheck-suppress unknownMacro
@@ -117,7 +117,7 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameter(const rclcpp::Parameter & parameter);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameters(const std::vector<rclcpp::Parameter> & parameters);
@@ -133,9 +133,8 @@ class Mode : public ModeBase
 {
 public:
   SYSTEM_MODES_PUBLIC
-  explicit
-  Mode(const std::string & mode_name) = delete;
-  
+  explicit Mode(const std::string & mode_name) = delete;
+
   SYSTEM_MODES_PUBLIC
   Mode(const std::string & mode_name, const DefaultModePtr default_mode);
   // cppcheck-suppress unknownMacro
@@ -148,7 +147,7 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameter(const rclcpp::Parameter & parameter);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   set_parameters(const std::vector<rclcpp::Parameter> & parameters);

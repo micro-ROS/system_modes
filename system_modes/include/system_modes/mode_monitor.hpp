@@ -40,7 +40,7 @@ class ModeMonitor : public rclcpp::Node
 public:
   SYSTEM_MODES_PUBLIC
   ModeMonitor();
-  
+
   SYSTEM_MODES_PUBLIC
   ModeMonitor(const ModeMonitor &) = delete;
 
@@ -56,11 +56,11 @@ protected:
   SYSTEM_MODES_PUBLIC
   virtual void
   refresh() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual std::string
   header() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual std::string
   format_line(

@@ -19,14 +19,14 @@
 
 #include <lifecycle_msgs/msg/state.hpp>
 
-#include "system_modes/visibility_control.hpp"
-
 #include <map>
 #include <mutex>
 #include <vector>
 #include <string>
 #include <memory>
 #include <utility>
+
+#include "system_modes/visibility_control.hpp"
 
 using lifecycle_msgs::msg::State;
 
@@ -62,8 +62,7 @@ struct StateAndMode
   std::string mode;
 
   SYSTEM_MODES_PUBLIC
-  explicit
-  StateAndMode(unsigned int newstate = 0, const std::string & newmode = "")
+  explicit StateAndMode(unsigned int newstate = 0, const std::string & newmode = "")
   {
     state = newstate;
     mode = newmode;
@@ -125,8 +124,7 @@ class ModeImpl
 {
 public:
   SYSTEM_MODES_PUBLIC
-  explicit
-  ModeImpl(const std::string & mode_name);
+  explicit ModeImpl(const std::string & mode_name);
 
   SYSTEM_MODES_PUBLIC
   virtual

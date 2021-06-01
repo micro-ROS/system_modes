@@ -41,23 +41,23 @@ class ModeInference
 {
 public:
   SYSTEM_MODES_PUBLIC
-  explicit
-  ModeInference(const std::string & model_path);
+  explicit ModeInference(const std::string & model_path);
+
   // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(ModeInference)
 
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_all_parts() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_nodes() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_systems() const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual const std::vector<std::string>
   get_all_parts_of(
@@ -66,27 +66,27 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual void
   update(const std::string &, const StateAndMode &);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   update_state(const std::string &, unsigned int);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   update_mode(const std::string &, const std::string &);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   update_param(const std::string &, rclcpp::Parameter &);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
-  update_target(const std::string &, StateAndMode);
+    update_target(const std::string &, StateAndMode);
 
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   get(const std::string & part) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   get_or_infer(const std::string & part);
@@ -94,11 +94,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   infer(const std::string & part);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   infer_node(const std::string & part);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   infer_system(const std::string & part);
@@ -114,7 +114,7 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual Deviation
   infer_transitions();
-  
+
   SYSTEM_MODES_PUBLIC
   virtual Deviation
   get_deviation();
@@ -122,11 +122,11 @@ public:
   SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   get_target(const std::string & part) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual ModeConstPtr
   get_mode(const std::string & part, const std::string & mode) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual std::vector<std::string>
   get_available_modes(const std::string & part) const;
@@ -139,14 +139,14 @@ protected:
   SYSTEM_MODES_PUBLIC
   virtual bool
   matching_parameters(const rclcpp::Parameter &, const rclcpp::Parameter &) const;
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
   read_modes_from_model(const std::string & model_path);
-  
+
   SYSTEM_MODES_PUBLIC
   virtual void
-  add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
+    add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
   ModeHandling * mode_handling_;

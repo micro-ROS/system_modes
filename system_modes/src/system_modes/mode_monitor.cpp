@@ -104,6 +104,10 @@ ModeMonitor::ModeMonitor()
   timer_ = this->create_wall_timer(std::chrono::milliseconds(rate_), [this]() {this->refresh();});
 }
 
+ModeMonitor::~ModeMonitor()
+{
+}
+
 std::shared_ptr<ModeInference>
 ModeMonitor::inference()
 {

@@ -49,7 +49,8 @@ using rcl_interfaces::msg::ParameterEvent;
 
 shared_ptr<ModeManager> manager;
 
-void transition_callback(
+void
+transition_callback(
   const TransitionEvent::SharedPtr msg,
   const string & node_name)
 {
@@ -57,7 +58,8 @@ void transition_callback(
   manager->handle_system_deviation("transition");
 }
 
-void mode_change_callback(
+void
+mode_change_callback(
   const ModeEvent::SharedPtr msg,
   const string & node_name)
 {
@@ -66,7 +68,8 @@ void mode_change_callback(
   manager->handle_system_deviation("mode change");
 }
 
-void transition_request_callback(
+void
+transition_request_callback(
   const TransitionEvent::SharedPtr msg,
   const string & node_name)
 {
@@ -81,7 +84,8 @@ void transition_request_callback(
   }
 }
 
-void mode_request_callback(
+void
+mode_request_callback(
   const ModeEvent::SharedPtr msg,
   const string & node_name)
 {
@@ -108,7 +112,8 @@ parameter_event_callback(const ParameterEvent::SharedPtr event)
   manager->handle_system_deviation("parameter event");
 }
 
-int main(int argc, char * argv[])
+int
+main(int argc, char * argv[])
 {
   using namespace std::placeholders;
 

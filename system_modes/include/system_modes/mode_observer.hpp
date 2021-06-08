@@ -52,35 +52,44 @@ using system_modes_msgs::srv::GetMode;
 class ModeObserver
 {
 public:
+  SYSTEM_MODES_PUBLIC
   explicit ModeObserver(std::weak_ptr<rclcpp::Node>);
-  virtual ~ModeObserver() = default;
+
+  SYSTEM_MODES_PUBLIC
+  virtual
+  ~ModeObserver();
 
   /**
    * Getter for observed state and mode.
    *
    * Returns cached observed state and mode for requested system entity (system or node).
    */
+  SYSTEM_MODES_PUBLIC
   virtual StateAndMode
   get(const string & part_name);
 
   /**
    * Add part to list of observed parts.
    */
+  SYSTEM_MODES_PUBLIC
   virtual void
   observe(const string & part_name);
 
   /**
    * Remove part from list of observed parts.
    */
+  SYSTEM_MODES_PUBLIC
   virtual void
   stop_observing(const string & part_name);
 
 protected:
+  SYSTEM_MODES_PUBLIC
   virtual void
   transition_callback(
     const TransitionEvent::SharedPtr msg,
     const string & part_name);
 
+  SYSTEM_MODES_PUBLIC
   virtual void
   mode_event_callback(
     const ModeEvent::SharedPtr msg,

@@ -101,6 +101,10 @@ ModeManager::ModeManager()
     });
 }
 
+ModeManager::~ModeManager()
+{
+}
+
 std::shared_ptr<ModeInference>
 ModeManager::inference()
 {
@@ -280,7 +284,7 @@ ModeManager::on_get_state(
       response->current_state.id = stateAndMode.state;
       response->current_state.label = state_label_(stateAndMode.state);
     }
-  } catch (std::exception & ex) {
+  } catch (std::exception &) {
     response->current_state.id = State::PRIMARY_STATE_UNKNOWN;
     response->current_state.label = "unknown";
   }
@@ -341,7 +345,7 @@ ModeManager::on_get_mode(
   try {
     auto stateAndMode = this->mode_inference_->infer(node_name);
     response->current_mode = stateAndMode.mode;
-  } catch (std::exception & ex) {
+  } catch (std::exception &) {
     response->current_mode = "unknown";
   }
   RCLCPP_INFO(this->get_logger(), " mode %s", response->current_mode.c_str());
@@ -360,7 +364,7 @@ ModeManager::on_get_available_modes(
     node_name.c_str());
   try {
     response->available_modes = mode_inference_->get_available_modes(node_name);
-  } catch (std::exception & ex) {
+  } catch (std::exception &) {
     RCLCPP_INFO(this->get_logger(), " unknown");
   }
 }

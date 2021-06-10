@@ -85,8 +85,6 @@ protected:
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
 private:
-  ModeHandling * mode_handling_;
-
   StatesMap nodes_, nodes_target_, nodes_cache_;
   StatesMap systems_, systems_target_, systems_cache_;
   std::map<std::string, ModeMap> modes_;

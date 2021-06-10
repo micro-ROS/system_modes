@@ -42,8 +42,7 @@ namespace system_modes
 {
 
 ModeInference::ModeInference(const string & model_path)
-: mode_handling_(new ModeHandling(model_path)),
-  nodes_(), nodes_target_(),
+: nodes_(), nodes_target_(),
   systems_(), systems_target_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),

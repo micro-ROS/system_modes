@@ -505,13 +505,14 @@ ModeInference::read_modes_from_model(const string & model_path)
 
   rcl_params_t * yaml_params = rcl_yaml_node_struct_init(rcl_get_default_allocator());
   if (!rcl_parse_yaml_file(model_path.c_str(), yaml_params)) {
-    throw std::runtime_error("Failed to parse parameters " + model_path);
+    throw std::runtime_error("Failed to parse modes and parameters from: " + model_path);
   }
 
   rclcpp::ParameterMap param_map = rclcpp::parameter_map_from(yaml_params);
   rcl_yaml_node_struct_fini(yaml_params);
 
-  ParameterMap::iterator it;
+  ParameterMap::iterator it, part_start;
+  string old_part_name;
   for (it = param_map.begin(); it != param_map.end(); it++) {
     string part_name(it->first.substr(1));
 
@@ -520,6 +521,49 @@ ModeInference::read_modes_from_model(const string & model_path)
       this->modes_.emplace(part_name, ModeMap());
     }
 
+    // First, look for a default mode
+    string default_mode_name;
+    part_start = it;
+    for (auto & param : it->second) {
+      if (param.get_name().compare("type") != 0) {
+        string mode_name;
+
+        // Parse mode definitions
+        std::size_t foundm = param.get_name().find("modes.");
+        if (foundm != string::npos) {
+          std::size_t foundmr = param.get_name().find(".", 6);
+          if (foundmr != string::npos) {
+            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
+          } else {
+            continue;
+          }
+        } else {
+          continue;
+        }
+
+        // Take the first one as backup
+        if (default_mode_name.empty()) {
+          default_mode_name = mode_name;
+        }
+
+        std::size_t found = param.get_name().find("ros__parameters");
+        if (found != string::npos && param.get_name().compare("__default") == 0) {
+          default_mode_name = mode_name;
+        }
+
+        // valid parameter, add to mode map
+        if (mode_name.compare(DEFAULT_MODE) == 0) {
+          default_mode_name = DEFAULT_MODE;
+          continue;
+        }
+      }
+    }
+    if (default_mode_name.empty()) {
+      throw std::runtime_error("Failed to find default mode for " + part_name);
+    }
+    it = part_start;
+
+    // Build up modes
     ModeBasePtr mode;
     DefaultModePtr default_mode;
     for (auto & param : it->second) {
@@ -541,15 +585,10 @@ ModeInference::read_modes_from_model(const string & model_path)
 
         // valid parameter, add to mode map
         if (!mode || mode->get_name().compare(mode_name) != 0) {
-          if (mode_name.compare(DEFAULT_MODE) != 0) {
-            if (!default_mode) {
-              throw std::runtime_error(
-                      "Could not find default mode for mode '" +
-                      mode_name + "'. Make sure, default mode is defined first.");
-            }
+          if (mode_name.compare(default_mode_name) != 0) {
             mode = std::make_shared<Mode>(mode_name, default_mode);
           } else {
-            default_mode = std::make_shared<DefaultMode>();
+            default_mode = std::make_shared<DefaultMode>(default_mode_name);
             mode = default_mode;
           }
         }

@@ -105,8 +105,8 @@ ModeBase::print() const
   return os.str();
 }
 
-DefaultMode::DefaultMode()
-: ModeBase(DEFAULT_MODE)
+DefaultMode::DefaultMode(const std::string & mode_name)
+: ModeBase(mode_name)
 {
 }
 

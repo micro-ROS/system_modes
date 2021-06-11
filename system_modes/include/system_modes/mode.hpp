@@ -74,8 +74,7 @@ protected:
 class DefaultMode : public ModeBase
 {
 public:
-  DefaultMode();
-  explicit DefaultMode(const std::string & mode_name) = delete;
+  explicit DefaultMode(const std::string & mode_name = DEFAULT_MODE);
   // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(DefaultMode)
 

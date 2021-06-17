@@ -72,6 +72,8 @@ TEST(TestModeFilesParse, parse_rules) {
 TEST(TestModeFilesParse, test_rules) {
   ModeHandling * handling = new ModeHandling(MODE_FILE_RULES);
 
+  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "DEFAULT");
+
   auto rules = handling->get_rules_for("system", StateAndMode(State::PRIMARY_STATE_ACTIVE, "AA"));
 
   EXPECT_EQ("degrade_from_AA", rules[0].name);
@@ -79,7 +81,7 @@ TEST(TestModeFilesParse, test_rules) {
   EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_ACTIVE, "AA"), rules[0].system_target);
   EXPECT_EQ("part0", rules[0].part);
   EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_INACTIVE), rules[0].part_actual);
-  EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_ACTIVE), rules[0].new_system_target);
+  EXPECT_EQ(active_default, rules[0].new_system_target);
 
   EXPECT_EQ("inactive_from_AA", rules[1].name);
   EXPECT_EQ("system", rules[1].system);
@@ -95,7 +97,7 @@ TEST(TestModeFilesParse, test_rules) {
   EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_ACTIVE, "BB"), rules[0].system_target);
   EXPECT_EQ("part0", rules[0].part);
   EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_INACTIVE), rules[0].part_actual);
-  EXPECT_EQ(StateAndMode(State::PRIMARY_STATE_ACTIVE), rules[0].new_system_target);
+  EXPECT_EQ(active_default, rules[0].new_system_target);
 
   EXPECT_EQ("inactive_from_BB", rules[1].name);
   EXPECT_EQ("system", rules[1].system);

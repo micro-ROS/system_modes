@@ -29,7 +29,6 @@
 
 #include "system_modes/mode_observer.hpp"
 
-using std::cerr;
 using std::cout;
 using std::string;
 using std::vector;
@@ -38,7 +37,6 @@ using std::make_pair;
 using std::shared_ptr;
 
 using system_modes::ModeObserver;
-using system_modes::DEFAULT_MODE;
 using system_modes::StateAndMode;
 using system_modes_msgs::msg::ModeEvent;
 

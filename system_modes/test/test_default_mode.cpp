@@ -40,7 +40,7 @@ protected:
 
   void SetUp()
   {
-    default_mode = DefaultModePtr(new DefaultMode());
+    default_mode = DefaultModePtr(new DefaultMode("custom name"));
   }
 
   void TearDown()
@@ -57,6 +57,9 @@ TEST_F(TestDefaultMode, construction_and_destruction) {
   {
     DefaultMode mode;
     EXPECT_EQ("__DEFAULT__", mode.get_name());
+
+    DefaultMode mode_named("custom default mode name");
+    EXPECT_EQ("custom default mode name", mode_named.get_name());
   }
 }
 

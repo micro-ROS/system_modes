@@ -7,8 +7,9 @@ actuation:
     parts:
       manipulator
       drive_base
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
+      DEFAULT:
         manipulator: inactive
         drive_base: active
       MODERATE:
@@ -40,21 +41,22 @@ manipulator:
   ros__parameters:
     type: node
     modes:
-      __DEFAULT__:
-        ros__parameters:
-          max_torque: 0.1
       WEAK:
         ros__parameters:
           max_torque: 0.1
       STRONG:
         ros__parameters:
           max_torque: 0.2
+      __DEFAULT__:
+        ros__parameters:
+          max_torque: 0.1
 
 drive_base:
   ros__parameters:
     type: node
+    defaultmode: NORMAL
     modes:
-      __DEFAULT__:
+      NORMAL:
         ros__parameters:
           max_speed: 0.1
           controller: PID

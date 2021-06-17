@@ -4,11 +4,12 @@
 system:
   ros__parameters:
     type: system
+    defaultmode: DEFAULT
     parts:
       part0
       part1
     modes:
-      __DEFAULT__:
+      DEFAULT:
         part0: inactive
         part1: active
       AA:
@@ -21,11 +22,11 @@ system:
       degrade_from_AA:
         if_target: active.AA
         if_part: [part0, inactive]
-        new_target: active.__DEFAULT__
+        new_target: active.DEFAULT
       degrade_from_BB:
         if_target: active.BB
         if_part: [part0, inactive]
-        new_target: active.__DEFAULT__
+        new_target: active.DEFAULT
       inactive_from_AA:
         if_target: active.AA
         if_part: [part1, inactive]
@@ -55,8 +56,9 @@ part0:
 part1:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
+      DEFAULT:
         ros__parameters:
           foo: 0.1
           bar: WARN

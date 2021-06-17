@@ -778,7 +778,8 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
 }
 
 bool
-ModeInference::matching_modes(const std::string & part,
+ModeInference::matching_modes(
+  const std::string & part,
   const StateAndMode & a,
   const StateAndMode & b) const
 {

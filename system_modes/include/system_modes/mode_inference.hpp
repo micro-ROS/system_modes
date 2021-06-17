@@ -62,6 +62,11 @@ public:
   virtual StateAndMode infer_node(const std::string & part);
   virtual StateAndMode infer_system(const std::string & part);
 
+  virtual bool matching_modes(
+    const std::string & part,
+    const StateAndMode & a,
+    const StateAndMode & b) const;
+
   /**
    * Infers latest transitions of systems
    *
@@ -75,12 +80,15 @@ public:
 
   virtual StateAndMode get_target(const std::string & part) const;
   virtual ModeConstPtr get_mode(const std::string & part, const std::string & mode) const;
+  virtual ModeConstPtr get_default_mode(const std::string & part) const;
+  virtual const std::string get_default_mode_name(const std::string & part) const;
   virtual std::vector<std::string> get_available_modes(const std::string & part) const;
 
   virtual ~ModeInference() = default;
 
 protected:
   virtual bool matching_parameters(const rclcpp::Parameter &, const rclcpp::Parameter &) const;
+
   virtual void read_modes_from_model(const std::string & model_path);
   virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
 
@@ -88,12 +96,13 @@ private:
   StatesMap nodes_, nodes_target_, nodes_cache_;
   StatesMap systems_, systems_target_, systems_cache_;
   std::map<std::string, ModeMap> modes_;
+  std::map<std::string, std::string> default_modes_;
   ParametersMap parameters_;
 
   mutable std::shared_timed_mutex
     nodes_mutex_, systems_mutex_,
-    modes_mutex_, parts_mutex_,
-    param_mutex_;
+    modes_mutex_, default_modes_mutex_,
+    parts_mutex_, param_mutex_;
   mutable std::shared_timed_mutex
     nodes_target_mutex_, systems_target_mutex_;
   mutable std::shared_timed_mutex

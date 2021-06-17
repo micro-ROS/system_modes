@@ -28,8 +28,6 @@
 
 #include "system_modes/mode_manager.hpp"
 
-using std::cerr;
-using std::cout;
 using std::string;
 using std::vector;
 using std::function;
@@ -37,7 +35,6 @@ using std::make_pair;
 using std::shared_ptr;
 
 using system_modes::ModeManager;
-using system_modes::DEFAULT_MODE;
 using system_modes::StateAndMode;
 using system_modes_msgs::msg::ModeEvent;
 
@@ -77,7 +74,7 @@ void transition_request_callback(
   } else {
     manager->inference()->update_target(
       node_name,
-      StateAndMode(msg->goal_state.id, DEFAULT_MODE));
+      StateAndMode(msg->goal_state.id, manager->inference()->get_default_mode_name(node_name)));
   }
 }
 

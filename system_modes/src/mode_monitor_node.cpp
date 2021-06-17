@@ -28,9 +28,6 @@
 
 #include "system_modes/mode_monitor.hpp"
 
-using std::cerr;
-using std::cout;
-using std::endl;
 using std::string;
 using std::vector;
 using std::function;
@@ -41,7 +38,6 @@ using std::make_shared;
 using std::invalid_argument;
 
 using system_modes::ModeMonitor;
-using system_modes::DEFAULT_MODE;
 using system_modes::StateAndMode;
 using system_modes_msgs::msg::ModeEvent;
 using lifecycle_msgs::msg::State;
@@ -78,7 +74,7 @@ void transition_request_callback(
   } else {
     monitor->inference()->update_target(
       node_name,
-      StateAndMode(msg->goal_state.id, DEFAULT_MODE));
+      StateAndMode(msg->goal_state.id, monitor->inference()->get_default_mode_name(node_name)));
   }
 }
 

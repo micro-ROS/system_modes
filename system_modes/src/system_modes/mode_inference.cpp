@@ -45,8 +45,8 @@ ModeInference::ModeInference(const string & model_path)
 : nodes_(), nodes_target_(),
   systems_(), systems_target_(),
   modes_(),
-  nodes_mutex_(), systems_mutex_(), modes_mutex_(), parts_mutex_(),
-  nodes_target_mutex_(), systems_target_mutex_()
+  nodes_mutex_(), systems_mutex_(), modes_mutex_(), default_modes_mutex_(),
+  parts_mutex_(), nodes_target_mutex_(), systems_target_mutex_()
 {
   this->read_modes_from_model(model_path);
 }
@@ -204,12 +204,7 @@ ModeInference::infer_system(const string & part)
   string mode = "";
 
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
-  auto default_mode = this->modes_.at(part).at(DEFAULT_MODE);
-  if (!default_mode) {
-    throw std::out_of_range(
-            "Can't infer for system '" + part +
-            "', missing default mode.");
-  }
+  auto default_mode = get_default_mode(part);
 
   // If we don't know the target state/mode, we can hardly infer anything
   std::shared_lock<shared_mutex> stlock(this->systems_target_mutex_);
@@ -254,7 +249,6 @@ ModeInference::infer_system(const string & part)
         // to switch to inactive, then the actual state of the current entity will
         // go to error-processing until the mentioned part recovers.
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
-
         return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
       }
 
@@ -263,7 +257,6 @@ ModeInference::infer_system(const string & part)
         stateAndMode.state != State::PRIMARY_STATE_UNCONFIGURED)
       {
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
-
         return StateAndMode(State::TRANSITION_STATE_DEACTIVATING, "");
       }
     }
@@ -284,20 +277,10 @@ ModeInference::infer_system(const string & part)
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
           this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
-
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
-        // TODO(anordman): overly complictated. intent: we are in our target
-        // mode, if actual and target state are the same OR they can be
-        // considered same, i.e. unconfigured and inactive
-        if (
-          (stateAndMode.state != targetStateAndMode.state &&
-          !(targetStateAndMode.state == State::PRIMARY_STATE_INACTIVE &&
-          stateAndMode.state == State::PRIMARY_STATE_UNCONFIGURED)) ||
-          (stateAndMode.state == State::PRIMARY_STATE_ACTIVE &&
-          stateAndMode.mode.compare(targetStateAndMode.mode) != 0))
-        {
+        if (!matching_modes(partpart, stateAndMode, targetStateAndMode)) {
           // not in target state, or active but not in target mode
           inTargetMode = false;
           continue;
@@ -306,7 +289,6 @@ ModeInference::infer_system(const string & part)
       if (inTargetMode) {
         // Target state and target mode reached, all good!
         this->systems_[part] = StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
-
         return StateAndMode(State::PRIMARY_STATE_ACTIVE, targetMode);
       }
     }
@@ -321,14 +303,10 @@ ModeInference::infer_system(const string & part)
         // TODO(anordman): consider DONT-CARE
         if (stateAndMode.state == State::TRANSITION_STATE_ERRORPROCESSING) {
           this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
-
           return StateAndMode(State::TRANSITION_STATE_ERRORPROCESSING, "");
         }
 
-        if (stateAndMode.state != targetStateAndMode.state ||
-          (stateAndMode.state == State::PRIMARY_STATE_ACTIVE &&
-          stateAndMode.mode.compare(targetStateAndMode.mode) != 0))
-        {
+        if (!matching_modes(partpart, stateAndMode, targetStateAndMode)) {
           // not in target state, or active but not in target mode
           foundMode = false;
           continue;
@@ -337,13 +315,11 @@ ModeInference::infer_system(const string & part)
       if (foundMode) {
         // We are in a non-target mode, this means we are still activating
         this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
-
         return StateAndMode(State::TRANSITION_STATE_ACTIVATING, mode.first);
       }
     }
 
     this->systems_[part] = StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
-
     return StateAndMode(State::TRANSITION_STATE_ACTIVATING, "");
   }
 
@@ -355,13 +331,6 @@ ModeInference::infer_node(const string & part)
 {
   std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
   std::shared_lock<shared_mutex> prlock(this->param_mutex_);
-
-  auto default_mode = this->modes_.at(part).at(DEFAULT_MODE);
-  if (!default_mode) {
-    throw std::out_of_range(
-            "Can't infer for node '" + part +
-            "', missing default mode.");
-  }
 
   // Do we know the target mode?
   try {
@@ -396,18 +365,18 @@ ModeInference::infer_node(const string & part)
 
   // no target mode, so next we check the default mode
   bool inDefaultMode = true;
-  auto defaultMode = this->modes_.at(part).at(DEFAULT_MODE);
+  auto defaultMode = get_default_mode(part);
   for (auto param : defaultMode->get_parameter_names()) {
     if (!matching_parameters(
         defaultMode->get_parameter(param),
         parameters_.at(part).at(param)))
     {
       inDefaultMode = false;
-      continue;
+      break;
     }
   }
   if (inDefaultMode) {
-    return StateAndMode(State::PRIMARY_STATE_ACTIVE, DEFAULT_MODE);
+    return get_default_mode(part)->sm();
   }
 
   // no target mode, not default mode, so we try our luck, infering any mode from parameters
@@ -425,7 +394,7 @@ ModeInference::infer_node(const string & part)
     }
     if (foundMode) {
       // We are in a non-target mode, this means we are still activating
-      return StateAndMode(State::PRIMARY_STATE_ACTIVE, mode.first);
+      return mode.second->sm();
     }
   }
 
@@ -485,6 +454,20 @@ ModeInference::get_mode(const string & part, const string & mode) const
   return nullptr;
 }
 
+ModeConstPtr
+ModeInference::get_default_mode(const string & part) const
+{
+  std::shared_lock<shared_mutex> mlock(this->modes_mutex_);
+  return modes_.at(part).at(get_default_mode_name(part));
+}
+
+const std::string
+ModeInference::get_default_mode_name(const string & part) const
+{
+  std::shared_lock<shared_mutex> mlock(this->default_modes_mutex_);
+  return default_modes_.at(part);
+}
+
 std::vector<std::string>
 ModeInference::get_available_modes(const std::string & part) const
 {
@@ -501,6 +484,7 @@ ModeInference::read_modes_from_model(const string & model_path)
   std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
   std::unique_lock<shared_mutex> slock(this->systems_mutex_);
   std::unique_lock<shared_mutex> mlock(this->modes_mutex_);
+  std::unique_lock<shared_mutex> dmlock(this->default_modes_mutex_);
   std::unique_lock<shared_mutex> plock(this->parts_mutex_);
 
   rcl_params_t * yaml_params = rcl_yaml_node_struct_init(rcl_get_default_allocator());
@@ -511,7 +495,7 @@ ModeInference::read_modes_from_model(const string & model_path)
   rclcpp::ParameterMap param_map = rclcpp::parameter_map_from(yaml_params);
   rcl_yaml_node_struct_fini(yaml_params);
 
-  ParameterMap::iterator it, part_start;
+  ParameterMap::iterator it, part_start_it;
   string old_part_name;
   for (it = param_map.begin(); it != param_map.end(); it++) {
     string part_name(it->first.substr(1));
@@ -523,9 +507,12 @@ ModeInference::read_modes_from_model(const string & model_path)
 
     // First, look for a default mode
     string default_mode_name;
-    part_start = it;
+    part_start_it = it;
     for (auto & param : it->second) {
-      if (param.get_name().compare("type") != 0) {
+      if (param.get_name().compare("defaultmode") == 0) {
+        default_mode_name = param.value_to_string();
+        break;
+      } else if (param.get_name().compare("type") != 0) {
         string mode_name;
 
         // Parse mode definitions
@@ -546,26 +533,31 @@ ModeInference::read_modes_from_model(const string & model_path)
           default_mode_name = mode_name;
         }
 
-        std::size_t found = param.get_name().find("ros__parameters");
-        if (found != string::npos && param.get_name().compare("__default") == 0) {
-          default_mode_name = mode_name;
-        }
-
-        // valid parameter, add to mode map
+        /**
+         * Check for mode with name '__DEFAULT__'
+         *
+         * Necessary for backward-compatibility, will get deprecated soon, see
+         * https://github.com/micro-ROS/system_modes/issues/69
+         */
         if (mode_name.compare(DEFAULT_MODE) == 0) {
           default_mode_name = DEFAULT_MODE;
-          continue;
+          std::cout << "WARNING: Specifying the default mode just by its name '__DEFAULT__'" <<
+            " is deprecated. Please specify the 'defaultmode' parameter for '" <<
+            part_name << "' instead." << std::endl;
+          break;
         }
       }
     }
     if (default_mode_name.empty()) {
       throw std::runtime_error("Failed to find default mode for " + part_name);
     }
-    it = part_start;
 
-    // Build up modes
-    ModeBasePtr mode;
-    DefaultModePtr default_mode;
+    default_modes_[part_name] = default_mode_name;
+    it = part_start_it;
+
+    // Build up default mode
+    DefaultModePtr default_mode = std::make_shared<DefaultMode>(default_mode_name);
+    it = part_start_it;
     for (auto & param : it->second) {
       if (param.get_name().compare("type") != 0) {
         string mode_name;
@@ -582,15 +574,73 @@ ModeInference::read_modes_from_model(const string & model_path)
         } else {
           continue;
         }
+        if (mode_name.compare(default_mode_name) != 0) {
+          continue;
+        }
+
+        // valid parameter, add to mode map
+        std::size_t found = param.get_name().find("ros__parameters");
+        if (found != string::npos) {
+          this->add_param_to_mode(default_mode, param);
+        } else {
+          // part mode
+          string part_part = param.get_name();
+          std::size_t foundr = param.get_name().rfind(".");
+          if (foundr != string::npos) {
+            part_part = param.get_name().substr(foundr + 1);
+          }
+
+          string state(param.value_to_string());
+          string smode;
+          foundr = param.value_to_string().rfind(".");
+          if (foundr != string::npos) {
+            state = param.value_to_string().substr(0, foundr);
+            smode = param.value_to_string().substr(foundr + 1);
+          }
+
+          default_mode->set_part_mode(part_part, StateAndMode(state_id_(state), smode));
+        }
+        this->modes_[part_name].emplace(default_mode_name, default_mode);
+
+      } else {
+        if (param.value_to_string().compare("node") != 0) {
+          this->systems_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
+        } else {
+          this->nodes_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
+        }
+      }
+    }
+
+    // Build up non-default modes
+    ModeBasePtr mode;
+    it = part_start_it;
+    for (auto & param : it->second) {
+      if (param.get_name().compare("type") != 0) {
+        string mode_name;
+
+        // Parse mode definitions
+        std::size_t foundm = param.get_name().find("modes.");
+        if (foundm != string::npos) {
+          std::size_t foundmr = param.get_name().find(".", 6);
+          if (foundmr != string::npos) {
+            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
+          } else {
+            continue;
+          }
+        } else {
+          continue;
+        }
+        if (mode_name.compare(default_mode_name) == 0) {
+          continue;
+        }
 
         // valid parameter, add to mode map
         if (!mode || mode->get_name().compare(mode_name) != 0) {
-          if (mode_name.compare(default_mode_name) != 0) {
-            mode = std::make_shared<Mode>(mode_name, default_mode);
-          } else {
-            default_mode = std::make_shared<DefaultMode>(default_mode_name);
-            mode = default_mode;
-          }
+          mode = std::make_shared<Mode>(mode_name, default_mode);
         }
         std::size_t found = param.get_name().find("ros__parameters");
         if (found != string::npos) {
@@ -685,7 +735,7 @@ ModeInference::get_all_parts_of(const string & system) const
   if (system.empty()) {
     return std::vector<string>();
   }
-  return this->modes_.at(system).at(DEFAULT_MODE)->get_parts();
+  return get_default_mode(system)->get_parts();
 }
 
 bool
@@ -723,6 +773,29 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
     return true;
   }
   // TODO(anordman): More types
+
+  return false;
+}
+
+bool
+ModeInference::matching_modes(const std::string & part,
+  const StateAndMode & a,
+  const StateAndMode & b) const
+{
+  if (a == b) {
+    return true;
+  }
+
+  if (a.state == State::PRIMARY_STATE_ACTIVE &&
+    b.state == State::PRIMARY_STATE_ACTIVE &&
+    ((a.mode.empty() && b.mode.compare(get_default_mode_name(part)) == 0) ||
+    (b.mode.empty() && a.mode.compare(get_default_mode_name(part)) == 0)))
+  {
+    return true;  // We consider empty mode to be the same as default mode
+  }
+
+  // TODO(anordman): considered unconfigured and inactive the same as well?
+  // Should be fine from a system_modes point of view?
 
   return false;
 }

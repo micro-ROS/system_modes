@@ -405,8 +405,8 @@ ModeManager::change_state(
       this->change_part_state(part, transition_id);
     }
   } else {
-    RCLCPP_DEBUG(this->get_logger(), "  active, so trigger mode transition to __DEFAULT__");
-    this->change_mode(node_name, DEFAULT_MODE);
+    RCLCPP_DEBUG(this->get_logger(), "  active, so trigger mode transition to default");
+    this->change_mode(node_name, mode_inference_->get_default_mode_name(node_name));
   }
   return true;
 }
@@ -481,7 +481,7 @@ ModeManager::change_mode(
         // state/transition and mode via mode inference
         this->change_part_state(part, Transition::TRANSITION_ACTIVATE);
         if (stateAndMode.mode.empty()) {
-          this->change_part_mode(part, DEFAULT_MODE);
+          this->change_part_mode(part, mode_inference_->get_default_mode_name(part));
         } else {
           this->change_part_mode(part, stateAndMode.mode);
         }
@@ -530,13 +530,19 @@ ModeManager::change_part_state(const string & node, unsigned int transition)
 }
 
 void
-ModeManager::change_part_mode(const string & node, const string & mode)
+ModeManager::change_part_mode(const string & node, const string & m)
 {
   RCLCPP_DEBUG(
     this->get_logger(),
-    " changing mode of part %s to %s",
+    " changing mode of part %s to mode '%s'",
     node.c_str(),
-    mode.c_str());
+    m.c_str());
+
+  // We consider empty mode = default mode
+  auto mode = m;
+  if (mode.empty()) {
+    mode = mode_inference_->get_default_mode_name(node);
+  }
 
   auto request = std::make_shared<ChangeMode::Request>();
   request->mode_name = mode;

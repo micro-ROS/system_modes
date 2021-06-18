@@ -47,6 +47,48 @@ TEST(TestModeFilesParse, parsing) {
 
   EXPECT_NO_THROW(inference = new ModeInference(MODE_FILE_CORRECT));
   EXPECT_EQ(3u, inference->get_all_parts().size());
+
+  EXPECT_EQ("DEFAULT", inference->get_default_mode_name("system"));
+  EXPECT_EQ("__DEFAULT__", inference->get_default_mode_name("part0"));
+  EXPECT_EQ("NORMAL", inference->get_default_mode_name("part1"));
+
+  EXPECT_EQ(
+    State::PRIMARY_STATE_INACTIVE,
+    inference->get_default_mode("system")->get_part_mode("part0").state);
+  EXPECT_EQ(
+    State::PRIMARY_STATE_ACTIVE,
+    inference->get_default_mode("system")->get_part_mode("part1").state);
+
+  EXPECT_EQ(0.1, inference->get_default_mode("part0")->get_parameter("foo").as_double());
+  EXPECT_EQ("WARN", inference->get_default_mode("part0")->get_parameter("bar").as_string());
+
+  EXPECT_EQ(0.1, inference->get_default_mode("part1")->get_parameter("foo").as_double());
+  EXPECT_EQ("WARN", inference->get_default_mode("part1")->get_parameter("bar").as_string());
+}
+
+TEST(TestModeFilesParse, comparison) {
+  ModeInference * inference = new ModeInference(MODE_FILE_CORRECT);
+
+  StateAndMode active_empty(State::PRIMARY_STATE_ACTIVE, "");
+  StateAndMode active_default__(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "DEFAULT");
+  StateAndMode active_normal(State::PRIMARY_STATE_ACTIVE, "NORMAL");
+  StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
+
+  EXPECT_TRUE(inference->matching_modes("system", active_default, active_default));
+  EXPECT_FALSE(inference->matching_modes("system", active_empty, active_default__));
+  EXPECT_TRUE(inference->matching_modes("system", active_empty, active_default));
+  EXPECT_FALSE(inference->matching_modes("system", active_empty, active_normal));
+
+  EXPECT_TRUE(inference->matching_modes("part0", active_default__, active_default__));
+  EXPECT_TRUE(inference->matching_modes("part0", active_empty, active_default__));
+  EXPECT_FALSE(inference->matching_modes("part0", active_empty, active_default));
+  EXPECT_FALSE(inference->matching_modes("part0", active_empty, active_normal));
+
+  EXPECT_TRUE(inference->matching_modes("part1", active_normal, active_normal));
+  EXPECT_FALSE(inference->matching_modes("part1", active_empty, active_default__));
+  EXPECT_FALSE(inference->matching_modes("part1", active_empty, active_default));
+  EXPECT_TRUE(inference->matching_modes("part1", active_empty, active_normal));
 }
 
 TEST(TestModeFilesParse, initialization) {
@@ -65,11 +107,11 @@ TEST(TestModeFilesParse, initialization) {
   EXPECT_EQ(3u, inference->get_available_modes("part1").size());
 
   // default modes
-  auto mode = inference->get_mode("system", "__DEFAULT__");
+  auto mode = inference->get_default_mode("system");
   EXPECT_EQ(2u, mode->get_parts().size());
   EXPECT_EQ(State::PRIMARY_STATE_INACTIVE, mode->get_part_mode("part0").state);
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, mode->get_part_mode("part1").state);
-  mode = inference->get_mode("part0", "__DEFAULT__");
+  mode = inference->get_default_mode("part0");
   EXPECT_EQ(2u, mode->get_parameters().size());
   EXPECT_EQ(0.1, mode->get_parameter("foo").as_double());
   EXPECT_EQ("WARN", mode->get_parameter("bar").as_string());
@@ -106,15 +148,17 @@ TEST(TestModeInference, update_target) {
 TEST(TestModeInference, update_state_and_mode) {
   ModeInference inference(MODE_FILE_CORRECT);
 
-  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "DEFAULT");
+  StateAndMode active_normal(State::PRIMARY_STATE_ACTIVE, "NORMAL");
   StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
 
   inference.update_target("system", active_default);
   EXPECT_THROW(inference.update_state("system", active_default.state), std::out_of_range);
   EXPECT_THROW(inference.update_mode("system", active_default.mode), std::out_of_range);
+
   inference.update("part0", inactive);
-  inference.update_state("part1", active_default.state);
-  inference.update_mode("part1", active_default.mode);
+  inference.update_state("part1", active_normal.state);
+  inference.update_mode("part1", active_normal.mode);
   EXPECT_EQ(active_default.state, inference.get_or_infer("system").state);
   EXPECT_EQ(active_default.mode, inference.get_or_infer("system").mode);
 }
@@ -138,30 +182,32 @@ TEST(TestModeInference, inference) {
   ModeInference inference(MODE_FILE_CORRECT);
 
   // update node modes, test inferred system mode
-  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_system_default(State::PRIMARY_STATE_ACTIVE, "DEFAULT");
+  StateAndMode active_part0_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_part1_default(State::PRIMARY_STATE_ACTIVE, "NORMAL");
   StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
-  inference.update_target("system", active_default);
+  inference.update_target("system", active_system_default);
   inference.update("part0", inactive);
-  inference.update("part1", active_default);
+  inference.update("part1", active_part1_default);
 
   // System inference
   StateAndMode sm = inference.get_or_infer("system");
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, sm.state);
-  EXPECT_EQ("__DEFAULT__", sm.mode);
+  EXPECT_EQ(active_system_default.mode, sm.mode);
 
   // Node inference
   Parameter foo("foo", 0.2);
   Parameter bar("bar", "DBG");
   inference.update_param("part1", foo);
   inference.update_param("part1", bar);
-  EXPECT_EQ(active_default.state, inference.infer("part1").state);
+  EXPECT_EQ(active_part1_default.state, inference.infer("part1").state);
   EXPECT_EQ("AAA", inference.infer("part1").mode);
   Parameter foo2("foo", 0.1);
   Parameter bar2("bar", "DBG");
   inference.update_state("part0", State::PRIMARY_STATE_ACTIVE);
   inference.update_param("part0", foo2);
   inference.update_param("part0", bar2);
-  EXPECT_EQ(active_default.state, inference.infer("part0").state);
+  EXPECT_EQ(active_part1_default.state, inference.infer("part0").state);
   EXPECT_EQ("FOO", inference.infer("part0").mode);
 
   // System inference
@@ -172,11 +218,13 @@ TEST(TestModeInference, infer_transitions) {
   ModeInference inference(MODE_FILE_CORRECT);
 
   // update node modes, test inferred system mode
-  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_default__(State::PRIMARY_STATE_ACTIVE, "__DEFAULT__");
+  StateAndMode active_default(State::PRIMARY_STATE_ACTIVE, "DEFAULT");
+  StateAndMode active_normal(State::PRIMARY_STATE_ACTIVE, "NORMAL");
   StateAndMode inactive(State::PRIMARY_STATE_INACTIVE, "");
   inference.update_target("system", active_default);
   inference.update("part0", inactive);
-  inference.update("part1", active_default);
+  inference.update("part1", active_normal);
 
   // Expect to have one initial transition
   EXPECT_EQ(1u, inference.infer_transitions().size());
@@ -190,7 +238,7 @@ TEST(TestModeInference, infer_transitions) {
   auto transitions = inference.infer_transitions();
   EXPECT_EQ(1u, transitions.size());
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part1"].first.state);
-  EXPECT_EQ("__DEFAULT__", transitions["part1"].first.mode);
+  EXPECT_EQ("NORMAL", transitions["part1"].first.mode);
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part1"].second.state);
   EXPECT_EQ("AAA", transitions["part1"].second.mode);
 
@@ -209,7 +257,7 @@ TEST(TestModeInference, infer_transitions) {
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["part0"].second.state);
   EXPECT_EQ("FOO", transitions["part0"].second.mode);
   EXPECT_EQ(State::PRIMARY_STATE_ACTIVE, transitions["system"].first.state);
-  EXPECT_EQ("__DEFAULT__", transitions["system"].first.mode);
+  EXPECT_EQ("DEFAULT", transitions["system"].first.mode);
   EXPECT_EQ(State::TRANSITION_STATE_ACTIVATING, transitions["system"].second.state);
 
   // Expect to have cleared transitions

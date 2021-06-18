@@ -65,6 +65,10 @@ public:
   virtual const std::vector<std::string> get_parts() const;
   virtual const StateAndMode get_part_mode(const std::string & part) const;
 
+  /**
+   * Created StateAndMode struct that describes this mode
+   */
+  virtual const StateAndMode sm() const;
   virtual std::string print() const;
 
 protected:
@@ -74,8 +78,7 @@ protected:
 class DefaultMode : public ModeBase
 {
 public:
-  DefaultMode();
-  explicit DefaultMode(const std::string & mode_name) = delete;
+  explicit DefaultMode(const std::string & mode_name = DEFAULT_MODE);
   // cppcheck-suppress unknownMacro
   RCLCPP_DISABLE_COPY(DefaultMode)
 

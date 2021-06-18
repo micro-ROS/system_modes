@@ -21,8 +21,9 @@ sys:
 A:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
+      DEFAULT:
         ros__parameters:
           foo: 0.1
       AA:
@@ -35,11 +36,8 @@ A:
 B:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
-        ros__parameters:
-          foo: 0.1
-          bar: ONE
       EE:
         ros__parameters:
           foo: 0.2
@@ -48,3 +46,7 @@ B:
         ros__parameters:
           foo: 0.9
           bar: THREE
+      DEFAULT:
+        ros__parameters:
+          foo: 0.1
+          bar: ONE

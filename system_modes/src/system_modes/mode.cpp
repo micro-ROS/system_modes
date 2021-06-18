@@ -105,8 +105,14 @@ ModeBase::print() const
   return os.str();
 }
 
-DefaultMode::DefaultMode()
-: ModeBase(DEFAULT_MODE)
+const StateAndMode
+ModeBase::sm() const
+{
+  return StateAndMode(State::PRIMARY_STATE_ACTIVE, this->get_name());
+}
+
+DefaultMode::DefaultMode(const std::string & mode_name)
+: ModeBase(mode_name)
 {
 }
 
@@ -128,7 +134,7 @@ DefaultMode::set_part_mode(
   const StateAndMode stateAndMode)
 {
   if (stateAndMode.mode.empty()) {
-    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, DEFAULT_MODE));
+    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, ""));
   } else {
     this->mode_impl_.add_part_mode(part, stateAndMode);
   }
@@ -170,7 +176,7 @@ Mode::set_part_mode(
   const StateAndMode stateAndMode)
 {
   if (stateAndMode.mode.empty()) {
-    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, DEFAULT_MODE));
+    this->mode_impl_.add_part_mode(part, StateAndMode(stateAndMode.state, ""));
   } else {
     this->mode_impl_.add_part_mode(part, stateAndMode);
   }

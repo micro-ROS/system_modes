@@ -61,9 +61,7 @@ struct StateAndMode
       return true;
     }
 
-    return cmp.mode.compare(mode) == 0 ||                            // same mode
-           (cmp.mode.compare(DEFAULT_MODE) == 0 && mode.empty()) ||  // we consider empty and
-           (mode.compare(DEFAULT_MODE) == 0 && cmp.mode.empty());    // DEFAULT_MODE the same
+    return cmp.mode.compare(mode) == 0;
   }
 
   bool operator!=(const StateAndMode & cmp) const

@@ -4,11 +4,12 @@
 system:
   ros__parameters:
     type: system
+    defaultmode: DEFAULT
     parts:
       part0
       part1
     modes:
-      __DEFAULT__:
+      DEFAULT:
         part0: inactive
         part1: active
       AA:
@@ -38,11 +39,8 @@ part0:
 part1:
   ros__parameters:
     type: node
+    defaultmode: NORMAL
     modes:
-      __DEFAULT__:
-        ros__parameters:
-          foo: 0.1
-          bar: WARN
       AAA:
         ros__parameters:
           foo: 0.2
@@ -51,4 +49,8 @@ part1:
         ros__parameters:
           foo: 0.9
           bar: ERR
+      NORMAL:
+        ros__parameters:
+          foo: 0.1
+          bar: WARN
 

@@ -39,7 +39,7 @@ protected:
     active.state = State::PRIMARY_STATE_ACTIVE;
 
     active_default.state = State::PRIMARY_STATE_ACTIVE;
-    active_default.mode = "__DEFAULT__";
+    active_default.mode = "DEFAULT";
 
     active_foo.state = State::PRIMARY_STATE_ACTIVE;
     active_foo.mode = "FOO";
@@ -63,7 +63,6 @@ TEST_F(TestStateAndMode, comparison) {
   {
     EXPECT_EQ(inactive, inactive);
     EXPECT_EQ(active, active);
-    EXPECT_EQ(active, active_default);
 
     EXPECT_NE(active, inactive);
     EXPECT_NE(active, active_foo);
@@ -79,7 +78,7 @@ TEST_F(TestStateAndMode, string_getter) {
   {
     EXPECT_EQ("inactive"s, inactive.as_string());
     EXPECT_EQ("active"s, active.as_string());
-    EXPECT_EQ("active.__DEFAULT__"s, active_default.as_string());
+    EXPECT_EQ("active.DEFAULT"s, active_default.as_string());
     EXPECT_EQ("active.FOO"s, active_foo.as_string());
     active_foo.state = State::PRIMARY_STATE_INACTIVE;
     EXPECT_EQ("inactive"s, active_foo.as_string());
@@ -93,7 +92,7 @@ TEST_F(TestStateAndMode, string_setter) {
     copy.from_string("active");
     EXPECT_EQ(active, copy);
 
-    copy.from_string("active.__DEFAULT__");
+    copy.from_string("active.DEFAULT");
     EXPECT_EQ(active_default, copy);
 
     copy.from_string("active.FOO");

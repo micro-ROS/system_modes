@@ -40,7 +40,7 @@ System modes extend the *ACTIVE* state of the ROS 2 lifecycle and allow to speci
 * **Modes of nodes** consist of parameter values.
 * **Modes of (sub-)system)** consist of modes of their *parts*.
 
-For example, a node representing an actuator might provide different modes that specify certain maximum speed or maximum torque values. An actuation sub-system, grouping several actuator nodes, might provide modes that activate/deactivate certain contained actuator nodes and/or change their modes based on its own modes.
+For example, a node representing an actuator might provide different modes that specify certain maximum speed or maximum torque values. An actuation sub-system, grouping several actuator nodes, might provide modes that activate/deactivate certain contained actuator nodes and/or change their modes based on its own modes. Each part (system or node) has to specify a default mode that is selected, if no specific mode is requested.
 
 Both, the [system hierarchy](#hierarchical-system-modeling) as well as the system modes are specified in a system modes and hierarchy model file (SHM file, yaml format) that can be parsed by the [mode inference](#mode-inference) mechanism. The SMH file adheres to the following format *(curly brackets indicate placeholders, square brackets indicate optional parts, ellipses indicate repeatability)*:
 
@@ -48,13 +48,11 @@ Both, the [system hierarchy](#hierarchical-system-modeling) as well as the syste
 {system}:
   ros__parameters:
     type: system
+    defaultmode: {MODE}
     parts:
-      {node}
+      {node or system}
       […]
     modes:
-      __DEFAULT__:
-        {node}: {state}[.{MODE}]
-        […]
       {MODE}:
         {node}: {state}[.{MODE}]
         […]
@@ -64,11 +62,8 @@ Both, the [system hierarchy](#hierarchical-system-modeling) as well as the syste
 {node}:
   ros__parameters:
     type: node
+    defaultmode: {MODE}
     modes:
-      __DEFAULT__:
-        ros__parameters:
-          {parameter}: {value}
-          […]
       {MODE}:
         ros__parameters:
           {parameter}: {value}

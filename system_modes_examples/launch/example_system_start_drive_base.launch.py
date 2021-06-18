@@ -73,7 +73,7 @@ def generate_launch_description():
     drive_base_change_mode_to_DEFAULT = launch.actions.EmitEvent(
         event=launch_system_modes.events.ChangeMode(
             system_part_matcher=launch.events.matchers.matches_action(drive_base),
-            mode_name='__DEFAULT__',
+            mode_name='NORMAL',
         ))
 
     drive_base_change_mode_to_FAST = launch.actions.EmitEvent(
@@ -98,7 +98,7 @@ def generate_launch_description():
     on_DEFAULT_mode = launch.actions.RegisterEventHandler(
         launch_system_modes.event_handlers.OnModeChanged(
             target_system_part=drive_base,
-            goal_mode='__DEFAULT__',
+            goal_mode='NORMAL',
             entities=[drive_base_change_mode_to_FAST]))
 
     description = launch.LaunchDescription()

@@ -38,7 +38,7 @@ class Mode;
 using ModeBasePtr = std::shared_ptr<ModeBase>;
 using ModeConstPtr = std::shared_ptr<const ModeBase>;
 using ModePtr = std::shared_ptr<Mode>;
-using DefaultModePtr = std::shared_ptr<DefaultMode>;
+using DefaultModePtr = std::shared_ptr<const DefaultMode>;
 
 using ModeMap = std::map<std::string, ModeConstPtr>;
 

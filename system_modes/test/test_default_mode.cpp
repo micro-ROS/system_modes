@@ -40,14 +40,14 @@ protected:
 
   void SetUp()
   {
-    default_mode = DefaultModePtr(new DefaultMode("custom name"));
+    default_mode = std::make_shared<DefaultMode>("custom name");
   }
 
   void TearDown()
   {
   }
 
-  DefaultModePtr default_mode;
+  std::shared_ptr<DefaultMode> default_mode;
 };
 
 /*

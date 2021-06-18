@@ -22,12 +22,14 @@
 #include <vector>
 
 #include "system_modes/mode.hpp"
+#include "system_modes/mode_impl.hpp"
 
 using std::string;
 using std::vector;
 using rclcpp::Parameter;
 
 using system_modes::Mode;
+using system_modes::DEFAULT_MODE;
 using system_modes::DefaultMode;
 using system_modes::DefaultModePtr;
 
@@ -41,7 +43,7 @@ protected:
 
   void SetUp()
   {
-    default_mode = DefaultModePtr(new DefaultMode());
+    default_mode = std::make_shared<DefaultMode>();
 
     Parameter param1("foo", "bar");
     Parameter param2("fubar", 0.123);
@@ -57,7 +59,7 @@ protected:
   {
   }
 
-  DefaultModePtr default_mode;
+  std::shared_ptr<DefaultMode> default_mode;
 };
 
 /*
@@ -67,6 +69,11 @@ TEST_F(TestMode, construction_and_destruction) {
   {
     vector<string> parameter_names({"foo", "fubar"});
     DefaultModePtr default_mode_null;
+
+    DefaultModePtr default_mode_no_custom_name(new DefaultMode());
+    EXPECT_EQ(DEFAULT_MODE, default_mode_no_custom_name->get_name());
+    DefaultModePtr default_mode_custom_name(new DefaultMode("custom"));
+    EXPECT_EQ("custom", default_mode_custom_name->get_name());
 
     Mode * mode;
 

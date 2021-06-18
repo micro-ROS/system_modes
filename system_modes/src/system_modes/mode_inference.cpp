@@ -46,9 +46,9 @@ ModeInference::ModeInference(const string & model_path)
   systems_(), systems_target_(),
   modes_(),
   nodes_mutex_(), systems_mutex_(), modes_mutex_(), default_modes_mutex_(),
-  parts_mutex_(), nodes_target_mutex_(), systems_target_mutex_()
+  nodes_target_mutex_(), systems_target_mutex_()
 {
-  this->read_modes_from_model(model_path);
+  this->parse_smh_file(model_path);
 }
 
 void
@@ -104,7 +104,7 @@ ModeInference::update_param(const string & node, Parameter & param)
   // TODO(anordman): Think about, how to handle the leading slash - never? always?
   string nodename = node;
   const auto start = nodename.find_first_not_of("/");
-  if (start != std::string::npos) {
+  if (start != string::npos) {
     nodename = nodename.substr(start);
   }
 
@@ -461,17 +461,17 @@ ModeInference::get_default_mode(const string & part) const
   return modes_.at(part).at(get_default_mode_name(part));
 }
 
-const std::string
+const string
 ModeInference::get_default_mode_name(const string & part) const
 {
   std::shared_lock<shared_mutex> mlock(this->default_modes_mutex_);
   return default_modes_.at(part);
 }
 
-std::vector<std::string>
-ModeInference::get_available_modes(const std::string & part) const
+std::vector<string>
+ModeInference::get_available_modes(const string & part) const
 {
-  std::vector<std::string> modes;
+  std::vector<string> modes;
   for (auto mode : this->modes_.at(part)) {
     modes.push_back(mode.first);
   }
@@ -479,198 +479,40 @@ ModeInference::get_available_modes(const std::string & part) const
 }
 
 void
-ModeInference::read_modes_from_model(const string & model_path)
+ModeInference::parse_smh_file(const string & model_path)
 {
-  std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
-  std::unique_lock<shared_mutex> slock(this->systems_mutex_);
-  std::unique_lock<shared_mutex> mlock(this->modes_mutex_);
-  std::unique_lock<shared_mutex> dmlock(this->default_modes_mutex_);
-  std::unique_lock<shared_mutex> plock(this->parts_mutex_);
-
+  // Parse yaml to parameter map
   rcl_params_t * yaml_params = rcl_yaml_node_struct_init(rcl_get_default_allocator());
   if (!rcl_parse_yaml_file(model_path.c_str(), yaml_params)) {
     throw std::runtime_error("Failed to parse modes and parameters from: " + model_path);
   }
-
-  rclcpp::ParameterMap param_map = rclcpp::parameter_map_from(yaml_params);
+  ParameterMap smh = rclcpp::parameter_map_from(yaml_params);
   rcl_yaml_node_struct_fini(yaml_params);
 
-  ParameterMap::iterator it, part_start_it;
-  string old_part_name;
-  for (it = param_map.begin(); it != param_map.end(); it++) {
-    string part_name(it->first.substr(1));
+  // Find all parts (systems, nodes) and their modes
+  find_parts_and_modes(smh);
 
-    auto itm = this->modes_.find(part_name);
-    if (itm == this->modes_.end()) {
-      this->modes_.emplace(part_name, ModeMap());
+  // Parse all modes - start with default modes...
+  std::map<string, string>::const_iterator mit;
+  for (mit = default_modes_.begin(); mit != default_modes_.end(); mit++) {
+    parse_mode(smh, mit->first, mit->second, true);
+  }
+
+  // then non-default mdoes of systems
+  for (auto system = std::begin(systems_); system != std::end(systems_); ++system) {
+    ModeMap::const_iterator mit;
+    auto modes = modes_.at(system->first);
+    for (mit = modes.begin(); mit != modes.end(); mit++) {
+      parse_mode(smh, system->first, mit->first);
     }
+  }
 
-    // First, look for a default mode
-    string default_mode_name;
-    part_start_it = it;
-    for (auto & param : it->second) {
-      if (param.get_name().compare("defaultmode") == 0) {
-        default_mode_name = param.value_to_string();
-        break;
-      } else if (param.get_name().compare("type") != 0) {
-        string mode_name;
-
-        // Parse mode definitions
-        std::size_t foundm = param.get_name().find("modes.");
-        if (foundm != string::npos) {
-          std::size_t foundmr = param.get_name().find(".", 6);
-          if (foundmr != string::npos) {
-            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
-          } else {
-            continue;
-          }
-        } else {
-          continue;
-        }
-
-        /**
-         * Check for mode with name '__DEFAULT__'
-         *
-         * Necessary for backward-compatibility, will get deprecated soon, see
-         * https://github.com/micro-ROS/system_modes/issues/69
-         */
-        if (mode_name.compare(DEFAULT_MODE) == 0) {
-          default_mode_name = DEFAULT_MODE;
-          std::cerr << "WARNING: Specifying the default mode just by its name '__DEFAULT__'" <<
-            " is deprecated. Please specify the 'defaultmode' parameter for '" <<
-            part_name << "' instead." << std::endl;
-          break;
-        }
-      }
-    }
-    if (default_mode_name.empty()) {
-      throw std::runtime_error("Failed to find default mode for " + part_name);
-    }
-
-    default_modes_[part_name] = default_mode_name;
-    it = part_start_it;
-
-    // Build up default mode
-    DefaultModePtr default_mode = std::make_shared<DefaultMode>(default_mode_name);
-    it = part_start_it;
-    for (auto & param : it->second) {
-      if (param.get_name().compare("type") != 0) {
-        string mode_name;
-
-        // Parse mode definitions
-        std::size_t foundm = param.get_name().find("modes.");
-        if (foundm != string::npos) {
-          std::size_t foundmr = param.get_name().find(".", 6);
-          if (foundmr != string::npos) {
-            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
-          } else {
-            continue;
-          }
-        } else {
-          continue;
-        }
-        if (mode_name.compare(default_mode_name) != 0) {
-          continue;
-        }
-
-        // valid parameter, add to mode map
-        std::size_t found = param.get_name().find("ros__parameters");
-        if (found != string::npos) {
-          this->add_param_to_mode(default_mode, param);
-        } else {
-          // part mode
-          string part_part = param.get_name();
-          std::size_t foundr = param.get_name().rfind(".");
-          if (foundr != string::npos) {
-            part_part = param.get_name().substr(foundr + 1);
-          }
-
-          string state(param.value_to_string());
-          string smode;
-          foundr = param.value_to_string().rfind(".");
-          if (foundr != string::npos) {
-            state = param.value_to_string().substr(0, foundr);
-            smode = param.value_to_string().substr(foundr + 1);
-          }
-
-          default_mode->set_part_mode(part_part, StateAndMode(state_id_(state), smode));
-        }
-        this->modes_[part_name].emplace(default_mode_name, default_mode);
-
-      } else {
-        if (param.value_to_string().compare("node") != 0) {
-          this->systems_.emplace(
-            part_name,
-            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
-        } else {
-          this->nodes_.emplace(
-            part_name,
-            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
-        }
-      }
-    }
-
-    // Build up non-default modes
-    ModeBasePtr mode;
-    it = part_start_it;
-    for (auto & param : it->second) {
-      if (param.get_name().compare("type") != 0) {
-        string mode_name;
-
-        // Parse mode definitions
-        std::size_t foundm = param.get_name().find("modes.");
-        if (foundm != string::npos) {
-          std::size_t foundmr = param.get_name().find(".", 6);
-          if (foundmr != string::npos) {
-            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
-          } else {
-            continue;
-          }
-        } else {
-          continue;
-        }
-        if (mode_name.compare(default_mode_name) == 0) {
-          continue;
-        }
-
-        // valid parameter, add to mode map
-        if (!mode || mode->get_name().compare(mode_name) != 0) {
-          mode = std::make_shared<Mode>(mode_name, default_mode);
-        }
-        std::size_t found = param.get_name().find("ros__parameters");
-        if (found != string::npos) {
-          this->add_param_to_mode(mode, param);
-        } else {
-          // part mode
-          string part_part = param.get_name();
-          std::size_t foundr = param.get_name().rfind(".");
-          if (foundr != string::npos) {
-            part_part = param.get_name().substr(foundr + 1);
-          }
-
-          string state(param.value_to_string());
-          string smode;
-          foundr = param.value_to_string().rfind(".");
-          if (foundr != string::npos) {
-            state = param.value_to_string().substr(0, foundr);
-            smode = param.value_to_string().substr(foundr + 1);
-          }
-
-          mode->set_part_mode(part_part, StateAndMode(state_id_(state), smode));
-        }
-        this->modes_[part_name].emplace(mode->get_name(), mode);
-
-      } else {
-        if (param.value_to_string().compare("node") != 0) {
-          this->systems_.emplace(
-            part_name,
-            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
-        } else {
-          this->nodes_.emplace(
-            part_name,
-            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
-        }
-      }
+  // then non-default modes of nodes
+  for (auto node = std::begin(nodes_); node != std::end(nodes_); ++node) {
+    ModeMap::const_iterator mit;
+    auto modes = modes_.at(node->first);
+    for (mit = modes.begin(); mit != modes.end(); mit++) {
+      parse_mode(smh, node->first, mit->first);
     }
   }
 }
@@ -679,9 +521,9 @@ void
 ModeInference::add_param_to_mode(ModeBasePtr mode, const Parameter & param)
 {
   // TODO(anordman): All of this has to be easier
-  std::string param_name = param.get_name();
+  string param_name = param.get_name();
   std::size_t foundr = param.get_name().rfind("ros__parameters");
-  if (foundr != std::string::npos) {
+  if (foundr != string::npos) {
     param_name = param_name.substr(foundr + strlen("ros__parameters") + 1);
   }
   auto paramMsg = param.to_parameter_msg();
@@ -774,7 +616,7 @@ ModeInference::matching_parameters(const Parameter & target, const Parameter & a
 
 bool
 ModeInference::matching_modes(
-  const std::string & part,
+  const string & part,
   const StateAndMode & a,
   const StateAndMode & b) const
 {
@@ -872,6 +714,182 @@ ModeInference::get_deviation()
   }
 
   return deviation;
+}
+
+void
+ModeInference::find_parts_and_modes(const ParameterMap & smh)
+{
+  std::unique_lock<shared_mutex> nlock(this->nodes_mutex_);
+  std::unique_lock<shared_mutex> slock(this->systems_mutex_);
+  std::unique_lock<shared_mutex> mlock(this->modes_mutex_);
+  std::unique_lock<shared_mutex> dmlock(this->default_modes_mutex_);
+
+  ParameterMap::const_iterator it, part_start_it;
+  string part_name_tmp;
+
+  for (it = smh.begin(); it != smh.end(); it++) {
+    string part_name(it->first.substr(1));
+
+    auto itm = modes_.find(part_name);
+    if (itm == modes_.end()) {
+      modes_.emplace(part_name, ModeMap());
+    }
+
+    // First, find default mode for each part
+    string default_mode_name;
+    part_start_it = it;
+    for (auto & param : it->second) {
+      if (param.get_name().compare("defaultmode") == 0) {
+        default_mode_name = param.value_to_string();
+        break;
+      } else if (param.get_name().compare("type") != 0) {
+        string mode_name;
+
+        // Parse mode definitions
+        std::size_t foundm = param.get_name().find("modes.");
+        if (foundm != string::npos) {
+          std::size_t foundmr = param.get_name().find(".", 6);
+          if (foundmr != string::npos) {
+            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
+          } else {
+            continue;
+          }
+        } else {
+          continue;
+        }
+
+        /**
+         * Check for mode with name '__DEFAULT__'
+         *
+         * Necessary for backward-compatibility, will get deprecated soon, see
+         * https://github.com/micro-ROS/system_modes/issues/69
+         */
+        if (mode_name.compare(DEFAULT_MODE) == 0) {
+          default_mode_name = DEFAULT_MODE;
+          std::cerr << "WARNING: Specifying the default mode just by its name '__DEFAULT__'" <<
+            " is deprecated. Please specify the 'defaultmode' parameter for '" <<
+            part_name << "' instead." << std::endl;
+          break;
+        }
+      }
+    }
+    if (default_mode_name.empty()) {
+      throw std::runtime_error("Failed to find default mode for " + part_name);
+    }
+    default_modes_[part_name] = default_mode_name;
+
+    // Find non-default modes
+    ModeBasePtr mode;
+    it = part_start_it;
+    for (auto & param : it->second) {
+      if (param.get_name().compare("type") != 0) {
+        string mode_name;
+
+        // Parse mode definitions
+        std::size_t foundm = param.get_name().find("modes.");
+        if (foundm != string::npos) {
+          std::size_t foundmr = param.get_name().find(".", 6);
+          if (foundmr != string::npos) {
+            mode_name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
+          } else {
+            continue;
+          }
+        } else {
+          continue;
+        }
+        if (!mode_name.empty() &&
+          mode_name.compare(default_mode_name) != 0 &&
+          modes_.find(mode_name) == modes_.end())
+        {
+          modes_[part_name].emplace(mode_name, mode);
+        }
+      } else {
+        if (param.value_to_string().compare("node") != 0) {
+          systems_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
+        } else {
+          nodes_.emplace(
+            part_name,
+            StateAndMode(State::PRIMARY_STATE_UNKNOWN, ""));
+        }
+      }
+    }
+  }
+}
+
+void
+ModeInference::parse_mode(
+  const ParameterMap & smh,
+  const string & part_name,
+  const string & mode_name,
+  bool is_default_mode)
+{
+  ModeBasePtr mode;
+  if (is_default_mode) {
+    mode = std::make_shared<DefaultMode>(mode_name);
+  } else {
+    mode = std::make_shared<Mode>(
+      mode_name,
+      std::static_pointer_cast<const DefaultMode>(get_default_mode(part_name)));
+  }
+
+  for (ParameterMap::const_iterator it = smh.begin(); it != smh.end(); it++) {
+    if (it->first.substr(1).compare(part_name) != 0) {
+      continue;
+    }
+
+    // First, look for a default mode
+    for (auto & param : it->second) {
+      if (param.get_name().compare("defaultmode") == 0 ||
+        param.get_name().compare("type") == 0)
+      {
+        continue;
+      }
+
+      // Mode of this parameter
+      std::size_t foundm = param.get_name().find("modes.");
+      if (foundm != string::npos) {
+        std::size_t foundmr = param.get_name().find(".", 6);
+        if (foundmr != string::npos) {
+          auto name = param.get_name().substr(foundm + 6, foundmr - foundm - 6);
+          if (name.compare(mode_name) != 0) {
+            continue;
+          }
+        } else {
+          continue;
+        }
+      } else {
+        continue;
+      }
+
+      // valid parameter, add to mode
+      std::size_t found = param.get_name().find("ros__parameters");
+      if (found != string::npos) {
+        this->add_param_to_mode(mode, param);
+      } else {
+        // part mode
+        string part_part = param.get_name();
+        std::size_t foundr = param.get_name().rfind(".");
+        if (foundr != string::npos) {
+          part_part = param.get_name().substr(foundr + 1);
+        }
+
+        string state(param.value_to_string());
+        string part_mode;
+        foundr = param.value_to_string().rfind(".");
+        if (foundr != string::npos) {
+          state = param.value_to_string().substr(0, foundr);
+          part_mode = param.value_to_string().substr(foundr + 1);
+        }
+
+        mode->set_part_mode(part_part, StateAndMode(state_id_(state), part_mode));
+      }
+    }
+  }
+
+  std::unique_lock<shared_mutex> mlock(this->modes_mutex_);
+  modes_[part_name][mode_name] = mode;
 }
 
 }  // namespace system_modes

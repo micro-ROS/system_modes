@@ -87,12 +87,28 @@ public:
   virtual ~ModeInference() = default;
 
 protected:
+  virtual void parse_smh_file(const std::string & model_path);
+
+  virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
   virtual bool matching_parameters(const rclcpp::Parameter &, const rclcpp::Parameter &) const;
 
-  virtual void read_modes_from_model(const std::string & model_path);
-  virtual void add_param_to_mode(ModeBasePtr, const rclcpp::Parameter &);
-
 private:
+  /**
+   * Parse SMH and find all parts (systems, nodes) and all their modes
+   *
+   * Post condition: We know all
+   * * Parts (systems, nodes)
+   * * Default modes of all parts
+   * * Non-default modes of all parts
+   * Members nodes_, systems_, default_modes_, and modes_ are populated.
+   */
+  virtual void find_parts_and_modes(const rclcpp::ParameterMap & smh);
+  virtual void parse_mode(
+    const rclcpp::ParameterMap & smh,
+    const std::string & part_name,
+    const std::string & mode_name,
+    bool is_default_mode = false);
+
   StatesMap nodes_, nodes_target_, nodes_cache_;
   StatesMap systems_, systems_target_, systems_cache_;
   std::map<std::string, ModeMap> modes_;
@@ -102,7 +118,7 @@ private:
   mutable std::shared_timed_mutex
     nodes_mutex_, systems_mutex_,
     modes_mutex_, default_modes_mutex_,
-    parts_mutex_, param_mutex_;
+    param_mutex_;
   mutable std::shared_timed_mutex
     nodes_target_mutex_, systems_target_mutex_;
   mutable std::shared_timed_mutex

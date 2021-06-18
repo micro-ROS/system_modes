@@ -528,11 +528,6 @@ ModeInference::read_modes_from_model(const string & model_path)
           continue;
         }
 
-        // Take the first one as backup
-        if (default_mode_name.empty()) {
-          default_mode_name = mode_name;
-        }
-
         /**
          * Check for mode with name '__DEFAULT__'
          *
@@ -541,7 +536,7 @@ ModeInference::read_modes_from_model(const string & model_path)
          */
         if (mode_name.compare(DEFAULT_MODE) == 0) {
           default_mode_name = DEFAULT_MODE;
-          std::cout << "WARNING: Specifying the default mode just by its name '__DEFAULT__'" <<
+          std::cerr << "WARNING: Specifying the default mode just by its name '__DEFAULT__'" <<
             " is deprecated. Please specify the 'defaultmode' parameter for '" <<
             part_name << "' instead." << std::endl;
           break;

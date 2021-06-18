@@ -108,10 +108,7 @@ ModeBase::print() const
 const StateAndMode
 ModeBase::sm() const
 {
-  StateAndMode sm;
-  sm.state = State::PRIMARY_STATE_ACTIVE;
-  sm.mode = this->get_name();
-  return sm;
+  return StateAndMode(State::PRIMARY_STATE_ACTIVE, this->get_name());
 }
 
 DefaultMode::DefaultMode(const std::string & mode_name)

@@ -4,12 +4,13 @@
 actuation:
   ros__parameters:
     type: system
+    defaultmode: DEFAULT
     parts:
       drive_base
       left/manipulator
       right/manipulator
     modes:
-      __DEFAULT__:
+      DEFAULT:
         drive_base: active
         left/manipulator: inactive
         right/manipulator: active.WEAK
@@ -25,8 +26,9 @@ actuation:
 left/manipulator:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
+      DEFAULT:
         ros__parameters:
           max_torque: 0.1
       WEAK:
@@ -39,8 +41,9 @@ left/manipulator:
 drive_base:
   ros__parameters:
     type: node
+    defaultmode: NORMAL
     modes:
-      __DEFAULT__:
+      NORMAL:
         ros__parameters:
           max_speed: 0.1
           controller: PID
@@ -56,8 +59,9 @@ drive_base:
 right/manipulator:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
-      __DEFAULT__:
+      DEFAULT:
         ros__parameters:
           max_torque: 0.11
       WEAK:

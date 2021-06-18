@@ -40,6 +40,7 @@ actuation:
 manipulator:
   ros__parameters:
     type: node
+    defaultmode: DEFAULT
     modes:
       WEAK:
         ros__parameters:
@@ -47,7 +48,7 @@ manipulator:
       STRONG:
         ros__parameters:
           max_torque: 0.2
-      __DEFAULT__:
+      DEFAULT:
         ros__parameters:
           max_torque: 0.1
 

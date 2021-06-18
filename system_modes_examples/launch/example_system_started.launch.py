@@ -84,7 +84,7 @@ def generate_launch_description():
     on_DEFAULT_mode = launch.actions.RegisterEventHandler(
         launch_system_modes.event_handlers.OnModeChanged(
             target_system_part=actuation,
-            goal_mode='__DEFAULT__',
+            goal_mode='DEFAULT',
             entities=[actuation_change_mode_to_PERFORMANCE]))
 
     description = launch.LaunchDescription()

@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>launch_system_modes</name>
-  <version>0.8.0</version>
+  <version>0.9.0</version>
   <description>
     System modes specific extensions to the launch tool, i.e. launch actions, events, and event
     handlers for system modes.

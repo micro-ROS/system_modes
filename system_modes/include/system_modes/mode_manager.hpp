@@ -30,6 +30,7 @@
 
 #include "system_modes/mode_handling.hpp"
 #include "system_modes/mode_inference.hpp"
+#include "system_modes/visibility_control.hpp"
 #include "system_modes_msgs/srv/change_mode.hpp"
 #include "system_modes_msgs/srv/get_mode.hpp"
 #include "system_modes_msgs/srv/get_available_modes.hpp"
@@ -41,63 +42,107 @@ namespace system_modes
 class ModeManager : public rclcpp::Node
 {
 public:
+  SYSTEM_MODES_PUBLIC
   ModeManager();
+
+  SYSTEM_MODES_PUBLIC
   ModeManager(const ModeManager &) = delete;
 
-  std::shared_ptr<ModeInference> inference();
-  virtual void handle_system_deviation(const std::string & reason);
+  SYSTEM_MODES_PUBLIC
+  virtual
+  ~ModeManager();
 
-  virtual ~ModeManager() = default;
+  SYSTEM_MODES_PUBLIC
+  std::shared_ptr<ModeInference>
+  inference();
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  handle_system_deviation(const std::string & reason);
 
 protected:
-  virtual void add_system(const std::string &);
-  virtual void add_node(const std::string &);
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  add_system(const std::string &);
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  add_node(const std::string &);
 
   // Lifecycle service callbacks
-  virtual void on_change_state(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_change_state(
     const std::string &,
     const std::shared_ptr<lifecycle_msgs::srv::ChangeState::Request>,
     std::shared_ptr<lifecycle_msgs::srv::ChangeState::Response>);
-  virtual void on_get_state(
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_get_state(
     const std::string &,
     std::shared_ptr<lifecycle_msgs::srv::GetState::Response>);
-  virtual void on_get_available_states(
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_get_available_states(
     const std::string &,
     std::shared_ptr<lifecycle_msgs::srv::GetAvailableStates::Response>);
 
   // Mode service callbacks
-  virtual void on_change_mode(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_change_mode(
     const std::string &,
     const std::shared_ptr<system_modes_msgs::srv::ChangeMode::Request>,
     std::shared_ptr<system_modes_msgs::srv::ChangeMode::Response>);
-  virtual void on_get_mode(
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_get_mode(
     const std::string &,
     std::shared_ptr<system_modes_msgs::srv::GetMode::Response>);
-  virtual void on_get_available_modes(
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  on_get_available_modes(
     const std::string &,
     std::shared_ptr<system_modes_msgs::srv::GetAvailableModes::Response>);
 
-  virtual bool change_state(
+  SYSTEM_MODES_PUBLIC
+  virtual bool
+  change_state(
     const std::string &,
     unsigned int,
     bool transitive = true);
-  virtual bool change_mode(
+
+  SYSTEM_MODES_PUBLIC
+  virtual bool
+  change_mode(
     const std::string &,
     const std::string &);
 
-  virtual void change_part_state(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  change_part_state(
     const std::string &,
     unsigned int);
-  virtual void change_part_mode(
+
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  change_part_mode(
     const std::string &,
     const std::string &);
 
-  virtual void publish_transitions();
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  publish_transitions();
 
 private:
   std::shared_ptr<ModeInference> mode_inference_;
   std::shared_ptr<ModeHandling> mode_handling_;
   rclcpp::TimerBase::SharedPtr periodic_timer_;
+
   std::string model_path_;
 
   // Lifecycle change services

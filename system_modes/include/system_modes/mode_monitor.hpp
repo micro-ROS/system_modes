@@ -14,8 +14,8 @@
 // limitations under the License.
 #pragma once
 
-#include <rclcpp/rclcpp.hpp>
 #include <rclcpp/node.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include <map>
 #include <string>
@@ -25,6 +25,7 @@
 
 #include "system_modes/mode.hpp"
 #include "system_modes/mode_inference.hpp"
+#include "system_modes/visibility_control.hpp"
 
 #include "system_modes_msgs/srv/change_mode.hpp"
 #include "system_modes_msgs/srv/get_mode.hpp"
@@ -37,22 +38,39 @@ namespace system_modes
 class ModeMonitor : public rclcpp::Node
 {
 public:
+  SYSTEM_MODES_PUBLIC
   ModeMonitor();
+
+  SYSTEM_MODES_PUBLIC
   ModeMonitor(const ModeMonitor &) = delete;
 
-  std::shared_ptr<ModeInference> inference();
+  SYSTEM_MODES_PUBLIC
+  virtual
+  ~ModeMonitor();
 
-  virtual ~ModeMonitor() = default;
+  SYSTEM_MODES_PUBLIC
+  std::shared_ptr<ModeInference>
+  inference();
 
 protected:
-  virtual void refresh() const;
-  virtual std::string header() const;
-  virtual std::string format_line(
+  SYSTEM_MODES_PUBLIC
+  virtual void
+  refresh() const;
+
+  SYSTEM_MODES_PUBLIC
+  virtual std::string
+  header() const;
+
+  SYSTEM_MODES_PUBLIC
+  virtual std::string
+  format_line(
     const std::string &,
     unsigned int, unsigned int, unsigned int,
     const std::string &, const std::string &) const;
 
-  inline const std::string MONITOR_HLINE(const std::string & label) const;
+  SYSTEM_MODES_LOCAL
+  inline const
+  std::string MONITOR_HLINE(const std::string & label) const;
 
   std::shared_ptr<ModeInference> mode_inference_;
   std::string model_path_;
@@ -60,7 +78,7 @@ protected:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
 
-  unsigned int rate_;
+  int64_t rate_;
   bool clear_screen_, verbose_;
 };
 

@@ -18,11 +18,12 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
-find_package(rclcpp REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 find_package(rcl_lifecycle REQUIRED)
+find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
-find_package(lifecycle_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(system_modes_msgs REQUIRED)
 
 add_library(mode SHARED
@@ -40,12 +41,12 @@ ament_target_dependencies(mode
   "rclcpp_lifecycle"
   "rosidl_typesupport_cpp"
   "lifecycle_msgs"
+  "std_msgs"
   "system_modes_msgs"
-)
-
+  "builtin_interfaces")
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
-target_compile_definitions(mode PRIVATE "SYSTEMMODES_BUILDING_LIBRARY")
+target_compile_definitions(mode PRIVATE "SYSTEM_MODES_BUILDING_LIBRARY")
 
 install(
   DIRECTORY include/

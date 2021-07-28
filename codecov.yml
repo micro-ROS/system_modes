@@ -1,4 +1,6 @@
 ignore:
-  - "system_modes_examples"
-  - "system_modes/test"
-  - "**/*_node.cpp"
+  - "launch_system_modes/test/*"
+  - "system_modes_examples/*"
+  - "system_modes/test/*"
+  - "test_launch_system_modes/*"
+  - "**/src/*_node.cpp"

@@ -47,6 +47,11 @@ struct ModeRule
 
 using RulesMap = std::map<std::string, ModeRule>;
 
+/**
+ * Reads and parses the error handling rules from the sytem modes and hierarchy file (SMH file).
+ * Provides getters to receive all rules that are applicable for a certain system state, usually
+ * a system deviation.
+ */
 class ModeHandling
 {
 public:

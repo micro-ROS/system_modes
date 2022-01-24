@@ -34,6 +34,11 @@
 namespace system_modes
 {
 
+/**
+ * Based on mode inference and live updates from the system, this class monitors the live
+ * system state and renders a simple command-line view of the known resp. inferred state
+ * of all systems and system parts within the SMH file.
+ */
 class ModeMonitor : public rclcpp::Node
 {
 public:

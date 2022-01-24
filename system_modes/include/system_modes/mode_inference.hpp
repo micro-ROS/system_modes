@@ -36,6 +36,12 @@ typedef std::map<std::string, StateAndMode> StatesMap;
 typedef std::map<std::string, std::map<std::string, rclcpp::Parameter>> ParametersMap;
 typedef std::map<std::string, std::pair<StateAndMode, StateAndMode>> Deviation;
 
+/**
+ * Reads and parses the sytem modes and hierarchy file (SMH file) and provides
+ * getters to access the resulting model. Provides setters to inform inference about
+ * the live system state (update current state and mode targets as well as current
+ * parametization).
+ */
 class ModeInference
 {
 public:
@@ -71,6 +77,11 @@ public:
    * mode transitions.
    */
   virtual Deviation infer_transitions();
+
+  /**
+   * Infers deviations of the _target_ system state (state and mode of systems and nodes)
+   * and their respective _actual_ state.
+   */
   virtual Deviation get_deviation();
 
   virtual StateAndMode get_target(const std::string & part) const;

@@ -71,6 +71,13 @@ protected:
   ModeImpl mode_impl_;
 };
 
+/**
+ * Represents a default system mode.
+ *
+ * For default modes of nodes it holds the according parametrization, for
+ * default modes of systems, it holds the according states and modes of its
+ * system parts.
+ */
 class DefaultMode : public ModeBase
 {
 public:
@@ -87,6 +94,13 @@ public:
     const StateAndMode stateAndMode);
 };
 
+/**
+ * Represents a (non-default) system mode.
+ *
+ * For default modes of nodes it holds the according parametrization, for
+ * default modes of systems, it holds the according states and modes of its
+ * system parts.
+ */
 class Mode : public ModeBase
 {
 public:

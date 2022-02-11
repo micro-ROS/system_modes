@@ -1,4 +1,4 @@
-name: "CI: foxy, galactic on focal"
+name: "CI: rolling on jammy"
 
 on:
   push:
@@ -15,8 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04 ]
-        ros_distribution: [ foxy, galactic, rolling ]
+        os: [ ubuntu-22.04 ]
+        ros_distribution: [ rolling ]
     steps:
     - uses: actions/checkout@v2.4.0
     - uses: ros-tooling/setup-ros@v0.2

@@ -148,3 +148,7 @@ When designing the hierarchy of your system, try to group parts semantically, e.
 When designing system modes for your system, try to focus on platform-specific aspects (so those that are generally present) rather than aspects specific to a certain application. Good examples are *degraded* and *performance* modes of the platform, bad examples are system modes to encode the current number of (grasping) re-tries.
 
 Also, do not model any "read-only" system modes, e.g., modes that discretize/encode a read-only internal state. An example for such a mode specification to avoid is *low energy* and *full*, discretizing the charging level of a battery component. The System Modes concept assumes that the activatability of a system mode of a given node or subsystem should depend only on the states and modes of the other nodes and subsystems (and on the higher-level task executed by some deliberation layer). Note that the same applies to the ROS 2 node lifecycle states (*Unconfigured*, *Inactive*, etc.). The only exception is the *ErrorProcessing* state, which can be entered autonomously by the node itself. Within the mode inference, if a node performs a transition to *ErrorProcessing*, this is automatically propagated upwards as inferred state along the hierarchy. It is up to the deliberation layer to handle the failure of this node or subsystem.
+
+## Quality Declaration
+
+This package claims to be in the Quality Level 3 category, see the [Quality Declaration](QUALITY_DECLARATION.md) for more details.

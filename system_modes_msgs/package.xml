@@ -8,6 +8,7 @@
     for the system modes package.
   </description>
   <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
+  <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
   <license>Apache License 2.0</license>
 
   <url type="website">https://micro.ros.org/docs/concepts/client_library/lifecycle_and_system_modes/</url>

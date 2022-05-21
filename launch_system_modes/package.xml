@@ -10,6 +10,7 @@
     handlers for system modes.
   </description>
   <maintainer email="arne.nordmann@de.bosch.com">Arne Nordmann</maintainer>
+  <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
   <license>Apache License 2.0</license>
 
   <depend>ament_index_python</depend>

@@ -9,7 +9,7 @@
     System modes specific extensions to the launch tool, i.e. launch actions, events, and event
     handlers for system modes.
   </description>
-  <maintainer email="arne.nordmann@de.bosch.com">Arne Nordmann</maintainer>
+  <maintainer email="github@norro.de">Arne Nordmann</maintainer>
   <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
   <license>Apache License 2.0</license>
 

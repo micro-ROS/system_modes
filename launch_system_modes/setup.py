@@ -20,7 +20,7 @@ setup(
         ],
     zip_safe=True,
     maintainer='Arne Nordmann',
-    maintainer_email='arne.nordmann@de.bosch.com',
+    maintainer_email='github@norro.de',
     keywords=['ROS', 'launch', 'system modes'],
     description='System modes specific extensions to launch_ros.',
     license='Apache License 2.0',

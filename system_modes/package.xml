@@ -10,7 +10,7 @@
     that determine the configuration of these nodes and (sub-)systems in
     terms of their parameter values.
   </description>
-  <maintainer email="arne.nordmann@bosch.com">Arne Nordmann</maintainer>
+  <maintainer email="github@norro.de">Arne Nordmann</maintainer>
   <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
   <license>Apache License 2.0</license>
 

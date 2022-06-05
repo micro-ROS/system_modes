@@ -16,10 +16,6 @@
 
 #include "system_modes/mode_impl.hpp"
 
-#include <rclcpp/macros.hpp>
-#include <rclcpp/node_interfaces/node_parameters.hpp>
-#include <rclcpp/parameter_map.hpp>
-
 #include <map>
 #include <mutex>
 #include <string>
@@ -27,6 +23,10 @@
 #include <memory>
 #include <utility>
 #include <iostream>
+
+#include <rclcpp/macros.hpp>
+#include <rclcpp/node_interfaces/node_parameters.hpp>
+#include <rclcpp/parameter_map.hpp>
 
 namespace system_modes
 {

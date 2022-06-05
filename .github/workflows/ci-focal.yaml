@@ -1,0 +1,41 @@
+name: "CI: foxy, galactic on focal"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # Run once per day to detect broken dependencies.
+    - cron: '17 6 * * *'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-20.04 ]
+        ros_distribution: [ foxy, galactic ]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ros-tooling/setup-ros@v0.3
+      with:
+        required-ros-distributions: ${{ matrix.ros_distribution }}
+    - uses : ros-tooling/action-ros-ci@v0.2
+      with:
+        package-name: "launch_system_modes system_modes system_modes_examples system_modes_msgs test_launch_system_modes"
+        target-ros2-distro: ${{ matrix.ros_distribution }}
+        colcon-defaults: |
+          {
+            "build": {
+              "mixin": ["coverage-gcc", "coverage-pytest"]
+            },
+            "test": {
+              "mixin": ["coverage-pytest"]
+            }
+          }
+        colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+    - uses: codecov/codecov-action@v3
+      with:
+        file: ros_ws/lcov/total_coverage.info

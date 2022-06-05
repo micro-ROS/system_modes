@@ -1,4 +1,4 @@
-name: "CI: foxy, galactic, rolling"
+name: "CI: humble, rolling on jammy"
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
   schedule:
     # Run once per day to detect broken dependencies.
-    - cron: '17 6 * * *'
+    - cron: '17 5 * * *'
 
 jobs:
   build:
@@ -15,16 +15,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04 ]
-        ros_distribution: [ foxy, galactic, rolling ]
+        os: [ ubuntu-22.04 ]
+        ros_distribution: [ humble, rolling ]
     steps:
-    - uses: actions/checkout@v2.3.4
-    - uses: ros-tooling/setup-ros@v0.2
+    - uses: actions/checkout@v3
+    - uses: ros-tooling/setup-ros@v0.3
       with:
         required-ros-distributions: ${{ matrix.ros_distribution }}
     - uses : ros-tooling/action-ros-ci@v0.2
       with:
-        package-name: "launch_system_modes system_modes system_modes_examples system_modes_msgs test_launch_system_modes "
+        package-name: "launch_system_modes system_modes system_modes_examples system_modes_msgs test_launch_system_modes"
         target-ros2-distro: ${{ matrix.ros_distribution }}
         colcon-defaults: |
           {
@@ -36,6 +36,6 @@ jobs:
             }
           }
         colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-    - uses: codecov/codecov-action@v1.5.0
+    - uses: codecov/codecov-action@v3
       with:
         file: ros_ws/lcov/total_coverage.info

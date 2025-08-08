@@ -7,13 +7,15 @@
     Interface package, containing message definitions and service definitions
     for the system modes package.
   </description>
-  <maintainer email="github@norro.de">Arne Nordmann</maintainer>
-  <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
+  <maintainer email="ros-orphaned-packages@googlegroups.com">Unmaintained see http://wiki.ros.org/MaintenanceGuide#Claiming_Maintainership</maintainer>
   <license>Apache License 2.0</license>
 
   <url type="website">https://micro.ros.org/docs/concepts/client_library/lifecycle_and_system_modes/</url>
   <url type="repository">https://github.com/micro-ROS/system_modes</url>
   <url type="bugtracker">https://github.com/micro-ROS/system_modes/issues</url>
+
+  <author email="github@norro.de">Arne Nordmann</author>
+  <author email="ralph.lange@de.bosch.com">Ralph Lange</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>

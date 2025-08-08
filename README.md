@@ -1,3 +1,6 @@
+| :warning: This repository is no longer maintained. If you are interested in taking over maintenance, please contact [Arne Nordmann](https://github.com/norro) or [Ralph Lange](https://github.com/ralph-lange). |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 # ROS 2 System Modes
 
 [![License](https://img.shields.io/badge/License-Apache%202-blue.svg)](https://github.com/micro-ROS/system_modes/blob/master/LICENSE)
@@ -13,8 +16,6 @@ This repository explores a system modes concept that is implemented for ROS 2 in
 * [system_modes_examples](./system_modes_examples/) implements a simple example
 * [launch_system_modes](./launch_system_modes/) launch actions, events, and event handlers for system modes
 * [test_launch_system_modes](./test_launch_system_modes/) launch test for the launch_system_modes` package
-
-For further information, please contact [Arne Nordmann](https://github.com/norro) or [Ralph Lange](https://github.com/ralph-lange).
 
 ## Purpose of the Project
 

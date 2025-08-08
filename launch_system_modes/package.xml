@@ -9,9 +9,11 @@
     System modes specific extensions to the launch tool, i.e. launch actions, events, and event
     handlers for system modes.
   </description>
-  <maintainer email="github@norro.de">Arne Nordmann</maintainer>
-  <maintainer email="ralph.lange@de.bosch.com">Ralph Lange</maintainer>
+  <maintainer email="ros-orphaned-packages@googlegroups.com">Unmaintained see http://wiki.ros.org/MaintenanceGuide#Claiming_Maintainership</maintainer>
   <license>Apache License 2.0</license>
+
+  <author email="github@norro.de">Arne Nordmann</author>
+  <author email="ralph.lange@de.bosch.com">Ralph Lange</author>
 
   <depend>ament_index_python</depend>
   <depend>launch</depend>
